@@ -182,6 +182,44 @@
           "url": "code-learning/代码开发学习/easyexcel的百万级导入导出 2a7335df240480e5b971e5d6bbc3a27e/"
         },
         {
+          "name": "JVM-垃圾回收机制详解.md",
+          "title": "JVM-垃圾回收机制详解",
+          "path": "代码开发学习/JVM-垃圾回收机制详解.md",
+          "type": "file",
+          "date": "2025-12-12",
+          "categories": [
+            "代码开发学习",
+            "01-编程语言基础",
+            "JVM"
+          ],
+          "tags": [
+            "JVM"
+          ],
+          "description": "JVM垃圾回收机制详解，深入理解GC算法和垃圾回收器",
+          "permalink": null,
+          "filePath": "代码开发学习/JVM-垃圾回收机制详解.md",
+          "url": "code-learning/programming-basics/jvm/代码开发学习/JVM-垃圾回收机制详解/"
+        },
+        {
+          "name": "JVM-内存模型详解.md",
+          "title": "JVM-内存模型详解",
+          "path": "代码开发学习/JVM-内存模型详解.md",
+          "type": "file",
+          "date": "2025-12-12",
+          "categories": [
+            "代码开发学习",
+            "01-编程语言基础",
+            "JVM"
+          ],
+          "tags": [
+            "JVM"
+          ],
+          "description": "JVM内存模型详解，深入理解堆、栈、方法区等内存区域",
+          "permalink": null,
+          "filePath": "代码开发学习/JVM-内存模型详解.md",
+          "url": "code-learning/programming-basics/jvm/代码开发学习/JVM-内存模型详解/"
+        },
+        {
           "name": "JVM-入门概览.md",
           "title": "JVM-入门概览",
           "path": "代码开发学习/JVM-入门概览.md",
@@ -268,6 +306,23 @@
           "permalink": null,
           "filePath": "代码开发学习/SMS短信服务整合文档.md",
           "url": "code-learning/代码开发学习/SMS短信服务整合文档/"
+        },
+        {
+          "name": "Spring Boot 核心原理与源码解析：AOP、IOC 与自动配置.md",
+          "title": "Spring Boot 核心原理与源码解析：AOP、IOC 与自动配置",
+          "path": "代码开发学习/Spring Boot 核心原理与源码解析：AOP、IOC 与自动配置.md",
+          "type": "file",
+          "date": "2025-12-12",
+          "categories": [
+            "代码开发学习"
+          ],
+          "tags": [
+            "AOP、IOC"
+          ],
+          "description": "AOP、IOC 与自动配置",
+          "permalink": null,
+          "filePath": "代码开发学习/Spring Boot 核心原理与源码解析：AOP、IOC 与自动配置.md",
+          "url": "code-learning/代码开发学习/Spring Boot 核心原理与源码解析：AOP、IOC 与自动配置/"
         }
       ]
     },
@@ -321,5 +376,19 @@
       "files": []
     }
   ],
-  "files": []
+  "files": [
+    {
+      "name": "猛攻.md",
+      "title": "猛攻",
+      "path": "猛攻.md",
+      "type": "file",
+      "date": null,
+      "categories": [],
+      "tags": [],
+      "description": "",
+      "permalink": null,
+      "filePath": "猛攻.md",
+      "url": "未分类/猛攻/"
+    }
+  ]
 }
