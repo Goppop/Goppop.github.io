@@ -376,5 +376,25 @@
       "files": []
     }
   ],
-  "files": []
+  "files": [
+    {
+      "name": "Java 并发编程（JUC）高级组件与原理：从 AQS 到并发容器 (1).md",
+      "title": "JVM-并发编程",
+      "path": "Java 并发编程（JUC）高级组件与原理：从 AQS 到并发容器 (1).md",
+      "type": "file",
+      "date": "2025-12-17",
+      "categories": [
+        "代码开发学习",
+        "01-编程语言基础",
+        "并发编程"
+      ],
+      "tags": [
+        "并发编程"
+      ],
+      "description": "Java 并发编程（JUC）高级组件与原理",
+      "permalink": null,
+      "filePath": "Java 并发编程（JUC）高级组件与原理：从 AQS 到并发容器 (1).md",
+      "url": "/code-learning/JVM-并发编程/"
+    }
+  ]
 }
