@@ -312,7 +312,7 @@
           "title": "Spring Boot 核心原理与源码解析：AOP、IOC 与自动配置",
           "path": "代码开发学习/Spring Boot 核心原理与源码解析：AOP、IOC 与自动配置.md",
           "type": "file",
-          "date": "2025-12-12",
+          "date": "2025-12-17",
           "categories": [
             "代码开发学习"
           ],
@@ -376,19 +376,5 @@
       "files": []
     }
   ],
-  "files": [
-    {
-      "name": "猛攻.md",
-      "title": "猛攻",
-      "path": "猛攻.md",
-      "type": "file",
-      "date": null,
-      "categories": [],
-      "tags": [],
-      "description": "",
-      "permalink": null,
-      "filePath": "猛攻.md",
-      "url": "未分类/猛攻/"
-    }
-  ]
+  "files": []
 }
