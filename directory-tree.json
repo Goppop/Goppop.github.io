@@ -367,6 +367,19 @@
           "url": "trading-log/交易/25号交易记录/"
         },
         {
+          "name": "交易记录：ETH 合约多单.md",
+          "title": "交易记录：ETH 合约多单",
+          "path": "交易/交易记录：ETH 合约多单.md",
+          "type": "file",
+          "date": null,
+          "categories": [],
+          "tags": [],
+          "description": "",
+          "permalink": null,
+          "filePath": "交易/交易记录：ETH 合约多单.md",
+          "url": "/trading/交易记录：ETH 合约多单/"
+        },
+        {
           "name": "我的交易逻辑.md",
           "title": "我的趋势交易思想",
           "path": "交易/我的交易逻辑.md",
