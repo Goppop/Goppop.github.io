@@ -368,16 +368,20 @@
         },
         {
           "name": "交易记录：ETH 合约多单.md",
-          "title": "交易记录：ETH 合约多单",
+          "title": "交易记录",
           "path": "交易/交易记录：ETH 合约多单.md",
           "type": "file",
-          "date": null,
-          "categories": [],
-          "tags": [],
-          "description": "",
+          "date": "2025-12-22",
+          "categories": [
+            "交易记录"
+          ],
+          "tags": [
+            "趋势交易"
+          ],
+          "description": "2025年12月19日交易记录与思考",
           "permalink": null,
           "filePath": "交易/交易记录：ETH 合约多单.md",
-          "url": "/trading/交易记录：ETH 合约多单/"
+          "url": "/trading-log/交易记录/"
         },
         {
           "name": "我的交易逻辑.md",
