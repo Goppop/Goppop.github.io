@@ -44,24 +44,6 @@
           "url": "结构化总结回忆文档/代码开发学习/常用设计模式/"
         },
         {
-          "name": "代码开发学习-分类概览.md",
-          "title": "代码开发学习-分类概览",
-          "path": "代码开发学习/代码开发学习-分类概览.md",
-          "type": "file",
-          "date": "2025-12-12",
-          "categories": [
-            "代码开发学习"
-          ],
-          "tags": [
-            "代码开发学习",
-            "分类概览"
-          ],
-          "description": "代码开发学习知识体系概览，包含编程语言基础、框架技术、中间件技术等",
-          "permalink": null,
-          "filePath": "代码开发学习/代码开发学习-分类概览.md",
-          "url": "code-learning/代码开发学习/代码开发学习-分类概览/"
-        },
-        {
           "name": "扣费系统-从设计到开发全过程.md",
           "title": "算力平台扣费系统：从设计到开发全过程",
           "path": "代码开发学习/扣费系统-从设计到开发全过程.md",
@@ -77,6 +59,24 @@
           "permalink": null,
           "filePath": "代码开发学习/扣费系统-从设计到开发全过程.md",
           "url": "code-learning/代码开发学习/扣费系统-从设计到开发全过程/"
+        },
+        {
+          "name": "扣费系统-重构后架构设计文档.md",
+          "title": "算力平台扣费系统：重构后架构设计文档",
+          "path": "代码开发学习/扣费系统-重构后架构设计文档.md",
+          "type": "file",
+          "date": "2025-01-20",
+          "categories": [
+            "代码开发学习"
+          ],
+          "tags": [
+            "系统开发",
+            "架构重构"
+          ],
+          "description": "扣费系统重构后的架构设计、模块化拆分、组件职责说明",
+          "permalink": null,
+          "filePath": "代码开发学习/扣费系统-重构后架构设计文档.md",
+          "url": "code-learning/代码开发学习/扣费系统-重构后架构设计文档/"
         },
         {
           "name": "扣费系统对接文档.md",
@@ -217,98 +217,6 @@
           "url": "code-learning/代码开发学习/easyexcel的百万级导入导出 2a7335df240480e5b971e5d6bbc3a27e/"
         },
         {
-          "name": "Java 并发编程（JUC）高级组件与原理：从 AQS 到并发容器 (1).md",
-          "title": "Java 并发编程（JUC）高级组件与原理：从 AQS 到并发容器",
-          "path": "代码开发学习/Java 并发编程（JUC）高级组件与原理：从 AQS 到并发容器 (1).md",
-          "type": "file",
-          "date": "2025-12-17",
-          "categories": [
-            "代码开发学习"
-          ],
-          "tags": [
-            "JUC"
-          ],
-          "description": "并发编程高级组件与原理",
-          "permalink": null,
-          "filePath": "代码开发学习/Java 并发编程（JUC）高级组件与原理：从 AQS 到并发容器 (1).md",
-          "url": "code-learning/代码开发学习/Java 并发编程（JUC）高级组件与原理：从 AQS 到并发容器 (1)/"
-        },
-        {
-          "name": "JVM-垃圾回收机制详解.md",
-          "title": "JVM-垃圾回收机制详解",
-          "path": "代码开发学习/JVM-垃圾回收机制详解.md",
-          "type": "file",
-          "date": "2025-12-12",
-          "categories": [
-            "代码开发学习",
-            "01-编程语言基础",
-            "JVM"
-          ],
-          "tags": [
-            "JVM"
-          ],
-          "description": "JVM垃圾回收机制详解，深入理解GC算法和垃圾回收器",
-          "permalink": null,
-          "filePath": "代码开发学习/JVM-垃圾回收机制详解.md",
-          "url": "code-learning/programming-basics/jvm/代码开发学习/JVM-垃圾回收机制详解/"
-        },
-        {
-          "name": "JVM-内存模型详解.md",
-          "title": "JVM-内存模型详解",
-          "path": "代码开发学习/JVM-内存模型详解.md",
-          "type": "file",
-          "date": "2025-12-12",
-          "categories": [
-            "代码开发学习",
-            "01-编程语言基础",
-            "JVM"
-          ],
-          "tags": [
-            "JVM"
-          ],
-          "description": "JVM内存模型详解，深入理解堆、栈、方法区等内存区域",
-          "permalink": null,
-          "filePath": "代码开发学习/JVM-内存模型详解.md",
-          "url": "code-learning/programming-basics/jvm/代码开发学习/JVM-内存模型详解/"
-        },
-        {
-          "name": "JVM-入门概览.md",
-          "title": "JVM-入门概览",
-          "path": "代码开发学习/JVM-入门概览.md",
-          "type": "file",
-          "date": "2025-12-12",
-          "categories": [
-            "代码开发学习",
-            "01-编程语言基础",
-            "JVM"
-          ],
-          "tags": [
-            "JVM",
-            "入门概览"
-          ],
-          "description": "JVM入门概览，了解JVM是什么、为什么重要、核心组件和实践应用。",
-          "permalink": null,
-          "filePath": "代码开发学习/JVM-入门概览.md",
-          "url": "code-learning/programming-basics/jvm/代码开发学习/JVM-入门概览/"
-        },
-        {
-          "name": "jvm相关.md",
-          "title": "JVM内存模型和JVM调优",
-          "path": "代码开发学习/jvm相关.md",
-          "type": "file",
-          "date": "2025-04-14",
-          "categories": [
-            "代码开发学习"
-          ],
-          "tags": [
-            "JVM内存模型、JVM调优"
-          ],
-          "description": "文章描述",
-          "permalink": null,
-          "filePath": "代码开发学习/jvm相关.md",
-          "url": "code-learning/代码开发学习/jvm相关/"
-        },
-        {
           "name": "MapStruct.md",
           "title": "MapStruct 转换器使用总结",
           "path": "代码开发学习/MapStruct.md",
@@ -358,23 +266,6 @@
           "permalink": null,
           "filePath": "代码开发学习/SMS短信服务整合文档.md",
           "url": "code-learning/代码开发学习/SMS短信服务整合文档/"
-        },
-        {
-          "name": "Spring Boot 核心原理与源码解析：AOP、IOC 与自动配置.md",
-          "title": "Spring Boot 核心原理与源码解析：AOP、IOC 与自动配置",
-          "path": "代码开发学习/Spring Boot 核心原理与源码解析：AOP、IOC 与自动配置.md",
-          "type": "file",
-          "date": "2025-12-17",
-          "categories": [
-            "代码开发学习"
-          ],
-          "tags": [
-            "AOP、IOC"
-          ],
-          "description": "AOP、IOC 与自动配置",
-          "permalink": null,
-          "filePath": "代码开发学习/Spring Boot 核心原理与源码解析：AOP、IOC 与自动配置.md",
-          "url": "code-learning/代码开发学习/Spring Boot 核心原理与源码解析：AOP、IOC 与自动配置/"
         }
       ]
     },
