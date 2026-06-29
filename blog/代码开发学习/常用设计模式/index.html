@@ -1,0 +1,297 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-tldeq5d5><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" href="/favicon.ico"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Goppop 的博客" href="https://goppop.github.io/rss.xml"><meta name="generator" content="Astro v7.0.3"><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/7443039bbc50ce9a.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/0edeceb0e4e5adfc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/7443039bbc50ce9a.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/0edeceb0e4e5adfc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/%E5%B8%B8%E7%94%A8%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/"><!-- Primary Meta Tags --><title>常用设计模式（未全）</title><meta name="description" content="常用设计模式（未全）"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/%E5%B8%B8%E7%94%A8%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/"><meta property="og:title" content="常用设计模式（未全）"><meta property="og:description" content="常用设计模式（未全）"><meta property="og:image" content="https://goppop.github.io/_astro/blog-placeholder-1.Bx0Zcyzv.jpg"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/%E5%B8%B8%E7%94%A8%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/"><meta property="twitter:title" content="常用设计模式（未全）"><meta property="twitter:description" content="常用设计模式（未全）"><meta property="twitter:image" content="https://goppop.github.io/_astro/blog-placeholder-1.Bx0Zcyzv.jpg"><link rel="stylesheet" href="/_astro/Header.DHc1oVwj.css"><style>main[data-astro-cid-tldeq5d5]{width:100%;max-width:none;margin:0;padding:0}.article-shell[data-astro-cid-tldeq5d5]{max-width:1120px;margin:0 auto;padding:3rem 1rem 1rem}.article-head[data-astro-cid-tldeq5d5]{border-bottom:1px solid #e1d2bbe6;grid-template-columns:minmax(0,1fr) 260px;align-items:end;gap:1.5rem;padding-bottom:1.4rem;display:grid}.title[data-astro-cid-tldeq5d5]{margin:0;line-height:1}.title[data-astro-cid-tldeq5d5] h1[data-astro-cid-tldeq5d5]{max-width:12em;color:var(--accent-dark);margin:0;font-size:3.6rem;line-height:1.08}.date-card[data-astro-cid-tldeq5d5]{color:var(--muted);background:#fff9eeb3;border-radius:8px;padding:1rem;font-size:.9rem;box-shadow:0 12px 28px #58422314}.date-card[data-astro-cid-tldeq5d5] strong[data-astro-cid-tldeq5d5]{color:var(--clay);letter-spacing:0;text-transform:uppercase;margin-bottom:.4rem;font-size:.82rem;display:block}.last-updated-on[data-astro-cid-tldeq5d5]{border-top:1px solid #e1d2bbc7;margin-top:.8rem;padding-top:.8rem}.meta-row[data-astro-cid-tldeq5d5]{flex-wrap:wrap;gap:.55rem;margin-top:1rem;display:flex}.hero-image[data-astro-cid-tldeq5d5]{width:100%;max-width:1120px;margin:2rem auto 0}.hero-image[data-astro-cid-tldeq5d5] img[data-astro-cid-tldeq5d5]{box-shadow:var(--box-shadow);border-radius:6px;margin:0 auto;display:block}.prose[data-astro-cid-tldeq5d5]{width:780px;max-width:100%;color:var(--ink);margin:2.2rem auto 0;padding:0 1rem}.prose[data-astro-cid-tldeq5d5] h2{border-top:1px solid var(--line);margin-top:3.4rem;padding-top:1rem}.prose[data-astro-cid-tldeq5d5] h2:first-child{border-top:0;margin-top:0;padding-top:0}.prose[data-astro-cid-tldeq5d5] h3{color:var(--accent-dark)}.prose[data-astro-cid-tldeq5d5] p,.prose[data-astro-cid-tldeq5d5] li{font-size:1.02rem}.prose[data-astro-cid-tldeq5d5] ul,.prose[data-astro-cid-tldeq5d5] ol{padding-left:1.4rem}.prose[data-astro-cid-tldeq5d5] table{display:block;overflow-x:auto}.prose[data-astro-cid-tldeq5d5] li+li{margin-top:.35rem}@media (width<=820px){.article-shell[data-astro-cid-tldeq5d5]{padding:2rem .75rem 1rem}.article-head[data-astro-cid-tldeq5d5]{grid-template-columns:1fr}.title[data-astro-cid-tldeq5d5] h1[data-astro-cid-tldeq5d5]{font-size:2.25rem}.prose[data-astro-cid-tldeq5d5]{margin-top:2rem;padding:0 .75rem}}
+</style></head><body data-astro-cid-tldeq5d5><header data-astro-cid-nen7h5rs><nav data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs>Goppop 的博客</a><div class="internal-links" data-astro-cid-nen7h5rs><a href="/" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>首页</a><a href="/blog" class="active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>文章</a><a href="/about" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>关于</a></div><div class="social-links" data-astro-cid-nen7h5rs><a href="https://github.com/Goppop" target="_blank" data-astro-cid-nen7h5rs><span class="sr-only" data-astro-cid-nen7h5rs>Goppop GitHub</span><svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" data-astro-cid-nen7h5rs><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" data-astro-cid-nen7h5rs></path></svg></a></div></nav></header><main data-astro-cid-tldeq5d5><article data-astro-cid-tldeq5d5><div class="article-shell" data-astro-cid-tldeq5d5><header class="article-head" data-astro-cid-tldeq5d5><div class="title" data-astro-cid-tldeq5d5><p class="eyebrow" data-astro-cid-tldeq5d5>Article</p><h1 data-astro-cid-tldeq5d5>常用设计模式（未全）</h1><div class="meta-row" data-astro-cid-tldeq5d5><span class="label" data-astro-cid-tldeq5d5>结构化总结回忆文档</span><span class="label" data-astro-cid-tldeq5d5>设计模式</span></div></div><aside class="date-card" aria-label="文章日期" data-astro-cid-tldeq5d5><strong data-astro-cid-tldeq5d5>Published</strong><time datetime="2025-12-24T00:00:00.000Z">Dec 24, 2025</time></aside></header></div><div class="prose" data-astro-cid-tldeq5d5><blockquote>
+<p>长期以来是缺乏结构化和系统化的学习Java 本文档是最近打算把自己学过的用过的以及没用过的设计模式 整理出一个系统性的文档 方便自己在未来能够随时在有需要的时候进行回忆和学习 本文档考虑最坏的情形 就是完全忘记了某个设计模式的工作原理 能够支持极短时间内对该设计模式的理解可以支撑对当前业务情景的开发</p>
+</blockquote>
+<h2 id="目录">目录</h2>
+<h3 id="创建型模式creational">创建型模式（Creational）</h3>
+<ul>
+<li><a href="#%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F">单例模式</a></li>
+<li><a href="#%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F">工厂方法模式</a></li>
+<li><a href="#%E6%8A%BD%E8%B1%A1%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F">抽象工厂模式</a></li>
+<li><a href="#%E5%BB%BA%E9%80%A0%E8%80%85%E6%A8%A1%E5%BC%8F">建造者模式</a></li>
+<li><a href="#%E5%8E%9F%E5%9E%8B%E6%A8%A1%E5%BC%8F">原型模式</a></li>
+</ul>
+<h3 id="结构型模式structural">结构型模式（Structural）</h3>
+<ul>
+<li><a href="#%E9%80%82%E9%85%8D%E5%99%A8%E6%A8%A1%E5%BC%8F">适配器模式</a></li>
+<li><a href="#%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F">桥接模式</a></li>
+<li><a href="#%E7%BB%84%E5%90%88%E6%A8%A1%E5%BC%8F">组合模式</a></li>
+<li><a href="#%E8%A3%85%E9%A5%B0%E5%99%A8%E6%A8%A1%E5%BC%8F">装饰器模式</a></li>
+<li><a href="#%E5%A4%96%E8%A7%82%E6%A8%A1%E5%BC%8F">外观模式</a></li>
+<li><a href="#%E4%BA%AB%E5%85%83%E6%A8%A1%E5%BC%8F">享元模式</a></li>
+<li><a href="#%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F">代理模式</a></li>
+</ul>
+<h3 id="行为型模式behavioral">行为型模式（Behavioral）</h3>
+<ul>
+<li><a href="#%E8%B4%A3%E4%BB%BB%E9%93%BE%E6%A8%A1%E5%BC%8F">责任链模式</a></li>
+<li><a href="#%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F">命令模式</a></li>
+<li><a href="#%E8%A7%A3%E9%87%8A%E5%99%A8%E6%A8%A1%E5%BC%8F">解释器模式</a></li>
+<li><a href="#%E8%BF%AD%E4%BB%A3%E5%99%A8%E6%A8%A1%E5%BC%8F">迭代器模式</a></li>
+<li><a href="#%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F">中介者模式</a></li>
+<li><a href="#%E5%A4%87%E5%BF%98%E5%BD%95%E6%A8%A1%E5%BC%8F">备忘录模式</a></li>
+<li><a href="#%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F">观察者模式</a></li>
+<li><a href="#%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F">状态模式</a></li>
+<li><a href="#%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F">策略模式</a></li>
+<li><a href="#%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F">模板方法模式</a></li>
+<li><a href="#%E8%AE%BF%E9%97%AE%E8%80%85%E6%A8%A1%E5%BC%8F">访问者模式</a></li>
+</ul>
+<hr>
+<h2 id="创建型模式">创建型模式</h2>
+<h3 id="单例模式">单例模式</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">private</span><span style="color:#F97583"> static</span><span style="color:#F97583"> volatile</span><span style="color:#E1E4E8"> Singleton instance; </span><span style="color:#6A737D">// 1. 声明一个静态引用，初始为 null（未初始化）</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> static</span><span style="color:#E1E4E8"> Singleton </span><span style="color:#B392F0">getInstance</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (instance </span><span style="color:#F97583">==</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) {                 </span><span style="color:#6A737D">// 2. 第一次检查：如果没创建，才考虑加锁</span></span>
+<span class="line"><span style="color:#F97583">        synchronized</span><span style="color:#E1E4E8"> (Singleton.class) {    </span><span style="color:#6A737D">// 3. 锁的是 Singleton.class（类对象），不是 instance！</span></span>
+<span class="line"><span style="color:#F97583">            if</span><span style="color:#E1E4E8"> (instance </span><span style="color:#F97583">==</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) {         </span><span style="color:#6A737D">// 4. 第二次检查：防止多个线程同时通过第2步</span></span>
+<span class="line"><span style="color:#E1E4E8">                instance </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Singleton</span><span style="color:#E1E4E8">(); </span><span style="color:#6A737D">// 5. 真正创建实例</span></span>
+<span class="line"><span style="color:#E1E4E8">            }</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> instance;                        </span><span style="color:#6A737D">// 6. 返回（可能刚创建，也可能早已存在）</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<blockquote>
+<p>用一个静态引用（初始为 null）延迟保存唯一实例；通过两次 null 检查 + 对类对象加锁 + volatile 修饰，实现高效且线程安全的懒加载。</p>
+</blockquote>
+<hr>
+<h3 id="工厂方法模式">工厂方法模式</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">interface</span><span style="color:#B392F0"> Factory</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    Product </span><span style="color:#B392F0">createProduct</span><span style="color:#E1E4E8">(); </span><span style="color:#6A737D">// 1. 工厂接口：定义创建产品的方法</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> ConcreteFactory</span><span style="color:#F97583"> implements</span><span style="color:#B392F0"> Factory</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> Product </span><span style="color:#B392F0">createProduct</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ConcreteProduct</span><span style="color:#E1E4E8">(); </span><span style="color:#6A737D">// 2. 具体工厂：子类决定创建哪个具体产品</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 使用：Factory factory = new ConcreteFactory();</span></span>
+<span class="line"><span style="color:#6A737D">//      Product product = factory.createProduct();</span></span></code></pre>
+<blockquote>
+<p>定义一个创建对象的接口，让子类决定实例化哪一个类；将对象的创建延迟到子类，解耦产品创建与使用。核心：工厂接口 + 具体工厂实现，客户端通过工厂接口创建产品，无需知道具体产品类。</p>
+</blockquote>
+<hr>
+<h3 id="抽象工厂模式">抽象工厂模式</h3>
+<blockquote>
+<p>（待补全）</p>
+</blockquote>
+<hr>
+<h3 id="建造者模式">建造者模式</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">abstract</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> Builder</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    protected</span><span style="color:#E1E4E8"> Product product </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Product</span><span style="color:#E1E4E8">(); </span><span style="color:#6A737D">// 1. 持有产品引用</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> abstract</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> buildPartA</span><span style="color:#E1E4E8">();         </span><span style="color:#6A737D">// 2. 定义构建各部分的方法</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> abstract</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> buildPartB</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> Product </span><span style="color:#B392F0">getResult</span><span style="color:#E1E4E8">() { </span><span style="color:#F97583">return</span><span style="color:#E1E4E8"> product; } </span><span style="color:#6A737D">// 3. 返回构建完成的产品</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> ConcreteBuilder</span><span style="color:#F97583"> extends</span><span style="color:#B392F0"> Builder</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> buildPartA</span><span style="color:#E1E4E8">() { product.</span><span style="color:#B392F0">setPartA</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"A"</span><span style="color:#E1E4E8">); } </span><span style="color:#6A737D">// 4. 具体实现各部分构建</span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> buildPartB</span><span style="color:#E1E4E8">() { product.</span><span style="color:#B392F0">setPartB</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"B"</span><span style="color:#E1E4E8">); }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 使用：Builder builder = new ConcreteBuilder();</span></span>
+<span class="line"><span style="color:#6A737D">//      builder.buildPartA(); builder.buildPartB();</span></span>
+<span class="line"><span style="color:#6A737D">//      Product product = builder.getResult();</span></span></code></pre>
+<blockquote>
+<p>将复杂对象的构建与表示分离，通过一步步构建最终对象；适用于创建过程复杂、需要灵活组合的场景。核心：抽象建造者定义构建步骤 + 具体建造者实现各步骤 + 分步构建后返回完整产品。</p>
+</blockquote>
+<hr>
+<h3 id="原型模式">原型模式</h3>
+<blockquote>
+<p>（待补全）</p>
+</blockquote>
+<hr>
+<h2 id="结构型模式">结构型模式</h2>
+<h3 id="适配器模式">适配器模式</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> Adapter</span><span style="color:#F97583"> implements</span><span style="color:#B392F0"> Target</span><span style="color:#E1E4E8"> {        </span><span style="color:#6A737D">// 1. 适配器实现目标接口</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#E1E4E8"> Adaptee adaptee;             </span><span style="color:#6A737D">// 2. 持有被适配对象的引用</span></span>
+<span class="line"><span style="color:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#B392F0"> Adapter</span><span style="color:#E1E4E8">(Adaptee </span><span style="color:#FFAB70">adaptee</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">        this</span><span style="color:#E1E4E8">.adaptee </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> adaptee;          </span><span style="color:#6A737D">// 3. 构造时传入被适配对象</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> request</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#E1E4E8">        adaptee.</span><span style="color:#B392F0">specificRequest</span><span style="color:#E1E4E8">();       </span><span style="color:#6A737D">// 4. 将目标接口调用转换为被适配类的方法</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 使用：Target target = new Adapter(new Adaptee());</span></span>
+<span class="line"><span style="color:#6A737D">//      target.request(); // 客户端通过目标接口调用，实际执行被适配类的方法</span></span></code></pre>
+<blockquote>
+<p>将一个类的接口转换成客户端期望的另一个接口；让原本不兼容的类可以协同工作，通过适配器类进行转换。核心：适配器实现目标接口 + 持有被适配对象 + 在目标方法中调用被适配对象的方法。</p>
+</blockquote>
+<hr>
+<h3 id="桥接模式">桥接模式</h3>
+<blockquote>
+<p>（待补全）</p>
+</blockquote>
+<hr>
+<h3 id="组合模式">组合模式</h3>
+<blockquote>
+<p>（待补全）</p>
+</blockquote>
+<hr>
+<h3 id="装饰器模式">装饰器模式</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">abstract</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> Decorator</span><span style="color:#F97583"> implements</span><span style="color:#B392F0"> Component</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    protected</span><span style="color:#E1E4E8"> Component component;       </span><span style="color:#6A737D">// 1. 持有被装饰组件的引用</span></span>
+<span class="line"><span style="color:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#B392F0"> Decorator</span><span style="color:#E1E4E8">(Component </span><span style="color:#FFAB70">component</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">        this</span><span style="color:#E1E4E8">.component </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> component;      </span><span style="color:#6A737D">// 2. 构造时传入被装饰对象</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> operation</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#E1E4E8">        component.</span><span style="color:#B392F0">operation</span><span style="color:#E1E4E8">();           </span><span style="color:#6A737D">// 3. 委托给被装饰组件执行原有功能</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> ConcreteDecorator</span><span style="color:#F97583"> extends</span><span style="color:#B392F0"> Decorator</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> operation</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#79B8FF">        super</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">operation</span><span style="color:#E1E4E8">();               </span><span style="color:#6A737D">// 4. 先执行被装饰组件的功能</span></span>
+<span class="line"><span style="color:#B392F0">        addedBehavior</span><span style="color:#E1E4E8">();                 </span><span style="color:#6A737D">// 5. 再添加装饰器的新功能</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 使用：Component component = new ConcreteDecorator(new ConcreteComponent());</span></span>
+<span class="line"><span style="color:#6A737D">//      component.operation(); // 可以嵌套多个装饰器</span></span></code></pre>
+<blockquote>
+<p>动态地给对象添加额外的职责；通过组合而非继承扩展功能，保持接口一致性，可以灵活地叠加多个装饰器。核心：装饰器实现组件接口 + 持有组件引用 + 先调用组件方法再添加新功能，支持多层嵌套。</p>
+</blockquote>
+<hr>
+<h3 id="外观模式">外观模式</h3>
+<blockquote>
+<p>（待补全）</p>
+</blockquote>
+<hr>
+<h3 id="享元模式">享元模式</h3>
+<blockquote>
+<p>（待补全）</p>
+</blockquote>
+<hr>
+<h3 id="代理模式">代理模式</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> Proxy</span><span style="color:#F97583"> implements</span><span style="color:#B392F0"> Subject</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#E1E4E8"> RealSubject realSubject;     </span><span style="color:#6A737D">// 1. 持有真实主题的引用</span></span>
+<span class="line"><span style="color:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> request</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (realSubject </span><span style="color:#F97583">==</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">            realSubject </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> RealSubject</span><span style="color:#E1E4E8">(); </span><span style="color:#6A737D">// 2. 延迟创建真实对象（可选）</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#B392F0">        preRequest</span><span style="color:#E1E4E8">();                    </span><span style="color:#6A737D">// 3. 前置处理（权限检查、日志等）</span></span>
+<span class="line"><span style="color:#E1E4E8">        realSubject.</span><span style="color:#B392F0">request</span><span style="color:#E1E4E8">();           </span><span style="color:#6A737D">// 4. 委托给真实主题执行</span></span>
+<span class="line"><span style="color:#B392F0">        postRequest</span><span style="color:#E1E4E8">();                   </span><span style="color:#6A737D">// 5. 后置处理</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 使用：Subject subject = new Proxy();</span></span>
+<span class="line"><span style="color:#6A737D">//      subject.request(); // 客户端通过代理访问，代理控制对真实对象的访问</span></span></code></pre>
+<blockquote>
+<p>为其他对象提供一种代理以控制对这个对象的访问；在客户端和目标对象之间增加中间层，实现访问控制、延迟加载等功能。核心：代理实现主题接口 + 持有真实主题引用 + 在请求前后添加控制逻辑，客户端通过代理访问真实对象。</p>
+</blockquote>
+<hr>
+<h2 id="行为型模式">行为型模式</h2>
+<h3 id="责任链模式">责任链模式</h3>
+<blockquote>
+<p>（待补全）</p>
+</blockquote>
+<hr>
+<h3 id="命令模式">命令模式</h3>
+<blockquote>
+<p>（待补全）</p>
+</blockquote>
+<hr>
+<h3 id="解释器模式">解释器模式</h3>
+<blockquote>
+<p>（待补全）</p>
+</blockquote>
+<hr>
+<h3 id="迭代器模式">迭代器模式</h3>
+<blockquote>
+<p>（待补全）</p>
+</blockquote>
+<hr>
+<h3 id="中介者模式">中介者模式</h3>
+<blockquote>
+<p>（待补全）</p>
+</blockquote>
+<hr>
+<h3 id="备忘录模式">备忘录模式</h3>
+<blockquote>
+<p>（待补全）</p>
+</blockquote>
+<hr>
+<h3 id="观察者模式">观察者模式</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> Subject</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#E1E4E8"> List&#x3C;</span><span style="color:#F97583">Observer</span><span style="color:#E1E4E8">> observers </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#E1E4E8"> ArrayList&#x3C;>(); </span><span style="color:#6A737D">// 1. 维护观察者列表</span></span>
+<span class="line"><span style="color:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> attach</span><span style="color:#E1E4E8">(Observer </span><span style="color:#FFAB70">observer</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        observers.</span><span style="color:#B392F0">add</span><span style="color:#E1E4E8">(observer);         </span><span style="color:#6A737D">// 2. 注册观察者</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> notifyObservers</span><span style="color:#E1E4E8">(String </span><span style="color:#FFAB70">message</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">        for</span><span style="color:#E1E4E8"> (Observer observer </span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> observers) {</span></span>
+<span class="line"><span style="color:#E1E4E8">            observer.</span><span style="color:#B392F0">update</span><span style="color:#E1E4E8">(message);    </span><span style="color:#6A737D">// 3. 状态改变时，遍历通知所有观察者</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 使用：Subject subject = new Subject();</span></span>
+<span class="line"><span style="color:#6A737D">//      subject.attach(new ConcreteObserver("观察者1"));</span></span>
+<span class="line"><span style="color:#6A737D">//      subject.notifyObservers("状态改变"); // 所有观察者收到通知</span></span></code></pre>
+<blockquote>
+<p>定义对象间一对多的依赖关系，当被观察者状态改变时，所有观察者都会收到通知并自动更新；实现松耦合的事件通知机制。核心：主题维护观察者列表 + 提供注册/移除方法 + 状态改变时遍历调用所有观察者的 update 方法。</p>
+</blockquote>
+<hr>
+<h3 id="状态模式">状态模式</h3>
+<blockquote>
+<p>（待补全）</p>
+</blockquote>
+<hr>
+<h3 id="策略模式">策略模式</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> Context</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#E1E4E8"> Strategy strategy;           </span><span style="color:#6A737D">// 1. 持有策略接口的引用</span></span>
+<span class="line"><span style="color:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> setStrategy</span><span style="color:#E1E4E8">(Strategy </span><span style="color:#FFAB70">strategy</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">        this</span><span style="color:#E1E4E8">.strategy </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> strategy;       </span><span style="color:#6A737D">// 2. 动态设置策略（可运行时切换）</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> executeStrategy</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#E1E4E8">        strategy.</span><span style="color:#B392F0">execute</span><span style="color:#E1E4E8">();             </span><span style="color:#6A737D">// 3. 执行当前策略，无需知道具体实现</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 使用：Context context = new Context();</span></span>
+<span class="line"><span style="color:#6A737D">//      context.setStrategy(new ConcreteStrategyA());</span></span>
+<span class="line"><span style="color:#6A737D">//      context.executeStrategy(); // 可以随时切换策略</span></span></code></pre>
+<blockquote>
+<p>定义一系列算法，把它们封装起来，并使它们可以互相替换；将算法的选择与使用分离，客户端可以动态切换不同的策略。核心：上下文持有策略接口引用 + 提供设置策略方法 + 执行时调用策略接口方法，运行时可切换不同策略实现。</p>
+</blockquote>
+<hr>
+<h3 id="模板方法模式">模板方法模式</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">abstract</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> AbstractClass</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> final</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> templateMethod</span><span style="color:#E1E4E8">() { </span><span style="color:#6A737D">// 1. 模板方法用 final 固定算法骨架</span></span>
+<span class="line"><span style="color:#B392F0">        step1</span><span style="color:#E1E4E8">();                        </span><span style="color:#6A737D">// 2. 固定步骤：所有子类都执行</span></span>
+<span class="line"><span style="color:#B392F0">        step2</span><span style="color:#E1E4E8">();                        </span><span style="color:#6A737D">// 3. 固定步骤</span></span>
+<span class="line"><span style="color:#B392F0">        step3</span><span style="color:#E1E4E8">();                        </span><span style="color:#6A737D">// 4. 可变步骤：子类必须实现</span></span>
+<span class="line"><span style="color:#B392F0">        step4</span><span style="color:#E1E4E8">();                        </span><span style="color:#6A737D">// 5. 固定步骤</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#F97583">    protected</span><span style="color:#F97583"> abstract</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> step3</span><span style="color:#E1E4E8">();    </span><span style="color:#6A737D">// 6. 抽象方法：子类实现具体逻辑</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 使用：AbstractClass obj = new ConcreteClass();</span></span>
+<span class="line"><span style="color:#6A737D">//      obj.templateMethod(); // 执行固定流程，step3 由子类实现</span></span></code></pre>
+<blockquote>
+<p>定义一个操作中算法的骨架，将一些步骤延迟到子类中；子类可以不改变算法结构即可重定义算法的某些特定步骤，实现代码复用。核心：模板方法用 final 定义固定流程 + 抽象方法定义可变步骤 + 子类只需实现抽象方法，算法结构由父类控制。</p>
+</blockquote>
+<hr>
+<h3 id="访问者模式">访问者模式</h3>
+<blockquote>
+<p>（待补全）</p>
+</blockquote>
+</div></article></main><footer data-astro-cid-jo6i4kqk><div data-astro-cid-jo6i4kqk>Goppop 的博客</div><p data-astro-cid-jo6i4kqk>&copy; 2026 Goppop. 记录技术学习、系统设计和长期思考。</p></footer></body></html>

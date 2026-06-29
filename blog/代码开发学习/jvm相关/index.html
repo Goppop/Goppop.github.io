@@ -1,0 +1,166 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-tldeq5d5><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" href="/favicon.ico"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Goppop 的博客" href="https://goppop.github.io/rss.xml"><meta name="generator" content="Astro v7.0.3"><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/7443039bbc50ce9a.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/0edeceb0e4e5adfc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/7443039bbc50ce9a.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/0edeceb0e4e5adfc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/jvm%E7%9B%B8%E5%85%B3/"><!-- Primary Meta Tags --><title>JVM内存模型和JVM调优</title><meta name="description" content="文章描述"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/jvm%E7%9B%B8%E5%85%B3/"><meta property="og:title" content="JVM内存模型和JVM调优"><meta property="og:description" content="文章描述"><meta property="og:image" content="https://goppop.github.io/_astro/blog-placeholder-1.Bx0Zcyzv.jpg"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/jvm%E7%9B%B8%E5%85%B3/"><meta property="twitter:title" content="JVM内存模型和JVM调优"><meta property="twitter:description" content="文章描述"><meta property="twitter:image" content="https://goppop.github.io/_astro/blog-placeholder-1.Bx0Zcyzv.jpg"><link rel="stylesheet" href="/_astro/Header.DHc1oVwj.css"><style>main[data-astro-cid-tldeq5d5]{width:100%;max-width:none;margin:0;padding:0}.article-shell[data-astro-cid-tldeq5d5]{max-width:1120px;margin:0 auto;padding:3rem 1rem 1rem}.article-head[data-astro-cid-tldeq5d5]{border-bottom:1px solid #e1d2bbe6;grid-template-columns:minmax(0,1fr) 260px;align-items:end;gap:1.5rem;padding-bottom:1.4rem;display:grid}.title[data-astro-cid-tldeq5d5]{margin:0;line-height:1}.title[data-astro-cid-tldeq5d5] h1[data-astro-cid-tldeq5d5]{max-width:12em;color:var(--accent-dark);margin:0;font-size:3.6rem;line-height:1.08}.date-card[data-astro-cid-tldeq5d5]{color:var(--muted);background:#fff9eeb3;border-radius:8px;padding:1rem;font-size:.9rem;box-shadow:0 12px 28px #58422314}.date-card[data-astro-cid-tldeq5d5] strong[data-astro-cid-tldeq5d5]{color:var(--clay);letter-spacing:0;text-transform:uppercase;margin-bottom:.4rem;font-size:.82rem;display:block}.last-updated-on[data-astro-cid-tldeq5d5]{border-top:1px solid #e1d2bbc7;margin-top:.8rem;padding-top:.8rem}.meta-row[data-astro-cid-tldeq5d5]{flex-wrap:wrap;gap:.55rem;margin-top:1rem;display:flex}.hero-image[data-astro-cid-tldeq5d5]{width:100%;max-width:1120px;margin:2rem auto 0}.hero-image[data-astro-cid-tldeq5d5] img[data-astro-cid-tldeq5d5]{box-shadow:var(--box-shadow);border-radius:6px;margin:0 auto;display:block}.prose[data-astro-cid-tldeq5d5]{width:780px;max-width:100%;color:var(--ink);margin:2.2rem auto 0;padding:0 1rem}.prose[data-astro-cid-tldeq5d5] h2{border-top:1px solid var(--line);margin-top:3.4rem;padding-top:1rem}.prose[data-astro-cid-tldeq5d5] h2:first-child{border-top:0;margin-top:0;padding-top:0}.prose[data-astro-cid-tldeq5d5] h3{color:var(--accent-dark)}.prose[data-astro-cid-tldeq5d5] p,.prose[data-astro-cid-tldeq5d5] li{font-size:1.02rem}.prose[data-astro-cid-tldeq5d5] ul,.prose[data-astro-cid-tldeq5d5] ol{padding-left:1.4rem}.prose[data-astro-cid-tldeq5d5] table{display:block;overflow-x:auto}.prose[data-astro-cid-tldeq5d5] li+li{margin-top:.35rem}@media (width<=820px){.article-shell[data-astro-cid-tldeq5d5]{padding:2rem .75rem 1rem}.article-head[data-astro-cid-tldeq5d5]{grid-template-columns:1fr}.title[data-astro-cid-tldeq5d5] h1[data-astro-cid-tldeq5d5]{font-size:2.25rem}.prose[data-astro-cid-tldeq5d5]{margin-top:2rem;padding:0 .75rem}}
+</style></head><body data-astro-cid-tldeq5d5><header data-astro-cid-nen7h5rs><nav data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs>Goppop 的博客</a><div class="internal-links" data-astro-cid-nen7h5rs><a href="/" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>首页</a><a href="/blog" class="active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>文章</a><a href="/about" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>关于</a></div><div class="social-links" data-astro-cid-nen7h5rs><a href="https://github.com/Goppop" target="_blank" data-astro-cid-nen7h5rs><span class="sr-only" data-astro-cid-nen7h5rs>Goppop GitHub</span><svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" data-astro-cid-nen7h5rs><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" data-astro-cid-nen7h5rs></path></svg></a></div></nav></header><main data-astro-cid-tldeq5d5><article data-astro-cid-tldeq5d5><div class="article-shell" data-astro-cid-tldeq5d5><header class="article-head" data-astro-cid-tldeq5d5><div class="title" data-astro-cid-tldeq5d5><p class="eyebrow" data-astro-cid-tldeq5d5>Article</p><h1 data-astro-cid-tldeq5d5>JVM内存模型和JVM调优</h1><div class="meta-row" data-astro-cid-tldeq5d5><span class="label" data-astro-cid-tldeq5d5>代码开发学习</span><span class="label" data-astro-cid-tldeq5d5>JVM内存模型、JVM调优</span></div></div><aside class="date-card" aria-label="文章日期" data-astro-cid-tldeq5d5><strong data-astro-cid-tldeq5d5>Published</strong><time datetime="2025-04-14T00:00:00.000Z">Apr 14, 2025</time></aside></header></div><div class="prose" data-astro-cid-tldeq5d5><h2 id="一jvm-堆内存结构以-parallel-gc-为例">一、JVM 堆内存结构（以 Parallel GC 为例）</h2>
+<p>JVM 堆（Heap）分为两个主要区域：</p>
+<ul>
+<li>新生代（Young Generation）
+<ul>
+<li><strong>Eden 区</strong>：新对象首先在此分配。</li>
+<li><strong>Survivor 区（From/To）</strong>：Minor GC 后存活对象的暂存区，采用复制算法。</li>
+</ul>
+</li>
+<li>老年代（Old Generation）
+<ul>
+<li>存放长期存活对象，或因 Survivor 空间不足而提前晋升的对象。</li>
+<li>使用 <strong>标记-整理（Mark-Compact）</strong> 算法，仅在 Full GC 时回收。</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Minor GC：仅回收新生代，停顿时间短（通常 &lt;10ms）。</p>
+<p>Full GC：回收整个堆（包括老年代），停顿时间长（可达数百毫秒至秒级）。</p>
+</blockquote>
+<hr>
+<h2 id="二核心内存参数说明">二、核心内存参数说明</h2>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>作用</th>
+<th>注意事项</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-Xmx&lt;size&gt;</code></td>
+<td>设置堆最大内存</td>
+<td>如 <code>-Xmx4g</code>，建议生产环境固定</td>
+</tr>
+<tr>
+<td><code>-Xms&lt;size&gt;</code></td>
+<td>设置堆初始内存</td>
+<td><strong>推荐与 <code>-Xmx</code> 相等</strong>，避免运行时扩容开销</td>
+</tr>
+<tr>
+<td><code>-Xmn&lt;size&gt;</code></td>
+<td><strong>固定新生代大小</strong></td>
+<td>优先使用，可间接控制老年代大小</td>
+</tr>
+<tr>
+<td><code>-XX:NewRatio=N</code></td>
+<td>老年代 : 新生代 = N : 1</td>
+<td><strong>若设置 <code>-Xmn</code>，此参数失效</strong></td>
+</tr>
+<tr>
+<td><code>-XX:SurvivorRatio=R</code></td>
+<td>Eden : 一个 Survivor = R : 1</td>
+<td>控制新生代内部比例</td>
+</tr>
+<tr>
+<td><code>-XX:MaxMetaspaceSize</code></td>
+<td>限制元空间最大内存</td>
+<td>防止因动态类加载（如反射、CGLib）导致内存溢出</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>计算关系：</p>
+<p>老年代大小 = <code>-Xmx</code> - <code>-Xmn</code></p>
+</blockquote>
+<hr>
+<h2 id="三parallel-gc-调优策略">三、Parallel GC 调优策略</h2>
+<h3 id="适用场景">适用场景</h3>
+<ul>
+<li>后台批处理、高吞吐 Web 服务</li>
+<li>对延迟不敏感，但追求 CPU 利用率和吞吐量</li>
+</ul>
+<h3 id="推荐配置大量短命对象">推荐配置（大量短命对象）</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">-Xmx4g</span><span style="color:#79B8FF"> -Xms4g</span></span>
+<span class="line"><span style="color:#B392F0">-Xmn1536m</span></span>
+<span class="line"><span style="color:#B392F0">-XX:SurvivorRatio</span><span style="color:#9ECBFF">=16</span></span>
+<span class="line"><span style="color:#B392F0">-XX:-UseAdaptiveSizePolicy</span></span>
+<span class="line"><span style="color:#B392F0">-XX:MaxTenuringThreshold</span><span style="color:#9ECBFF">=1</span></span>
+<span class="line"><span style="color:#B392F0">-XX:MaxMetaspaceSize</span><span style="color:#9ECBFF">=256m</span></span>
+<span class="line"><span style="color:#B392F0">-XX:+PrintGCDetails</span><span style="color:#79B8FF"> -Xloggc:gc.log</span></span></code></pre>
+<h3 id="参数作用解析">参数作用解析</h3>
+<ul>
+<li><code>Xmn1536m</code>：新生代固定为 1.5GB，老年代 = 2.5GB，延缓 Full GC。</li>
+<li><code>XX:SurvivorRatio=16</code>：Eden 占比约 89%，减少 Minor GC 频率。</li>
+<li><code>XX:-UseAdaptiveSizePolicy</code>：<strong>必须关闭</strong>，否则 JVM 会忽略 <code>SurvivorRatio</code>。</li>
+<li><code>XX:MaxTenuringThreshold=1</code>：对象最多在新生代存活 1 次 GC，适合短命对象。</li>
+</ul>
+<hr>
+<h2 id="四关于-full-gc-的关键认知">四、关于 Full GC 的关键认知</h2>
+<ul>
+<li><strong>Parallel GC 无法避免 Full GC</strong>：老年代满即触发，停顿时间与老年代大小正相关。</li>
+<li><strong>G1 GC 可大幅降低 Full GC 频率</strong>：通过 Mixed GC 并发回收老年代区域。</li>
+<li><strong>ZGC / Shenandoah 可基本消除 Full GC</strong>：停顿时间 &lt;10ms，适合低延迟场景。</li>
+</ul>
+<blockquote>
+<p>若业务对停顿敏感（如实时系统、高频服务），应优先考虑 G1（JDK8u40+）或 ZGC（JDK11+），而非调优 Parallel GC。</p>
+</blockquote>
+<hr>
+<h2 id="五常见误区纠正">五、常见误区纠正</h2>
+<table>
+<thead>
+<tr>
+<th>误区</th>
+<th>正确认知</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>“SurvivorRatio 越小，Eden 越大”</td>
+<td><strong>SurvivorRatio 越大，Eden 占比越高</strong></td>
+</tr>
+<tr>
+<td>“内存设大就不需要调优”</td>
+<td>大堆可能导致 Full GC 停顿更长，风险更高</td>
+</tr>
+<tr>
+<td>“NewRatio 总是生效”</td>
+<td>若显式设置 <code>-Xmn</code>，NewRatio 被忽略</td>
+</tr>
+<tr>
+<td>“关闭 UseAdaptiveSizePolicy 不重要”</td>
+<td>Parallel GC 默认开启自适应策略，会覆盖手动 Ratio 设置</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="六调优基本原则">六、调优基本原则</h2>
+<ol>
+<li><strong>明确目标</strong>：是优化吞吐量，还是降低停顿时间？</li>
+<li><strong>控制新生代大小</strong>：通过 <code>Xmn</code> 精确管理老年代容量。</li>
+<li><strong>合理设置比例</strong>：根据对象生命周期调整 <code>SurvivorRatio</code> 和晋升阈值。</li>
+<li><strong>关闭自适应策略</strong>：确保手动配置生效。</li>
+<li><strong>持续监控</strong>：通过 GC 日志和工具（如 <code>jstat</code>）观察实际行为。</li>
+</ol>
+<hr>
+<h2 id="七验证与诊断建议">七、验证与诊断建议</h2>
+<ul>
+<li>
+<p><strong>开启 GC 日志</strong>：<code>XX:+PrintGCDetails -Xloggc:gc.log</code></p>
+</li>
+<li>
+<p><strong>实时监控</strong>：<code>jstat -gc &lt;pid&gt; 1s</code></p>
+</li>
+<li>
+<p><strong>分析工具</strong>：GCViewer、GCEasy、VisualVM</p>
+</li>
+<li>
+<p>关注指标</p>
+<ul>
+<li>Minor GC 频率（应 &lt;1 次/秒）</li>
+<li>老年代增长率（应平稳）</li>
+<li>Full GC 是否发生（生产环境应极少或零）</li>
+</ul>
+</li>
+</ul>
+<hr>
+<blockquote>
+<p>总结：</p>
+<p>JVM 调优的核心不是追求“零 GC”，而是<strong>确保 GC 行为符合业务 SLO</strong>。</p>
+<p>通过合理配置内存结构与 GC 策略，可在资源约束下实现稳定、高效的运行时表现。</p>
+</blockquote>
+<hr>
+</div></article></main><footer data-astro-cid-jo6i4kqk><div data-astro-cid-jo6i4kqk>Goppop 的博客</div><p data-astro-cid-jo6i4kqk>&copy; 2026 Goppop. 记录技术学习、系统设计和长期思考。</p></footer></body></html>

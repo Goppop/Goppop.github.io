@@ -1,0 +1,340 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-tldeq5d5><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" href="/favicon.ico"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Goppop 的博客" href="https://goppop.github.io/rss.xml"><meta name="generator" content="Astro v7.0.3"><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/7443039bbc50ce9a.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/0edeceb0e4e5adfc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/7443039bbc50ce9a.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/0edeceb0e4e5adfc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/jvm-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/"><!-- Primary Meta Tags --><title>JVM-垃圾回收机制详解</title><meta name="description" content="JVM垃圾回收机制详解，深入理解GC算法和垃圾回收器"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/jvm-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/"><meta property="og:title" content="JVM-垃圾回收机制详解"><meta property="og:description" content="JVM垃圾回收机制详解，深入理解GC算法和垃圾回收器"><meta property="og:image" content="https://goppop.github.io/_astro/blog-placeholder-1.Bx0Zcyzv.jpg"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/jvm-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/"><meta property="twitter:title" content="JVM-垃圾回收机制详解"><meta property="twitter:description" content="JVM垃圾回收机制详解，深入理解GC算法和垃圾回收器"><meta property="twitter:image" content="https://goppop.github.io/_astro/blog-placeholder-1.Bx0Zcyzv.jpg"><link rel="stylesheet" href="/_astro/Header.DHc1oVwj.css"><style>main[data-astro-cid-tldeq5d5]{width:100%;max-width:none;margin:0;padding:0}.article-shell[data-astro-cid-tldeq5d5]{max-width:1120px;margin:0 auto;padding:3rem 1rem 1rem}.article-head[data-astro-cid-tldeq5d5]{border-bottom:1px solid #e1d2bbe6;grid-template-columns:minmax(0,1fr) 260px;align-items:end;gap:1.5rem;padding-bottom:1.4rem;display:grid}.title[data-astro-cid-tldeq5d5]{margin:0;line-height:1}.title[data-astro-cid-tldeq5d5] h1[data-astro-cid-tldeq5d5]{max-width:12em;color:var(--accent-dark);margin:0;font-size:3.6rem;line-height:1.08}.date-card[data-astro-cid-tldeq5d5]{color:var(--muted);background:#fff9eeb3;border-radius:8px;padding:1rem;font-size:.9rem;box-shadow:0 12px 28px #58422314}.date-card[data-astro-cid-tldeq5d5] strong[data-astro-cid-tldeq5d5]{color:var(--clay);letter-spacing:0;text-transform:uppercase;margin-bottom:.4rem;font-size:.82rem;display:block}.last-updated-on[data-astro-cid-tldeq5d5]{border-top:1px solid #e1d2bbc7;margin-top:.8rem;padding-top:.8rem}.meta-row[data-astro-cid-tldeq5d5]{flex-wrap:wrap;gap:.55rem;margin-top:1rem;display:flex}.hero-image[data-astro-cid-tldeq5d5]{width:100%;max-width:1120px;margin:2rem auto 0}.hero-image[data-astro-cid-tldeq5d5] img[data-astro-cid-tldeq5d5]{box-shadow:var(--box-shadow);border-radius:6px;margin:0 auto;display:block}.prose[data-astro-cid-tldeq5d5]{width:780px;max-width:100%;color:var(--ink);margin:2.2rem auto 0;padding:0 1rem}.prose[data-astro-cid-tldeq5d5] h2{border-top:1px solid var(--line);margin-top:3.4rem;padding-top:1rem}.prose[data-astro-cid-tldeq5d5] h2:first-child{border-top:0;margin-top:0;padding-top:0}.prose[data-astro-cid-tldeq5d5] h3{color:var(--accent-dark)}.prose[data-astro-cid-tldeq5d5] p,.prose[data-astro-cid-tldeq5d5] li{font-size:1.02rem}.prose[data-astro-cid-tldeq5d5] ul,.prose[data-astro-cid-tldeq5d5] ol{padding-left:1.4rem}.prose[data-astro-cid-tldeq5d5] table{display:block;overflow-x:auto}.prose[data-astro-cid-tldeq5d5] li+li{margin-top:.35rem}@media (width<=820px){.article-shell[data-astro-cid-tldeq5d5]{padding:2rem .75rem 1rem}.article-head[data-astro-cid-tldeq5d5]{grid-template-columns:1fr}.title[data-astro-cid-tldeq5d5] h1[data-astro-cid-tldeq5d5]{font-size:2.25rem}.prose[data-astro-cid-tldeq5d5]{margin-top:2rem;padding:0 .75rem}}
+</style></head><body data-astro-cid-tldeq5d5><header data-astro-cid-nen7h5rs><nav data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs>Goppop 的博客</a><div class="internal-links" data-astro-cid-nen7h5rs><a href="/" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>首页</a><a href="/blog" class="active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>文章</a><a href="/about" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>关于</a></div><div class="social-links" data-astro-cid-nen7h5rs><a href="https://github.com/Goppop" target="_blank" data-astro-cid-nen7h5rs><span class="sr-only" data-astro-cid-nen7h5rs>Goppop GitHub</span><svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" data-astro-cid-nen7h5rs><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" data-astro-cid-nen7h5rs></path></svg></a></div></nav></header><main data-astro-cid-tldeq5d5><article data-astro-cid-tldeq5d5><div class="article-shell" data-astro-cid-tldeq5d5><header class="article-head" data-astro-cid-tldeq5d5><div class="title" data-astro-cid-tldeq5d5><p class="eyebrow" data-astro-cid-tldeq5d5>Article</p><h1 data-astro-cid-tldeq5d5>JVM-垃圾回收机制详解</h1><div class="meta-row" data-astro-cid-tldeq5d5><span class="label" data-astro-cid-tldeq5d5>代码开发学习</span><span class="label" data-astro-cid-tldeq5d5>01-编程语言基础</span><span class="label" data-astro-cid-tldeq5d5>JVM</span><span class="label" data-astro-cid-tldeq5d5>JVM</span></div></div><aside class="date-card" aria-label="文章日期" data-astro-cid-tldeq5d5><strong data-astro-cid-tldeq5d5>Published</strong><time datetime="2025-12-12T00:00:00.000Z">Dec 12, 2025</time><div class="last-updated-on" data-astro-cid-tldeq5d5><strong data-astro-cid-tldeq5d5>Updated</strong><time datetime="2025-12-15T00:00:00.000Z">Dec 15, 2025</time></div></aside></header></div><div class="prose" data-astro-cid-tldeq5d5><h1 id="jvm-垃圾回收机制详解">JVM-垃圾回收机制详解</h1>
+<h2 id="概述">概述</h2>
+<p><strong>垃圾回收（Garbage Collection, GC）</strong> 是 Java 虚拟机（JVM）自动管理内存的核心机制。它负责自动发现并释放不再被程序引用的对象所占用的内存空间，从而避免了手动内存管理带来的内存泄漏和内存溢出问题 [1]。</p>
+<p>GC 的整个过程可以概括为两个核心步骤：</p>
+<ol>
+<li><strong>垃圾识别</strong>：判断哪些对象是“存活”的，哪些是“死亡”的（即不再被引用的）。</li>
+<li><strong>垃圾收集</strong>：回收死亡对象所占用的内存空间。</li>
+</ol>
+<p>在垃圾回收过程中，为了确保数据的一致性，JVM 常常需要暂停所有应用线程，这个现象被称为 <strong>Stop-The-World (STW)</strong>。STW 的时间长短是衡量一个垃圾收集器性能的重要指标，现代 GC 优化的主要目标之一就是尽量缩短或消除 STW 时间 。</p>
+<h2 id="核心内容">核心内容</h2>
+<h3 id="1-垃圾对象的判断">1. 垃圾对象的判断</h3>
+<p>判断对象是否存活主要有两种算法：</p>
+<h4 id="11-引用计数法-reference-counting">1.1 引用计数法 (Reference Counting)</h4>
+<p>为每个对象设置一个引用计数器，每当有一个地方引用它时，计数器加 1；当引用失效时，计数器减 1。计数器为 0 的对象即为垃圾。</p>
+<ul>
+<li><strong>优点</strong>：实现简单，判定效率高。</li>
+<li><strong>缺点</strong>：难以解决<strong>对象间的循环引用</strong>问题，因此主流的 JVM（如 HotSpot）并没有采用此算法 。</li>
+</ul>
+<h4 id="12-可达性分析算法-reachability-analysis">1.2 可达性分析算法 (Reachability Analysis)</h4>
+<p>该算法通过一系列被称为 <strong>GC Roots</strong> 的对象作为起始点，从这些节点开始向下搜索，搜索所走过的路径称为<strong>引用链</strong>（Reference Chain）。当一个对象到 GC Roots 没有任何引用链相连时，则证明此对象是不可用的，可以被回收 。</p>
+<p><strong>可作为 GC Roots 的对象包括</strong> [1]：</p>
+<ul>
+<li>虚拟机栈（栈帧中的局部变量表）中引用的对象。</li>
+<li>方法区中类静态属性引用的对象。</li>
+<li>方法区中常量引用的对象。</li>
+<li>本地方法栈中 JNI（Native 方法）引用的对象。</li>
+</ul>
+<h3 id="2-对象的四种引用类型">2. 对象的四种引用类型</h3>
+<p>Java 提供了四种引用类型，强度依次递减，用于更灵活地控制对象的生命周期 [1]：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left">引用类型</th>
+<th style="text-align: left">强度</th>
+<th style="text-align: left">GC 行为</th>
+<th style="text-align: left">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left"><strong>强引用</strong> (Strong)</td>
+<td style="text-align: left">最强</td>
+<td style="text-align: left">只要强引用存在，垃圾回收器永远不会回收被引用的对象。</td>
+<td style="text-align: left">普遍使用的引用类型。</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>软引用</strong> (Soft)</td>
+<td style="text-align: left">较强</td>
+<td style="text-align: left">内存空间足够时不会回收；在即将发生内存溢出前，会回收软引用对象。</td>
+<td style="text-align: left">用于实现内存敏感的高速缓存。</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>弱引用</strong> (Weak)</td>
+<td style="text-align: left">较弱</td>
+<td style="text-align: left">只要发生 GC，无论内存是否充足，都会回收被弱引用关联的对象。</td>
+<td style="text-align: left">用于实现生命周期较短的缓存，如 <code>WeakHashMap</code>。</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>虚引用</strong> (Phantom)</td>
+<td style="text-align: left">最弱</td>
+<td style="text-align: left">无法通过虚引用获取对象实例。唯一目的是在对象被回收时收到一个系统通知。</td>
+<td style="text-align: left">用于跟踪对象被回收的状态，配合 <code>ReferenceQueue</code> 使用。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="3-分代收集理论-generational-collection">3. 分代收集理论 (Generational Collection)</h3>
+<p>现代 JVM 普遍采用分代收集理论，将 Java 堆划分为<strong>新生代</strong>（Young Generation）和<strong>老年代</strong>（Old Generation），并根据各自的特点采用不同的 GC 策略 [1]。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left">区域</th>
+<th style="text-align: left">特点</th>
+<th style="text-align: left">GC 频率</th>
+<th style="text-align: left">采用算法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left"><strong>新生代</strong></td>
+<td style="text-align: left">绝大多数对象生命周期短，朝生夕死。</td>
+<td style="text-align: left">频繁（Minor GC）</td>
+<td style="text-align: left">复制算法（Copying）</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>老年代</strong></td>
+<td style="text-align: left">存放长期存活的对象，对象存活率高。</td>
+<td style="text-align: left">较低（Major GC）</td>
+<td style="text-align: left">标记-整理（Mark-Compact）或标记-清除（Mark-Sweep）及其变种</td>
+</tr>
+</tbody>
+</table>
+<p><strong>GC 类型划分</strong> [1]：</p>
+<ul>
+<li><strong>Minor GC / Young GC</strong>：发生在新生代的垃圾收集。速度快，STW 短。</li>
+<li><strong>Major GC / Old GC</strong>：发生在老年代的垃圾收集。通常比 Minor GC 慢 10 倍以上。</li>
+<li><strong>Full GC</strong>：收集整个 Java 堆和方法区。是所有 GC 中最慢的，应尽量避免。</li>
+</ul>
+<h3 id="4-垃圾收集算法">4. 垃圾收集算法</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left">算法</th>
+<th style="text-align: left">描述</th>
+<th style="text-align: left">优点</th>
+<th style="text-align: left">缺点</th>
+<th style="text-align: left">适用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left"><strong>标记-清除</strong> (Mark-Sweep)</td>
+<td style="text-align: left">先标记出所有可回收对象，然后统一回收被标记的对象。</td>
+<td style="text-align: left">实现简单。</td>
+<td style="text-align: left">产生大量不连续的<strong>内存碎片</strong>。</td>
+<td style="text-align: left">老年代（配合压缩）</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>复制</strong> (Copying)</td>
+<td style="text-align: left">将内存划分为大小相等的两块，每次只使用其中一块。当这块用完后，将存活对象复制到另一块上，然后清空已使用的这块。</td>
+<td style="text-align: left">不产生内存碎片，效率高。</td>
+<td style="text-align: left">内存利用率低（仅 50%）。</td>
+<td style="text-align: left">新生代（Eden:Survivor=8:1:1，空间浪费小）</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>标记-整理</strong> (Mark-Compact)</td>
+<td style="text-align: left">先标记存活对象，然后将所有存活对象移动到内存的一端，最后清理掉边界以外的内存。</td>
+<td style="text-align: left">不产生内存碎片。</td>
+<td style="text-align: left">效率相对较低，需要移动对象。</td>
+<td style="text-align: left">老年代</td>
+</tr>
+</tbody>
+</table>
+<h3 id="5-经典垃圾收集器">5. 经典垃圾收集器</h3>
+<p>JVM 提供了多种垃圾收集器，它们是上述算法的具体实现。在 JDK 9 之后，默认的垃圾收集器是 <strong>G1</strong> [1]。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left">收集器</th>
+<th style="text-align: left">作用区域</th>
+<th style="text-align: left">算法</th>
+<th style="text-align: left">特点</th>
+<th style="text-align: left">目标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left"><strong>Serial</strong></td>
+<td style="text-align: left">新生代</td>
+<td style="text-align: left">复制</td>
+<td style="text-align: left">单线程，STW 长。</td>
+<td style="text-align: left">客户端模式下默认新生代收集器。</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>ParNew</strong></td>
+<td style="text-align: left">新生代</td>
+<td style="text-align: left">复制</td>
+<td style="text-align: left">Serial 的多线程版本，多核 CPU 下效率高。</td>
+<td style="text-align: left">配合 CMS 使用。</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>Parallel Scavenge</strong></td>
+<td style="text-align: left">新生代</td>
+<td style="text-align: left">复制</td>
+<td style="text-align: left">多线程，关注<strong>吞吐量</strong>（Throughput）。</td>
+<td style="text-align: left">适合后台运算，对 STW 不敏感的场景。</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>Serial Old</strong></td>
+<td style="text-align: left">老年代</td>
+<td style="text-align: left">标记-整理</td>
+<td style="text-align: left">Serial 的老年代版本，单线程。</td>
+<td style="text-align: left">客户端模式下默认老年代收集器，或作为 CMS 失败时的后备。</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>Parallel Old</strong></td>
+<td style="text-align: left">老年代</td>
+<td style="text-align: left">标记-整理</td>
+<td style="text-align: left">Parallel Scavenge 的老年代版本，多线程。</td>
+<td style="text-align: left">配合 Parallel Scavenge 关注吞吐量。</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>CMS</strong></td>
+<td style="text-align: left">老年代</td>
+<td style="text-align: left">标记-清除</td>
+<td style="text-align: left"><strong>并发</strong>收集，以获取<strong>最短回收停顿时间</strong>为目标。</td>
+<td style="text-align: left">适用于对响应时间要求高的 Web 应用。</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>G1</strong></td>
+<td style="text-align: left">整个堆</td>
+<td style="text-align: left">标记-整理 + 复制</td>
+<td style="text-align: left"><strong>分区</strong>（Region）化管理，可预测的停顿时间。</td>
+<td style="text-align: left">适用于大内存（6GB 以上），追求低延迟的场景。</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>ZGC/Shenandoah</strong></td>
+<td style="text-align: left">整个堆</td>
+<td style="text-align: left">标记-整理</td>
+<td style="text-align: left"><strong>并发</strong>收集，<strong>停顿时间极短</strong>（10ms 以内）。</td>
+<td style="text-align: left">适用于对延迟要求极高的场景。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="实践示例">实践示例</h2>
+<h3 id="内存分配原则">内存分配原则</h3>
+<p>JVM 内存分配遵循以下几个基本原则，这些原则是分代收集理论的具体体现 [1]：</p>
+<ol>
+<li><strong>对象优先在 Eden 区分配</strong>：大多数对象在新生代的 Eden 区分配。当 Eden 区空间不足时，会触发 Minor GC。</li>
+<li><strong>大对象直接进入老年代</strong>：需要大量连续内存空间的对象（如大数组）会直接在老年代分配，以避免在新生代频繁进行 Minor GC 带来的额外开销。</li>
+<li><strong>长期存活的对象将进入老年代</strong>：JVM 为每个对象定义了年龄计数器。对象在新生代每经历一次 Minor GC 仍存活，年龄就加 1。当年龄达到一定阈值（默认为 15，CMS 默认为 6，可通过 <code>-XX:MaxTenuringThreshold</code> 设置）时，对象会被晋升到老年代。</li>
+<li><strong>空间分配担保</strong>：在发生 Minor GC 之前，JVM 会检查老年代最大可用的连续空间是否大于新生代所有对象总空间。如果大于，则 Minor GC 是安全的；如果小于，则会查看是否允许担保失败。如果允许，则检查老年代最大可用连续空间是否大于历次晋升到老年代对象的平均大小。如果大于，则尝试进行 Minor GC；否则，将进行 Full GC。</li>
+</ol>
+<h3 id="常用-gc-参数">常用 GC 参数</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left">参数</th>
+<th style="text-align: left">描述</th>
+<th style="text-align: left">示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left"><code>-Xms</code></td>
+<td style="text-align: left">初始堆大小</td>
+<td style="text-align: left"><code>-Xms512m</code></td>
+</tr>
+<tr>
+<td style="text-align: left"><code>-Xmx</code></td>
+<td style="text-align: left">最大堆大小</td>
+<td style="text-align: left"><code>-Xmx1024m</code></td>
+</tr>
+<tr>
+<td style="text-align: left"><code>-XX:+UseSerialGC</code></td>
+<td style="text-align: left">启用 Serial + Serial Old 收集器</td>
+<td style="text-align: left"></td>
+</tr>
+<tr>
+<td style="text-align: left"><code>-XX:+UseParNewGC</code></td>
+<td style="text-align: left">启用 ParNew + Serial Old 收集器</td>
+<td style="text-align: left"></td>
+</tr>
+<tr>
+<td style="text-align: left"><code>-XX:+UseParallelGC</code></td>
+<td style="text-align: left">启用 Parallel Scavenge + Parallel Old 收集器</td>
+<td style="text-align: left"></td>
+</tr>
+<tr>
+<td style="text-align: left"><code>-XX:+UseConcMarkSweepGC</code></td>
+<td style="text-align: left">启用 CMS 收集器</td>
+<td style="text-align: left"></td>
+</tr>
+<tr>
+<td style="text-align: left"><code>-XX:+UseG1GC</code></td>
+<td style="text-align: left">启用 G1 收集器（JDK 9+ 默认）</td>
+<td style="text-align: left"></td>
+</tr>
+<tr>
+<td style="text-align: left"><code>-XX:MaxGCPauseMillis</code></td>
+<td style="text-align: left">设置最大 GC 停顿时间（G1、Parallel Scavenge 等）</td>
+<td style="text-align: left"><code>-XX:MaxGCPauseMillis=200</code></td>
+</tr>
+<tr>
+<td style="text-align: left"><code>-XX:+PrintGCDetails</code></td>
+<td style="text-align: left">打印详细的 GC 日志</td>
+<td style="text-align: left"></td>
+</tr>
+<tr>
+<td style="text-align: left"><code>-XX:NewRatio=N</code></td>
+<td style="text-align: left">老年代 : 新生代 = N : 1</td>
+<td style="text-align: left"><strong>若设置 <code>-Xmn</code>，此参数失效</strong></td>
+</tr>
+<tr>
+<td style="text-align: left"><code>-XX:SurvivorRatio=R</code></td>
+<td style="text-align: left">Eden : 一个 Survivor = R : 1</td>
+<td style="text-align: left">控制新生代内部比例</td>
+</tr>
+<tr>
+<td style="text-align: left"><code>-XX:MaxMetaspaceSize</code></td>
+<td style="text-align: left">限制元空间最大内存</td>
+<td style="text-align: left">防止因动态类加载（如反射、CGLib）导致内存溢出</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>计算关系：</p>
+<p>老年代大小 = <code>-Xmx</code> - <code>-Xmn</code></p>
+</blockquote>
+<h2 id="关于-full-gc-的关键认知">关于 Full GC 的关键认知</h2>
+<ul>
+<li><strong>Parallel GC 无法避免 Full GC</strong>：老年代满即触发，停顿时间与老年代大小正相关。</li>
+<li><strong>G1 GC 可大幅降低 Full GC 频率</strong>：通过 Mixed GC 并发回收老年代区域。</li>
+<li><strong>ZGC / Shenandoah 可基本消除 Full GC</strong>：停顿时间 &lt;10ms，适合低延迟场景。</li>
+</ul>
+<blockquote>
+<p>若业务对停顿敏感（如实时系统、高频服务），应优先考虑 G1（JDK8u40+）或 ZGC（JDK11+），而非调优 Parallel GC。</p>
+</blockquote>
+<h2 id="常见误区纠正">常见误区纠正</h2>
+<table>
+<thead>
+<tr>
+<th>误区</th>
+<th>正确认知</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>“SurvivorRatio 越小，Eden 越大”</td>
+<td><strong>SurvivorRatio 越大，Eden 占比越高</strong></td>
+</tr>
+<tr>
+<td>“内存设大就不需要调优”</td>
+<td>大堆可能导致 Full GC 停顿更长，风险更高</td>
+</tr>
+<tr>
+<td>“NewRatio 总是生效”</td>
+<td>若显式设置 <code>-Xmn</code>，NewRatio 被忽略</td>
+</tr>
+<tr>
+<td>“关闭 UseAdaptiveSizePolicy 不重要”</td>
+<td>Parallel GC 默认开启自适应策略，会覆盖手动 Ratio 设置</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="调优基本原则">调优基本原则</h2>
+<ol>
+<li><strong>明确目标</strong>：是优化吞吐量，还是降低停顿时间？</li>
+<li><strong>控制新生代大小</strong>：通过 <code>Xmn</code> 精确管理老年代容量。</li>
+<li><strong>合理设置比例</strong>：根据对象生命周期调整 <code>SurvivorRatio</code> 和晋升阈值。</li>
+<li><strong>关闭自适应策略</strong>：确保手动配置生效。</li>
+<li><strong>持续监控</strong>：通过 GC 日志和工具（如 <code>jstat</code>）观察实际行为。</li>
+</ol>
+<h2 id="总结">总结</h2>
+<blockquote>
+<p>JVM 调优的核心不是追求“零 GC”，而是<strong>确保 GC 行为符合业务 SLO</strong>。</p>
+<p>通过合理配置内存结构与 GC 策略，可在资源约束下实现稳定、高效的运行时表现。</p>
+</blockquote>
+</div></article></main><footer data-astro-cid-jo6i4kqk><div data-astro-cid-jo6i4kqk>Goppop 的博客</div><p data-astro-cid-jo6i4kqk>&copy; 2026 Goppop. 记录技术学习、系统设计和长期思考。</p></footer></body></html>

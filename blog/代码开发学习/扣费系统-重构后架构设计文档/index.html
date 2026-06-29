@@ -1,0 +1,546 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-tldeq5d5><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" href="/favicon.ico"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Goppop 的博客" href="https://goppop.github.io/rss.xml"><meta name="generator" content="Astro v7.0.3"><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/7443039bbc50ce9a.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/0edeceb0e4e5adfc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/7443039bbc50ce9a.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/0edeceb0e4e5adfc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/%E6%89%A3%E8%B4%B9%E7%B3%BB%E7%BB%9F-%E9%87%8D%E6%9E%84%E5%90%8E%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3/"><!-- Primary Meta Tags --><title>算力平台扣费系统：重构后架构设计文档</title><meta name="description" content="扣费系统重构后的架构设计、模块化拆分、组件职责说明"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/%E6%89%A3%E8%B4%B9%E7%B3%BB%E7%BB%9F-%E9%87%8D%E6%9E%84%E5%90%8E%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3/"><meta property="og:title" content="算力平台扣费系统：重构后架构设计文档"><meta property="og:description" content="扣费系统重构后的架构设计、模块化拆分、组件职责说明"><meta property="og:image" content="https://goppop.github.io/_astro/blog-placeholder-1.Bx0Zcyzv.jpg"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/%E6%89%A3%E8%B4%B9%E7%B3%BB%E7%BB%9F-%E9%87%8D%E6%9E%84%E5%90%8E%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3/"><meta property="twitter:title" content="算力平台扣费系统：重构后架构设计文档"><meta property="twitter:description" content="扣费系统重构后的架构设计、模块化拆分、组件职责说明"><meta property="twitter:image" content="https://goppop.github.io/_astro/blog-placeholder-1.Bx0Zcyzv.jpg"><link rel="stylesheet" href="/_astro/Header.DHc1oVwj.css"><style>main[data-astro-cid-tldeq5d5]{width:100%;max-width:none;margin:0;padding:0}.article-shell[data-astro-cid-tldeq5d5]{max-width:1120px;margin:0 auto;padding:3rem 1rem 1rem}.article-head[data-astro-cid-tldeq5d5]{border-bottom:1px solid #e1d2bbe6;grid-template-columns:minmax(0,1fr) 260px;align-items:end;gap:1.5rem;padding-bottom:1.4rem;display:grid}.title[data-astro-cid-tldeq5d5]{margin:0;line-height:1}.title[data-astro-cid-tldeq5d5] h1[data-astro-cid-tldeq5d5]{max-width:12em;color:var(--accent-dark);margin:0;font-size:3.6rem;line-height:1.08}.date-card[data-astro-cid-tldeq5d5]{color:var(--muted);background:#fff9eeb3;border-radius:8px;padding:1rem;font-size:.9rem;box-shadow:0 12px 28px #58422314}.date-card[data-astro-cid-tldeq5d5] strong[data-astro-cid-tldeq5d5]{color:var(--clay);letter-spacing:0;text-transform:uppercase;margin-bottom:.4rem;font-size:.82rem;display:block}.last-updated-on[data-astro-cid-tldeq5d5]{border-top:1px solid #e1d2bbc7;margin-top:.8rem;padding-top:.8rem}.meta-row[data-astro-cid-tldeq5d5]{flex-wrap:wrap;gap:.55rem;margin-top:1rem;display:flex}.hero-image[data-astro-cid-tldeq5d5]{width:100%;max-width:1120px;margin:2rem auto 0}.hero-image[data-astro-cid-tldeq5d5] img[data-astro-cid-tldeq5d5]{box-shadow:var(--box-shadow);border-radius:6px;margin:0 auto;display:block}.prose[data-astro-cid-tldeq5d5]{width:780px;max-width:100%;color:var(--ink);margin:2.2rem auto 0;padding:0 1rem}.prose[data-astro-cid-tldeq5d5] h2{border-top:1px solid var(--line);margin-top:3.4rem;padding-top:1rem}.prose[data-astro-cid-tldeq5d5] h2:first-child{border-top:0;margin-top:0;padding-top:0}.prose[data-astro-cid-tldeq5d5] h3{color:var(--accent-dark)}.prose[data-astro-cid-tldeq5d5] p,.prose[data-astro-cid-tldeq5d5] li{font-size:1.02rem}.prose[data-astro-cid-tldeq5d5] ul,.prose[data-astro-cid-tldeq5d5] ol{padding-left:1.4rem}.prose[data-astro-cid-tldeq5d5] table{display:block;overflow-x:auto}.prose[data-astro-cid-tldeq5d5] li+li{margin-top:.35rem}@media (width<=820px){.article-shell[data-astro-cid-tldeq5d5]{padding:2rem .75rem 1rem}.article-head[data-astro-cid-tldeq5d5]{grid-template-columns:1fr}.title[data-astro-cid-tldeq5d5] h1[data-astro-cid-tldeq5d5]{font-size:2.25rem}.prose[data-astro-cid-tldeq5d5]{margin-top:2rem;padding:0 .75rem}}
+</style></head><body data-astro-cid-tldeq5d5><header data-astro-cid-nen7h5rs><nav data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs>Goppop 的博客</a><div class="internal-links" data-astro-cid-nen7h5rs><a href="/" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>首页</a><a href="/blog" class="active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>文章</a><a href="/about" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>关于</a></div><div class="social-links" data-astro-cid-nen7h5rs><a href="https://github.com/Goppop" target="_blank" data-astro-cid-nen7h5rs><span class="sr-only" data-astro-cid-nen7h5rs>Goppop GitHub</span><svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" data-astro-cid-nen7h5rs><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" data-astro-cid-nen7h5rs></path></svg></a></div></nav></header><main data-astro-cid-tldeq5d5><article data-astro-cid-tldeq5d5><div class="article-shell" data-astro-cid-tldeq5d5><header class="article-head" data-astro-cid-tldeq5d5><div class="title" data-astro-cid-tldeq5d5><p class="eyebrow" data-astro-cid-tldeq5d5>Article</p><h1 data-astro-cid-tldeq5d5>算力平台扣费系统：重构后架构设计文档</h1><div class="meta-row" data-astro-cid-tldeq5d5><span class="label" data-astro-cid-tldeq5d5>代码开发学习</span><span class="label" data-astro-cid-tldeq5d5>系统开发</span><span class="label" data-astro-cid-tldeq5d5>架构重构</span></div></div><aside class="date-card" aria-label="文章日期" data-astro-cid-tldeq5d5><strong data-astro-cid-tldeq5d5>Published</strong><time datetime="2025-01-20T00:00:00.000Z">Jan 20, 2025</time></aside></header></div><div class="prose" data-astro-cid-tldeq5d5><h1 id="算力平台扣费系统重构后架构设计文档">算力平台扣费系统：重构后架构设计文档</h1>
+<blockquote>
+<p>本文档记录了扣费系统重构后的架构设计、模块化拆分思路、组件职责说明以及关键技术实现。</p>
+</blockquote>
+<h2 id="目录">目录</h2>
+<ul>
+<li><a href="#%E4%B8%80%E9%87%8D%E6%9E%84%E8%83%8C%E6%99%AF">一、重构背景</a></li>
+<li><a href="#%E4%BA%8C%E9%87%8D%E6%9E%84%E7%9B%AE%E6%A0%87">二、重构目标</a></li>
+<li><a href="#%E4%B8%89%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1">三、架构设计</a></li>
+<li><a href="#%E5%9B%9B%E6%A0%B8%E5%BF%83%E7%BB%84%E4%BB%B6">四、核心组件</a></li>
+<li><a href="#%E4%BA%94%E5%85%B3%E9%94%AE%E5%AE%9E%E7%8E%B0">五、关键实现</a></li>
+<li><a href="#%E5%85%AD%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E6%9C%BA%E5%88%B6">六、异常处理机制</a></li>
+<li><a href="#%E4%B8%83%E9%87%8D%E6%9E%84%E6%94%B6%E7%9B%8A">七、重构收益</a></li>
+<li><a href="#%E5%85%AB%E6%80%BB%E7%BB%93%E4%B8%8E%E6%80%9D%E8%80%83">八、总结与思考</a></li>
+</ul>
+<hr>
+<h2 id="一重构背景">一、重构背景</h2>
+<h3 id="11-原有问题">1.1 原有问题</h3>
+<p>在重构前，扣费系统的核心逻辑都集中在 <code>DeductionServiceImpl</code> 中，存在以下问题：</p>
+<ol>
+<li><strong>代码臃肿</strong>：单个类超过700行，方法过长，可读性差</li>
+<li><strong>职责不清</strong>：一个类承担了太多职责（扣费、退款、周期续扣、消息发送等）</li>
+<li><strong>难以测试</strong>：方法耦合度高，单元测试困难</li>
+<li><strong>难以维护</strong>：修改一个功能可能影响其他功能</li>
+<li><strong>异常处理分散</strong>：异常处理逻辑分散在各个方法中，难以统一管理</li>
+</ol>
+<h3 id="12-重构动机">1.2 重构动机</h3>
+<ul>
+<li><strong>提升代码质量</strong>：通过模块化拆分，提高代码的可读性和可维护性</li>
+<li><strong>降低耦合度</strong>：每个组件职责单一，便于独立测试和修改</li>
+<li><strong>增强异常处理</strong>：统一异常记录机制，便于问题排查</li>
+<li><strong>提高可扩展性</strong>：新功能可以独立开发，不影响现有功能</li>
+</ul>
+<hr>
+<h2 id="二重构目标">二、重构目标</h2>
+<h3 id="21-设计原则">2.1 设计原则</h3>
+<ol>
+<li><strong>单一职责原则</strong>：每个组件只负责一个明确的功能</li>
+<li><strong>开闭原则</strong>：对扩展开放，对修改关闭</li>
+<li><strong>依赖倒置原则</strong>：依赖抽象而非具体实现</li>
+<li><strong>接口隔离原则</strong>：接口设计精简，避免冗余</li>
+</ol>
+<h3 id="22-重构目标">2.2 重构目标</h3>
+<ul>
+<li>将大方法拆分为多个小方法，每个方法不超过50行</li>
+<li>按功能职责拆分组件，每个组件职责单一</li>
+<li>统一异常处理机制，所有异常都记录到数据库</li>
+<li>提高代码可测试性，每个组件都可以独立测试</li>
+<li>保持原有功能不变，确保向后兼容</li>
+</ul>
+<hr>
+<h2 id="三架构设计">三、架构设计</h2>
+<h3 id="31-整体架构">3.1 整体架构</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>┌─────────────────────────────────────────────────────────┐</span></span>
+<span class="line"><span>│                  Controller 层                           │</span></span>
+<span class="line"><span>│  ┌──────────────────────────────────────────────────┐  │</span></span>
+<span class="line"><span>│  │  DeductionRecordController (管理后台)              │  │</span></span>
+<span class="line"><span>│  │  DeductionApiController (RPC接口)                 │  │</span></span>
+<span class="line"><span>│  └──────────────────────────────────────────────────┘  │</span></span>
+<span class="line"><span>└───────────────────────────┬────────────────────────────┘</span></span>
+<span class="line"><span>                            │</span></span>
+<span class="line"><span>                            ▼</span></span>
+<span class="line"><span>┌─────────────────────────────────────────────────────────┐</span></span>
+<span class="line"><span>│                  Service 层 (核心服务)                   │</span></span>
+<span class="line"><span>│  ┌──────────────────────────────────────────────────┐  │</span></span>
+<span class="line"><span>│  │  DeductionServiceImpl (主服务，编排各组件)         │  │</span></span>
+<span class="line"><span>│  └──────────────────────────────────────────────────┘  │</span></span>
+<span class="line"><span>└───────────────────────────┬────────────────────────────┘</span></span>
+<span class="line"><span>                            │</span></span>
+<span class="line"><span>                            ▼</span></span>
+<span class="line"><span>┌─────────────────────────────────────────────────────────┐</span></span>
+<span class="line"><span>│               Component 层 (功能组件)                    │</span></span>
+<span class="line"><span>│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐ │</span></span>
+<span class="line"><span>│  │ 记录管理器    │  │ 退款执行器    │  │ 周期扣费处理器 │ │</span></span>
+<span class="line"><span>│  │RecordManager │  │RefundExecutor│  │   Processor  │ │</span></span>
+<span class="line"><span>│  └──────────────┘  └──────────────┘  └──────────────┘ │</span></span>
+<span class="line"><span>│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐ │</span></span>
+<span class="line"><span>│  │ 周期扣费执行器 │  │ 周期扣费停止器 │  │ 消息发送器    │ │</span></span>
+<span class="line"><span>│  │   Executor   │  │    Stopper   │  │MessageSender │ │</span></span>
+<span class="line"><span>│  └──────────────┘  └──────────────┘  └──────────────┘ │</span></span>
+<span class="line"><span>│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐ │</span></span>
+<span class="line"><span>│  │ 余额预警服务  │  │ 扣费校验器    │  │ 余额助手      │ │</span></span>
+<span class="line"><span>│  │BalanceWarning│  │   Validator  │  │BalanceHelper │ │</span></span>
+<span class="line"><span>│  └──────────────┘  └──────────────┘  └──────────────┘ │</span></span>
+<span class="line"><span>│  ┌──────────────────────────────────────────────────┐  │</span></span>
+<span class="line"><span>│  │  异常记录服务 (DeductionExceptionService)          │  │</span></span>
+<span class="line"><span>│  └──────────────────────────────────────────────────┘  │</span></span>
+<span class="line"><span>└───────────────────────────┬────────────────────────────┘</span></span>
+<span class="line"><span>                            │</span></span>
+<span class="line"><span>                            ▼</span></span>
+<span class="line"><span>┌─────────────────────────────────────────────────────────┐</span></span>
+<span class="line"><span>│                  Util 层 (工具类)                         │</span></span>
+<span class="line"><span>│  ┌──────────────┐  ┌──────────────┐                      │</span></span>
+<span class="line"><span>│  │RefundCalculator│ │DeductionNoUtils│                    │</span></span>
+<span class="line"><span>│  └──────────────┘  └──────────────┘                      │</span></span>
+<span class="line"><span>└─────────────────────────────────────────────────────────┘</span></span>
+<span class="line"><span>                            │</span></span>
+<span class="line"><span>                            ▼</span></span>
+<span class="line"><span>┌─────────────────────────────────────────────────────────┐</span></span>
+<span class="line"><span>│                  DAL 层 (数据访问)                        │</span></span>
+<span class="line"><span>│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐ │</span></span>
+<span class="line"><span>│  │RecordMapper  │  │DetailMapper  │  │ExceptionMapper│ │</span></span>
+<span class="line"><span>│  └──────────────┘  └──────────────┘  └──────────────┘ │</span></span>
+<span class="line"><span>└─────────────────────────────────────────────────────────┘</span></span></code></pre>
+<h3 id="32-组件关系图">3.2 组件关系图</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>DeductionServiceImpl (主服务)</span></span>
+<span class="line"><span>    ├── DeductionRecordManager (记录管理)</span></span>
+<span class="line"><span>    ├── RefundExecutor (退款执行)</span></span>
+<span class="line"><span>    ├── PeriodicDeductionProcessor (周期扣费处理)</span></span>
+<span class="line"><span>    │   ├── PeriodicDeductionExecutor (周期扣费执行)</span></span>
+<span class="line"><span>    │   └── PeriodicDeductionStopper (周期扣费停止)</span></span>
+<span class="line"><span>    ├── DeductionMessageSender (消息发送)</span></span>
+<span class="line"><span>    ├── BalanceWarningService (余额预警)</span></span>
+<span class="line"><span>    ├── DeductionValidator (参数校验)</span></span>
+<span class="line"><span>    ├── AccountBalanceHelper (余额助手)</span></span>
+<span class="line"><span>    └── DeductionExceptionService (异常记录)</span></span></code></pre>
+<hr>
+<h2 id="四核心组件">四、核心组件</h2>
+<h3 id="41-deductionserviceimpl主服务">4.1 DeductionServiceImpl（主服务）</h3>
+<p><strong>职责</strong>：编排各个组件，实现扣费、退款、周期续扣等核心业务流程。</p>
+<p><strong>特点</strong>：</p>
+<ul>
+<li>作为门面，对外提供统一的服务接口</li>
+<li>负责事务管理（<code>@Transactional</code>）</li>
+<li>协调各个组件完成业务流程</li>
+<li>处理异常并记录到异常表</li>
+</ul>
+<p><strong>核心方法</strong>：</p>
+<ul>
+<li><code>deduct()</code> - 执行扣费</li>
+<li><code>refundByOrderNo()</code> - 按订单号退款</li>
+<li><code>refundByDeductionNo()</code> - 按扣费单号退款</li>
+<li><code>partialRefund()</code> - 部分退款</li>
+<li><code>executePeriodicDeductions()</code> - 执行周期续扣任务</li>
+</ul>
+<h3 id="42-deductionrecordmanager记录管理器">4.2 DeductionRecordManager（记录管理器）</h3>
+<p><strong>职责</strong>：管理扣费记录的创建、更新、幂等性检查等操作。</p>
+<p><strong>核心方法</strong>：</p>
+<ul>
+<li><code>generateIdempotentKey()</code> - 生成幂等键</li>
+<li><code>checkIdempotency()</code> - 检查幂等性</li>
+<li><code>createDeductionRecord()</code> - 创建扣费记录</li>
+<li><code>updateDeductionSuccess()</code> - 更新扣费记录为成功</li>
+<li><code>createDeductionDetail()</code> - 创建扣费明细记录</li>
+</ul>
+<p><strong>设计亮点</strong>：</p>
+<ul>
+<li>幂等键生成逻辑集中管理</li>
+<li>处理并发冲突（<code>DuplicateKeyException</code>）</li>
+<li>周期扣费相关字段的统一设置</li>
+</ul>
+<h3 id="43-refundexecutor退款执行器">4.3 RefundExecutor（退款执行器）</h3>
+<p><strong>职责</strong>：执行单次退款的核心逻辑（增加余额、CAS更新明细记录）。</p>
+<p><strong>核心方法</strong>：</p>
+<ul>
+<li><code>execute()</code> - 执行退款</li>
+</ul>
+<p><strong>设计亮点</strong>：</p>
+<ul>
+<li>使用CAS更新防止并发退款冲突</li>
+<li>先增加余额，再更新明细（失败时事务回滚）</li>
+<li>支持部分退款（通过 <code>refundedAmount</code> 字段）</li>
+</ul>
+<p><strong>关键代码</strong>：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">// 1. 先增加余额</span></span>
+<span class="line"><span style="color:#E1E4E8">accountBalanceService.</span><span style="color:#B392F0">addBalance</span><span style="color:#E1E4E8">(...);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 2. CAS更新明细记录</span></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#E1E4E8"> updateCount </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> deductionDetailMapper.</span><span style="color:#B392F0">updateRefundedAmountAtomic</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">    detail.</span><span style="color:#B392F0">getId</span><span style="color:#E1E4E8">(),</span></span>
+<span class="line"><span style="color:#E1E4E8">    totalRefundAmount,</span></span>
+<span class="line"><span style="color:#E1E4E8">    newRefundStatus,</span></span>
+<span class="line"><span style="color:#E1E4E8">    alreadyRefunded  </span><span style="color:#6A737D">// 期望值</span></span>
+<span class="line"><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">if</span><span style="color:#E1E4E8"> (updateCount </span><span style="color:#F97583">==</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">    // CAS失败，抛出异常触发事务回滚</span></span>
+<span class="line"><span style="color:#F97583">    throw</span><span style="color:#B392F0"> exception</span><span style="color:#E1E4E8">(DEDUCTION_REFUND_CONCURRENT_CONFLICT);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="44-periodicdeductionprocessor周期扣费处理器">4.4 PeriodicDeductionProcessor（周期扣费处理器）</h3>
+<p><strong>职责</strong>：处理周期扣费的核心逻辑，包括漏扣周期计算、周期续扣执行、重试机制等。</p>
+<p><strong>核心方法</strong>：</p>
+<ul>
+<li><code>processOneRecord()</code> - 处理单个订单的周期续扣</li>
+<li><code>executeWithOneRetry()</code> - 执行周期续扣（带1次重试）</li>
+<li><code>calculateMissedPeriods()</code> - 计算漏扣的周期数</li>
+<li><code>handleSuccessPostActions()</code> - 处理扣费成功后的非关键操作</li>
+</ul>
+<p><strong>设计亮点</strong>：</p>
+<ul>
+<li>支持停机补扣（最多补扣10个周期）</li>
+<li>每个周期的扣费在独立事务中执行</li>
+<li>失败时自动停止周期扣费</li>
+<li>非关键操作（预警、消息）失败不影响主流程</li>
+</ul>
+<p><strong>关键逻辑</strong>：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">// 1. 计算漏扣周期数</span></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#E1E4E8"> missedPeriods </span><span style="color:#F97583">=</span><span style="color:#B392F0"> calculateMissedPeriods</span><span style="color:#E1E4E8">(record);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 2. 逐个补扣（最多10个周期）</span></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#E1E4E8"> maxCatchUp </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Math.</span><span style="color:#B392F0">min</span><span style="color:#E1E4E8">(missedPeriods, MAX_CATCH_UP_PERIODS);</span></span>
+<span class="line"><span style="color:#F97583">for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">int</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> maxCatchUp; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    PeriodicDeductionResult result </span><span style="color:#F97583">=</span><span style="color:#B392F0"> executeWithOneRetry</span><span style="color:#E1E4E8">(record, balanceBefore);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">result.</span><span style="color:#B392F0">isSuccess</span><span style="color:#E1E4E8">()) {</span></span>
+<span class="line"><span style="color:#F97583">        break</span><span style="color:#E1E4E8">; </span><span style="color:#6A737D">// 失败则停止</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="45-periodicdeductionexecutor周期扣费执行器">4.5 PeriodicDeductionExecutor（周期扣费执行器）</h3>
+<p><strong>职责</strong>：执行单个周期的扣费操作（扣减余额、更新记录、创建明细）。</p>
+<p><strong>特点</strong>：</p>
+<ul>
+<li>每个周期扣费在独立事务中执行（<code>@Transactional</code>）</li>
+<li>使用CAS更新防止并发冲突</li>
+<li>失败时回滚余额</li>
+</ul>
+<h3 id="46-periodicdeductionstopper周期扣费停止器">4.6 PeriodicDeductionStopper（周期扣费停止器）</h3>
+<p><strong>职责</strong>：停止周期扣费（更新状态为STOPPED）。</p>
+<p><strong>特点</strong>：</p>
+<ul>
+<li>使用CAS更新防止并发冲突</li>
+<li>支持按订单号停止和按扣费单号停止</li>
+</ul>
+<h3 id="47-deductionmessagesender消息发送器">4.7 DeductionMessageSender（消息发送器）</h3>
+<p><strong>职责</strong>：发送各种业务消息（扣费结果、退款结果、余额不足、停止消息等）。</p>
+<p><strong>特点</strong>：</p>
+<ul>
+<li>消息发送失败不影响主流程</li>
+<li>失败时记录到异常表</li>
+<li>支持批量发送退款消息</li>
+</ul>
+<h3 id="48-deductionexceptionservice异常记录服务">4.8 DeductionExceptionService（异常记录服务）</h3>
+<p><strong>职责</strong>：记录系统中所有需要人工干预的数据异常情况。</p>
+<p><strong>异常类型</strong>：</p>
+<ul>
+<li><code>CAS_FAILED</code> - CAS更新失败</li>
+<li><code>TRANSACTION_ROLLBACK</code> - 事务回滚</li>
+<li><code>DATA_INCONSISTENCY</code> - 数据不一致</li>
+<li><code>OPERATION_FAILED</code> - 操作失败</li>
+</ul>
+<p><strong>核心方法</strong>：</p>
+<ul>
+<li><code>recordException()</code> - 记录异常（通用方法）</li>
+<li><code>recordCasFailed()</code> - 记录CAS更新失败</li>
+<li><code>recordBalanceReducedButFailed()</code> - 记录余额已扣减但后续操作失败</li>
+<li><code>recordStopFailed()</code> - 记录停止周期扣费失败</li>
+<li><code>recordMessageSendFailed()</code> - 记录消息发送失败</li>
+</ul>
+<p><strong>设计亮点</strong>：</p>
+<ul>
+<li>统一异常记录机制，便于每日检查和处理</li>
+<li>记录数据快照，便于问题排查</li>
+<li>支持异常处理状态跟踪</li>
+</ul>
+<h3 id="49-其他组件">4.9 其他组件</h3>
+<ul>
+<li><strong>DeductionValidator</strong>：参数校验器，负责校验扣费请求和退款请求</li>
+<li><strong>BalanceWarningService</strong>：余额预警服务，负责余额预警检查和消息发送</li>
+<li><strong>AccountBalanceHelper</strong>：账户余额助手，提供余额查询的便捷方法（带重试）</li>
+<li><strong>RefundCalculator</strong>：退款计算工具类，计算可退金额</li>
+<li><strong>DeductionNoUtils</strong>：扣费单号生成工具类</li>
+</ul>
+<hr>
+<h2 id="五关键实现">五、关键实现</h2>
+<h3 id="51-扣费流程重构后">5.1 扣费流程（重构后）</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Transactional</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">rollbackFor</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> Exception.class)</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> DeductionResult </span><span style="color:#B392F0">deduct</span><span style="color:#E1E4E8">(DeductionRequest request) {</span></span>
+<span class="line"><span style="color:#6A737D">    // 0. 参数校验</span></span>
+<span class="line"><span style="color:#E1E4E8">    deductionValidator.</span><span style="color:#B392F0">validateDeductionRequest</span><span style="color:#E1E4E8">(request);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 1. 生成幂等键</span></span>
+<span class="line"><span style="color:#E1E4E8">    String idempotentKey </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> deductionRecordManager.</span><span style="color:#B392F0">generateIdempotentKey</span><span style="color:#E1E4E8">(request);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 2. 检查幂等性</span></span>
+<span class="line"><span style="color:#E1E4E8">    DeductionRecordDO existing </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> deductionRecordManager.</span><span style="color:#B392F0">checkIdempotency</span><span style="color:#E1E4E8">(idempotentKey);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (existing </span><span style="color:#F97583">!=</span><span style="color:#79B8FF"> null</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#E1E4E8"> DeductionStatusEnum.SUCCESS.</span><span style="color:#B392F0">getCode</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">equals</span><span style="color:#E1E4E8">(existing.</span><span style="color:#B392F0">getStatus</span><span style="color:#E1E4E8">())) {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> DeductionResult.</span><span style="color:#B392F0">success</span><span style="color:#E1E4E8">(existing);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 3. 创建扣费记录</span></span>
+<span class="line"><span style="color:#E1E4E8">    DeductionRecordDO record </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> deductionRecordManager.</span><span style="color:#B392F0">createDeductionRecord</span><span style="color:#E1E4E8">(request, idempotentKey);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 4. 扣减余额</span></span>
+<span class="line"><span style="color:#E1E4E8">    BigDecimal balanceBefore </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> accountBalanceHelper.</span><span style="color:#B392F0">getAccountBalance</span><span style="color:#E1E4E8">(request.</span><span style="color:#B392F0">getUserId</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">    accountBalanceService.</span><span style="color:#B392F0">reduceBalance</span><span style="color:#E1E4E8">(...);</span></span>
+<span class="line"><span style="color:#E1E4E8">    BigDecimal balanceAfter </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> accountBalanceHelper.</span><span style="color:#B392F0">getAccountBalance</span><span style="color:#E1E4E8">(request.</span><span style="color:#B392F0">getUserId</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 5. 更新扣费记录为成功</span></span>
+<span class="line"><span style="color:#E1E4E8">    deductionRecordManager.</span><span style="color:#B392F0">updateDeductionSuccess</span><span style="color:#E1E4E8">(record, request);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 6. 创建扣费明细记录</span></span>
+<span class="line"><span style="color:#E1E4E8">    deductionRecordManager.</span><span style="color:#B392F0">createDeductionDetail</span><span style="color:#E1E4E8">(record, request.</span><span style="color:#B392F0">getAmount</span><span style="color:#E1E4E8">(), </span><span style="color:#9ECBFF">"SUCCESS"</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">null</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 7. 余额预警检查（非关键操作）</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (Boolean.TRUE.</span><span style="color:#B392F0">equals</span><span style="color:#E1E4E8">(request.</span><span style="color:#B392F0">getIsPeriodic</span><span style="color:#E1E4E8">())) {</span></span>
+<span class="line"><span style="color:#F97583">        try</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">            balanceWarningService.</span><span style="color:#B392F0">checkBeforeDeduction</span><span style="color:#E1E4E8">(record, balanceAfter);</span></span>
+<span class="line"><span style="color:#E1E4E8">        } </span><span style="color:#F97583">catch</span><span style="color:#E1E4E8"> (Exception </span><span style="color:#FFAB70">e</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">            log.</span><span style="color:#B392F0">error</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"[deduct][余额预警检查失败]"</span><span style="color:#E1E4E8">, e);</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 8. 发送扣费成功消息（非关键操作）</span></span>
+<span class="line"><span style="color:#F97583">    try</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">        deductionMessageSender.</span><span style="color:#B392F0">sendDeductionResultMessage</span><span style="color:#E1E4E8">(record, </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">null</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">catch</span><span style="color:#E1E4E8"> (Exception </span><span style="color:#FFAB70">e</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        log.</span><span style="color:#B392F0">error</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"[deduct][发送消息失败]"</span><span style="color:#E1E4E8">, e);</span></span>
+<span class="line"><span style="color:#E1E4E8">        deductionExceptionService.</span><span style="color:#B392F0">recordMessageSendFailed</span><span style="color:#E1E4E8">(record, </span><span style="color:#9ECBFF">"扣费成功消息"</span><span style="color:#E1E4E8">, e);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> DeductionResult.</span><span style="color:#B392F0">success</span><span style="color:#E1E4E8">(record);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>重构亮点</strong>：</p>
+<ul>
+<li>每个步骤职责清晰，易于理解和维护</li>
+<li>非关键操作（预警、消息）失败不影响主流程</li>
+<li>异常统一记录到异常表</li>
+</ul>
+<h3 id="52-退款流程重构后">5.2 退款流程（重构后）</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Transactional</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">rollbackFor</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> Exception.class)</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> RefundResult </span><span style="color:#B392F0">refundByOrderNo</span><span style="color:#E1E4E8">(String orderNo, String reason) {</span></span>
+<span class="line"><span style="color:#6A737D">    // 1. 查询可退款的扣费明细</span></span>
+<span class="line"><span style="color:#E1E4E8">    List&#x3C;</span><span style="color:#F97583">DeductionDetailDO</span><span style="color:#E1E4E8">> refundableDetails </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> deductionDetailMapper.</span><span style="color:#B392F0">selectRefundableByOrderNo</span><span style="color:#E1E4E8">(orderNo);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    BigDecimal totalRefundAmount </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> BigDecimal.ZERO;</span></span>
+<span class="line"><span style="color:#E1E4E8">    List&#x3C;</span><span style="color:#F97583">RefundMessageInfo</span><span style="color:#E1E4E8">> successfulRefunds </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#E1E4E8"> ArrayList&#x3C;>();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 2. 统一执行退款</span></span>
+<span class="line"><span style="color:#F97583">    for</span><span style="color:#E1E4E8"> (DeductionDetailDO detail </span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> refundableDetails) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        BigDecimal refundableAmount </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> RefundCalculator.</span><span style="color:#B392F0">calculateRefundableAmount</span><span style="color:#E1E4E8">(detail);</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (refundableAmount.</span><span style="color:#B392F0">compareTo</span><span style="color:#E1E4E8">(BigDecimal.ZERO) </span><span style="color:#F97583">&#x3C;=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">            continue</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">        // 执行退款（失败会抛异常触发回滚）</span></span>
+<span class="line"><span style="color:#E1E4E8">        BigDecimal refundAmount </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> refundExecutor.</span><span style="color:#B392F0">execute</span><span style="color:#E1E4E8">(detail, refundableAmount, reason);</span></span>
+<span class="line"><span style="color:#E1E4E8">        totalRefundAmount </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> totalRefundAmount.</span><span style="color:#B392F0">add</span><span style="color:#E1E4E8">(refundAmount);</span></span>
+<span class="line"><span style="color:#E1E4E8">        successfulRefunds.</span><span style="color:#B392F0">add</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">new</span><span style="color:#B392F0"> RefundMessageInfo</span><span style="color:#E1E4E8">(detail, refundAmount, reason, </span><span style="color:#79B8FF">false</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 3. 停止周期扣费（关键操作）</span></span>
+<span class="line"><span style="color:#F97583">    boolean</span><span style="color:#E1E4E8"> stopped </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> periodicDeductionStopper.</span><span style="color:#B392F0">stopByOrderNo</span><span style="color:#E1E4E8">(orderNo);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">stopped) {</span></span>
+<span class="line"><span style="color:#F97583">        throw</span><span style="color:#B392F0"> exception</span><span style="color:#E1E4E8">(DEDUCTION_UPDATE_STATUS_FAILED);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 4. 发送退款消息（非关键操作）</span></span>
+<span class="line"><span style="color:#E1E4E8">    deductionMessageSender.</span><span style="color:#B392F0">sendRefundMessages</span><span style="color:#E1E4E8">(successfulRefunds, </span><span style="color:#9ECBFF">"refundByOrderNo"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> RefundResult.</span><span style="color:#B392F0">success</span><span style="color:#E1E4E8">(orderNo, totalRefundAmount);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>重构亮点</strong>：</p>
+<ul>
+<li>退款逻辑封装在 <code>RefundExecutor</code> 中，可复用</li>
+<li>退款计算逻辑封装在 <code>RefundCalculator</code> 中</li>
+<li>消息发送失败不影响退款结果</li>
+</ul>
+<h3 id="53-周期续扣流程重构后">5.3 周期续扣流程（重构后）</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> executePeriodicDeductions</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#6A737D">    // 1. 查询待续扣记录</span></span>
+<span class="line"><span style="color:#E1E4E8">    List&#x3C;</span><span style="color:#F97583">DeductionRecordDO</span><span style="color:#E1E4E8">> records </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> deductionRecordMapper.</span><span style="color:#B392F0">selectPendingPeriodicDeductions</span><span style="color:#E1E4E8">(LocalDateTime.</span><span style="color:#B392F0">now</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    for</span><span style="color:#E1E4E8"> (DeductionRecordDO record </span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> records) {</span></span>
+<span class="line"><span style="color:#F97583">        try</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">            // 2. 处理单个订单的周期续扣</span></span>
+<span class="line"><span style="color:#E1E4E8">            periodicDeductionProcessor.</span><span style="color:#B392F0">processOneRecord</span><span style="color:#E1E4E8">(record);</span></span>
+<span class="line"><span style="color:#E1E4E8">        } </span><span style="color:#F97583">catch</span><span style="color:#E1E4E8"> (Exception </span><span style="color:#FFAB70">e</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">            // 3. 处理失败：停止周期扣费、发送消息、记录异常</span></span>
+<span class="line"><span style="color:#B392F0">            handlePeriodicDeductionFailure</span><span style="color:#E1E4E8">(record, e);</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>重构亮点</strong>：</p>
+<ul>
+<li>周期续扣逻辑封装在 <code>PeriodicDeductionProcessor</code> 中</li>
+<li>每个订单的处理完全独立，失败不影响其他订单</li>
+<li>异常统一处理，记录到异常表</li>
+</ul>
+<hr>
+<h2 id="六异常处理机制">六、异常处理机制</h2>
+<h3 id="61-异常分类">6.1 异常分类</h3>
+<p>系统将异常分为以下几类：</p>
+<ol>
+<li>
+<p><strong>业务异常</strong>（ServiceException）</p>
+<ul>
+<li>余额不足、参数校验失败等</li>
+<li>需要回滚事务</li>
+<li>发送业务消息通知</li>
+</ul>
+</li>
+<li>
+<p><strong>系统异常</strong>（Exception）</p>
+<ul>
+<li>数据库连接失败、网络异常等</li>
+<li>需要回滚事务</li>
+<li>记录到异常表</li>
+</ul>
+</li>
+<li>
+<p><strong>非关键操作异常</strong></p>
+<ul>
+<li>消息发送失败、余额预警失败等</li>
+<li>不影响主流程</li>
+<li>记录到异常表</li>
+</ul>
+</li>
+</ol>
+<h3 id="62-异常记录机制">6.2 异常记录机制</h3>
+<p>所有需要人工干预的异常都会记录到 <code>tgkw_deduction_exception</code> 表：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">// 示例：记录CAS更新失败</span></span>
+<span class="line"><span style="color:#E1E4E8">deductionExceptionService.</span><span style="color:#B392F0">recordCasFailed</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">    record,</span></span>
+<span class="line"><span style="color:#E1E4E8">    exceptionCode,</span></span>
+<span class="line"><span style="color:#9ECBFF">    "停止周期扣费CAS失败，可能导致重复扣费"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    exception</span></span>
+<span class="line"><span style="color:#E1E4E8">);</span></span></code></pre>
+<p><strong>异常表字段</strong>：</p>
+<ul>
+<li><code>business_module</code> - 业务模块（DEDUCTION、REFUND等）</li>
+<li><code>business_type</code> - 业务类型（扣费、退款等）</li>
+<li><code>exception_type</code> - 异常类型（CAS_FAILED、TRANSACTION_ROLLBACK等）</li>
+<li><code>exception_code</code> - 异常错误码</li>
+<li><code>exception_message</code> - 异常信息</li>
+<li><code>data_snapshot</code> - 数据快照（JSON格式）</li>
+<li><code>handle_status</code> - 处理状态（UNHANDLED、HANDLED等）</li>
+</ul>
+<h3 id="63-异常处理流程">6.3 异常处理流程</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>异常发生</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>判断异常类型</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>业务异常 → 发送业务消息 → 抛出异常 → 事务回滚</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>系统异常 → 记录到异常表 → 抛出异常 → 事务回滚</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>非关键操作异常 → 记录到异常表 → 继续执行</span></span></code></pre>
+<hr>
+<h2 id="七重构收益">七、重构收益</h2>
+<h3 id="71-代码质量提升">7.1 代码质量提升</h3>
+<ul>
+<li><strong>可读性提升</strong>：每个组件职责单一，代码清晰易懂</li>
+<li><strong>可维护性提升</strong>：修改一个功能不影响其他功能</li>
+<li><strong>可测试性提升</strong>：每个组件都可以独立测试</li>
+<li><strong>代码行数减少</strong>：主服务类从700+行减少到400+行</li>
+</ul>
+<h3 id="72-架构优化">7.2 架构优化</h3>
+<ul>
+<li><strong>模块化设计</strong>：按功能职责拆分组件</li>
+<li><strong>低耦合高内聚</strong>：组件之间依赖关系清晰</li>
+<li><strong>易于扩展</strong>：新功能可以独立开发</li>
+</ul>
+<h3 id="73-异常处理增强">7.3 异常处理增强</h3>
+<ul>
+<li><strong>统一异常记录</strong>：所有异常都记录到数据库</li>
+<li><strong>便于问题排查</strong>：异常信息完整，包含数据快照</li>
+<li><strong>支持异常处理跟踪</strong>：记录处理状态</li>
+</ul>
+<h3 id="74-性能优化">7.4 性能优化</h3>
+<ul>
+<li><strong>非关键操作异步化</strong>：消息发送、预警检查失败不影响主流程</li>
+<li><strong>事务粒度优化</strong>：周期续扣每个周期独立事务</li>
+</ul>
+<hr>
+<h2 id="八总结与思考">八、总结与思考</h2>
+<h3 id="81-重构经验总结">8.1 重构经验总结</h3>
+<ol>
+<li><strong>渐进式重构</strong>：不要一次性重构所有代码，按模块逐步重构</li>
+<li><strong>保持功能不变</strong>：重构过程中确保原有功能不受影响</li>
+<li><strong>充分测试</strong>：重构后要进行充分的单元测试和集成测试</li>
+<li><strong>文档同步更新</strong>：重构后要及时更新技术文档</li>
+</ol>
+<h3 id="82-设计原则应用">8.2 设计原则应用</h3>
+<ul>
+<li><strong>单一职责原则</strong>：每个组件只负责一个明确的功能</li>
+<li><strong>开闭原则</strong>：通过接口和抽象类实现扩展</li>
+<li><strong>依赖倒置原则</strong>：依赖接口而非具体实现</li>
+<li><strong>接口隔离原则</strong>：接口设计精简，避免冗余</li>
+</ul>
+<h3 id="83-未来优化方向">8.3 未来优化方向</h3>
+<ol>
+<li>
+<p><strong>性能优化</strong>：</p>
+<ul>
+<li>批量处理周期续扣任务</li>
+<li>Redis缓存热点数据</li>
+<li>数据库分表（按月分表）</li>
+</ul>
+</li>
+<li>
+<p><strong>功能增强</strong>：</p>
+<ul>
+<li>支持更多计费模式（按天、按周）</li>
+<li>支持优惠券抵扣</li>
+<li>支持欠费处理</li>
+</ul>
+</li>
+<li>
+<p><strong>监控完善</strong>：</p>
+<ul>
+<li>对接监控系统（Prometheus + Grafana）</li>
+<li>配置告警规则</li>
+<li>定期生成对账报表</li>
+</ul>
+</li>
+<li>
+<p><strong>异常处理优化</strong>：</p>
+<ul>
+<li>异常自动处理机制（如自动重试）</li>
+<li>异常处理工作流</li>
+<li>异常统计分析</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="附录">附录</h2>
+<h3 id="a-关键代码文件">A. 关键代码文件</h3>
+<ul>
+<li><code>DeductionServiceImpl.java</code> - 扣费服务实现（主服务）</li>
+<li><code>DeductionRecordManager.java</code> - 扣费记录管理器</li>
+<li><code>RefundExecutor.java</code> - 退款执行器</li>
+<li><code>PeriodicDeductionProcessor.java</code> - 周期扣费处理器</li>
+<li><code>PeriodicDeductionExecutor.java</code> - 周期扣费执行器</li>
+<li><code>PeriodicDeductionStopper.java</code> - 周期扣费停止器</li>
+<li><code>DeductionMessageSender.java</code> - 消息发送器</li>
+<li><code>DeductionExceptionService.java</code> - 异常记录服务</li>
+<li><code>DeductionValidator.java</code> - 扣费校验器</li>
+<li><code>BalanceWarningService.java</code> - 余额预警服务</li>
+<li><code>AccountBalanceHelper.java</code> - 账户余额助手</li>
+<li><code>RefundCalculator.java</code> - 退款计算工具类</li>
+</ul>
+<h3 id="b-数据库表结构">B. 数据库表结构</h3>
+<ul>
+<li><code>tgkw_deduction_record</code> - 扣费记录表（主记录）</li>
+<li><code>tgkw_deduction_detail</code> - 扣费明细表</li>
+<li><code>tgkw_deduction_exception</code> - 异常记录表（新增）</li>
+</ul>
+<h3 id="c-相关文档">C. 相关文档</h3>
+<ul>
+<li><a href="./%E6%89%A3%E8%B4%B9%E7%B3%BB%E7%BB%9F-%E4%BB%8E%E8%AE%BE%E8%AE%A1%E5%88%B0%E5%BC%80%E5%8F%91%E5%85%A8%E8%BF%87%E7%A8%8B.md">扣费系统-从设计到开发全过程</a> - 原始设计文档</li>
+<li><a href="../tgwk-module-pay/tgwk-module-pay-server/src/test/resources/%E6%89%A3%E8%B4%B9%E7%B3%BB%E7%BB%9F%E5%AF%B9%E6%8E%A5%E6%96%87%E6%A1%A3.md">扣费系统对接文档</a> - 对接文档</li>
+</ul>
+</div></article></main><footer data-astro-cid-jo6i4kqk><div data-astro-cid-jo6i4kqk>Goppop 的博客</div><p data-astro-cid-jo6i4kqk>&copy; 2026 Goppop. 记录技术学习、系统设计和长期思考。</p></footer></body></html>

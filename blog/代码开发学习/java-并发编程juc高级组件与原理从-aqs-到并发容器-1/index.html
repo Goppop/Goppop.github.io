@@ -1,0 +1,305 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-tldeq5d5><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" href="/favicon.ico"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Goppop 的博客" href="https://goppop.github.io/rss.xml"><meta name="generator" content="Astro v7.0.3"><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/7443039bbc50ce9a.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/0edeceb0e4e5adfc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/7443039bbc50ce9a.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/0edeceb0e4e5adfc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/java-%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8Bjuc%E9%AB%98%E7%BA%A7%E7%BB%84%E4%BB%B6%E4%B8%8E%E5%8E%9F%E7%90%86%E4%BB%8E-aqs-%E5%88%B0%E5%B9%B6%E5%8F%91%E5%AE%B9%E5%99%A8-1/"><!-- Primary Meta Tags --><title>Java 并发编程（JUC）高级组件与原理：从 AQS 到并发容器</title><meta name="description" content="并发编程高级组件与原理"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/java-%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8Bjuc%E9%AB%98%E7%BA%A7%E7%BB%84%E4%BB%B6%E4%B8%8E%E5%8E%9F%E7%90%86%E4%BB%8E-aqs-%E5%88%B0%E5%B9%B6%E5%8F%91%E5%AE%B9%E5%99%A8-1/"><meta property="og:title" content="Java 并发编程（JUC）高级组件与原理：从 AQS 到并发容器"><meta property="og:description" content="并发编程高级组件与原理"><meta property="og:image" content="https://goppop.github.io/_astro/blog-placeholder-1.Bx0Zcyzv.jpg"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/java-%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8Bjuc%E9%AB%98%E7%BA%A7%E7%BB%84%E4%BB%B6%E4%B8%8E%E5%8E%9F%E7%90%86%E4%BB%8E-aqs-%E5%88%B0%E5%B9%B6%E5%8F%91%E5%AE%B9%E5%99%A8-1/"><meta property="twitter:title" content="Java 并发编程（JUC）高级组件与原理：从 AQS 到并发容器"><meta property="twitter:description" content="并发编程高级组件与原理"><meta property="twitter:image" content="https://goppop.github.io/_astro/blog-placeholder-1.Bx0Zcyzv.jpg"><link rel="stylesheet" href="/_astro/Header.DHc1oVwj.css"><style>main[data-astro-cid-tldeq5d5]{width:100%;max-width:none;margin:0;padding:0}.article-shell[data-astro-cid-tldeq5d5]{max-width:1120px;margin:0 auto;padding:3rem 1rem 1rem}.article-head[data-astro-cid-tldeq5d5]{border-bottom:1px solid #e1d2bbe6;grid-template-columns:minmax(0,1fr) 260px;align-items:end;gap:1.5rem;padding-bottom:1.4rem;display:grid}.title[data-astro-cid-tldeq5d5]{margin:0;line-height:1}.title[data-astro-cid-tldeq5d5] h1[data-astro-cid-tldeq5d5]{max-width:12em;color:var(--accent-dark);margin:0;font-size:3.6rem;line-height:1.08}.date-card[data-astro-cid-tldeq5d5]{color:var(--muted);background:#fff9eeb3;border-radius:8px;padding:1rem;font-size:.9rem;box-shadow:0 12px 28px #58422314}.date-card[data-astro-cid-tldeq5d5] strong[data-astro-cid-tldeq5d5]{color:var(--clay);letter-spacing:0;text-transform:uppercase;margin-bottom:.4rem;font-size:.82rem;display:block}.last-updated-on[data-astro-cid-tldeq5d5]{border-top:1px solid #e1d2bbc7;margin-top:.8rem;padding-top:.8rem}.meta-row[data-astro-cid-tldeq5d5]{flex-wrap:wrap;gap:.55rem;margin-top:1rem;display:flex}.hero-image[data-astro-cid-tldeq5d5]{width:100%;max-width:1120px;margin:2rem auto 0}.hero-image[data-astro-cid-tldeq5d5] img[data-astro-cid-tldeq5d5]{box-shadow:var(--box-shadow);border-radius:6px;margin:0 auto;display:block}.prose[data-astro-cid-tldeq5d5]{width:780px;max-width:100%;color:var(--ink);margin:2.2rem auto 0;padding:0 1rem}.prose[data-astro-cid-tldeq5d5] h2{border-top:1px solid var(--line);margin-top:3.4rem;padding-top:1rem}.prose[data-astro-cid-tldeq5d5] h2:first-child{border-top:0;margin-top:0;padding-top:0}.prose[data-astro-cid-tldeq5d5] h3{color:var(--accent-dark)}.prose[data-astro-cid-tldeq5d5] p,.prose[data-astro-cid-tldeq5d5] li{font-size:1.02rem}.prose[data-astro-cid-tldeq5d5] ul,.prose[data-astro-cid-tldeq5d5] ol{padding-left:1.4rem}.prose[data-astro-cid-tldeq5d5] table{display:block;overflow-x:auto}.prose[data-astro-cid-tldeq5d5] li+li{margin-top:.35rem}@media (width<=820px){.article-shell[data-astro-cid-tldeq5d5]{padding:2rem .75rem 1rem}.article-head[data-astro-cid-tldeq5d5]{grid-template-columns:1fr}.title[data-astro-cid-tldeq5d5] h1[data-astro-cid-tldeq5d5]{font-size:2.25rem}.prose[data-astro-cid-tldeq5d5]{margin-top:2rem;padding:0 .75rem}}
+</style></head><body data-astro-cid-tldeq5d5><header data-astro-cid-nen7h5rs><nav data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs>Goppop 的博客</a><div class="internal-links" data-astro-cid-nen7h5rs><a href="/" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>首页</a><a href="/blog" class="active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>文章</a><a href="/about" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>关于</a></div><div class="social-links" data-astro-cid-nen7h5rs><a href="https://github.com/Goppop" target="_blank" data-astro-cid-nen7h5rs><span class="sr-only" data-astro-cid-nen7h5rs>Goppop GitHub</span><svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" data-astro-cid-nen7h5rs><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" data-astro-cid-nen7h5rs></path></svg></a></div></nav></header><main data-astro-cid-tldeq5d5><article data-astro-cid-tldeq5d5><div class="article-shell" data-astro-cid-tldeq5d5><header class="article-head" data-astro-cid-tldeq5d5><div class="title" data-astro-cid-tldeq5d5><p class="eyebrow" data-astro-cid-tldeq5d5>Article</p><h1 data-astro-cid-tldeq5d5>Java 并发编程（JUC）高级组件与原理：从 AQS 到并发容器</h1><div class="meta-row" data-astro-cid-tldeq5d5><span class="label" data-astro-cid-tldeq5d5>代码开发学习</span><span class="label" data-astro-cid-tldeq5d5>JUC</span></div></div><aside class="date-card" aria-label="文章日期" data-astro-cid-tldeq5d5><strong data-astro-cid-tldeq5d5>Published</strong><time datetime="2025-12-17T00:00:00.000Z">Dec 17, 2025</time><div class="last-updated-on" data-astro-cid-tldeq5d5><strong data-astro-cid-tldeq5d5>Updated</strong><time datetime="2025-12-17T00:00:00.000Z">Dec 17, 2025</time></div></aside></header></div><div class="prose" data-astro-cid-tldeq5d5><h1 id="java-并发编程juc高级组件与原理从-aqs-到并发容器">Java 并发编程（JUC）高级组件与原理：从 AQS 到并发容器</h1>
+<h2 id="摘要">摘要</h2>
+<p>本文档旨在深入剖析 Java 并发工具包（JUC, Java Util Concurrent）中的核心高级组件与原理。我们将秉持**“合理符合实际、准确细节完备”**的原则，从并发编程的基石 <strong>JVM 优化</strong>出发，详细解析 <strong>AQS</strong>（AbstractQueuedSynchronizer）的底层机制，并扩展到 <strong>ReentrantLock</strong>、<strong>并发容器</strong>（如 <code>ConcurrentHashMap</code>）和 <strong>线程池</strong> 的实现细节，力求帮助读者彻底理解 JUC 的设计哲学和高性能秘密。</p>
+<h2 id="1-并发基础jvm-层的优化与保障">1. 并发基础：JVM 层的优化与保障</h2>
+<h3 id="11-synchronized-的锁升级机制">1.1 synchronized 的锁升级机制</h3>
+<p><code>synchronized</code> 关键字是 Java 中最基本的同步机制，但在 JDK 1.6 之后，其性能得到了大幅优化，不再是传统意义上的“重量级锁”。JVM 引入了<strong>锁升级</strong>机制，以适应不同的竞争情况，从而减少锁竞争带来的性能开销。</p>
+<p>锁的级别从低到高依次为：<strong>无锁 $\to$ 偏向锁 $\to$ 轻量级锁 $\to$ 重量级锁</strong>。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left">锁状态</th>
+<th style="text-align: left">适用场景</th>
+<th style="text-align: left">实现原理</th>
+<th style="text-align: left">性能特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left"><strong>偏向锁</strong> (Biased Locking)</td>
+<td style="text-align: left">几乎没有竞争，锁总是由同一个线程获得。</td>
+<td style="text-align: left">锁对象头中记录持有线程ID。线程再次进入同步块时，只需比较线程ID，无需 CAS 操作。</td>
+<td style="text-align: left"><strong>性能最高</strong>。适用于单线程反复进入同步块。</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>轻量级锁</strong> (Lightweight Locking)</td>
+<td style="text-align: left">少量竞争，线程交替进入同步块。</td>
+<td style="text-align: left">线程在栈帧中创建锁记录（Lock Record），通过 <strong>CAS</strong> 尝试将对象头中的 Mark Word 替换为指向锁记录的指针。</td>
+<td style="text-align: left"><strong>性能较高</strong>。适用于线程交替执行，没有阻塞。</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>重量级锁</strong> (Heavyweight Locking)</td>
+<td style="text-align: left">激烈竞争，线程需要阻塞等待。</td>
+<td style="text-align: left">锁膨胀为重量级锁，指向对象监视器（Monitor）。未获取锁的线程进入阻塞状态，涉及操作系统内核态切换。</td>
+<td style="text-align: left"><strong>性能最低</strong>。但能保证线程安全和公平性。</td>
+</tr>
+</tbody>
+</table>
+<p><strong>JVM 优化：</strong> JVM 还会进行<strong>锁消除</strong>（JIT 编译器发现不可能存在竞争的锁，直接消除）和<strong>锁粗化</strong>（将连续的加锁、解锁操作合并为一个更大的同步块），进一步提升 <code>synchronized</code> 的性能。</p>
+<h3 id="12-volatile-与内存屏障">1.2 volatile 与内存屏障</h3>
+<p><code>volatile</code> 关键字是 JUC 中许多组件（如 AQS 的 <code>state</code> 变量）实现可见性的底层保障。它主要解决两个问题：<strong>可见性</strong>和<strong>有序性</strong>。</p>
+<ul>
+<li><strong>可见性</strong>：当一个线程修改了 <code>volatile</code> 变量的值，新值会立即同步到主内存，并且其他线程读取该变量时，会强制从主内存刷新。</li>
+<li><strong>有序性</strong>：<code>volatile</code> 通过插入<strong>内存屏障</strong>（Memory Barrier）来禁止指令重排序。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align: left">内存屏障类型</th>
+<th style="text-align: left">插入位置</th>
+<th style="text-align: left">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left"><strong>StoreStore 屏障</strong></td>
+<td style="text-align: left">在 <code>volatile</code> 写操作之前。</td>
+<td style="text-align: left">确保 <code>volatile</code> 写之前的操作，不会被重排序到 <code>volatile</code> 写之后。</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>StoreLoad 屏障</strong></td>
+<td style="text-align: left">在 <code>volatile</code> 写操作之后。</td>
+<td style="text-align: left">确保 <code>volatile</code> 写操作对其他线程可见后，才执行后续的读操作。</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>LoadLoad 屏障</strong></td>
+<td style="text-align: left">在 <code>volatile</code> 读操作之后。</td>
+<td style="text-align: left">确保 <code>volatile</code> 读操作之前和之后的读操作，不会被重排序。</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>LoadStore 屏障</strong></td>
+<td style="text-align: left">在 <code>volatile</code> 读操作之后。</td>
+<td style="text-align: left">确保 <code>volatile</code> 读操作之前和之后的写操作，不会被重排序。</td>
+</tr>
+</tbody>
+</table>
+<p><strong>核心价值：</strong> <code>volatile</code> 保证了变量的修改能及时被其他线程看到，是实现轻量级同步和无锁编程的基础。</p>
+<h2 id="2-并发基石aqsabstractqueuedsynchronizer">2. 并发基石：AQS（AbstractQueuedSynchronizer）</h2>
+<p>AQS 是 JUC 中许多同步器（如 <code>ReentrantLock</code>、<code>Semaphore</code>、<code>CountDownLatch</code> 等）的<strong>抽象基类</strong>。它提供了一个<strong>FIFO</strong>（先进先出）的等待队列和一套原子操作，用于管理线程的阻塞和唤醒。</p>
+<h3 id="21-aqs-的核心组成">2.1 AQS 的核心组成</h3>
+<p>AQS 的设计围绕三个核心要素：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left">核心要素</th>
+<th style="text-align: left">作用</th>
+<th style="text-align: left">底层实现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left"><strong>State 状态</strong></td>
+<td style="text-align: left">用于表示同步状态，如锁的持有次数、信号量的可用资源数等。</td>
+<td style="text-align: left"><code>volatile int state</code>，通过 <strong>CAS</strong>（Compare-And-Swap）原子操作修改。</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>CLH 队列</strong></td>
+<td style="text-align: left">用于存储等待获取同步状态的线程。</td>
+<td style="text-align: left"><strong>双向链表</strong>，每个节点（<code>Node</code>）封装了一个等待的线程。</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>CAS 机制</strong></td>
+<td style="text-align: left">用于安全地修改 <code>state</code> 变量和操作 CLH 队列。</td>
+<td style="text-align: left"><code>Unsafe</code> 类提供的原子操作，确保多线程环境下的可见性和原子性。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="22-clh-队列与线程阻塞唤醒">2.2 CLH 队列与线程阻塞/唤醒</h3>
+<p>CLH 队列（Craig, Landin, and Hagersten lock）是 AQS 实现线程等待和唤醒的关键。</p>
+<ul>
+<li><strong>入队（自旋与阻塞）</strong>：当线程尝试获取同步状态失败时，它会被封装成一个 <code>Node</code> 节点，通过 <strong>CAS</strong> 尾插法加入到 CLH 队列的尾部。
+<ul>
+<li><strong>自旋</strong>：新入队的线程不会立即阻塞，而是会<strong>自旋</strong>检查其前驱节点的状态。</li>
+<li><strong>阻塞</strong>：只有当前驱节点是 <strong><code>SIGNAL</code> 状态</strong>时，线程才会调用 <code>LockSupport.park()</code> 方法进入<strong>等待状态</strong>（阻塞），释放 CPU 资源。</li>
+</ul>
+</li>
+<li><strong>出队（唤醒）</strong>：当持有锁的线程释放同步状态时，它会唤醒 CLH 队列中的<strong>头节点的后继节点</strong>。
+<ul>
+<li><strong>唤醒</strong>：被唤醒的线程会调用 <code>LockSupport.unpark()</code> 方法，从等待状态中恢复，重新尝试获取同步状态。</li>
+</ul>
+</li>
+</ul>
+<p><strong>核心细节：</strong> AQS 巧妙地利用了 <strong>“自旋 + park/unpark”</strong> 机制，避免了线程在内核态和用户态之间频繁切换的开销，只有在确定需要等待时才阻塞，提高了效率。</p>
+<h3 id="23-reentrantlock公平与非公平的抉择">2.3 ReentrantLock：公平与非公平的抉择</h3>
+<p><code>ReentrantLock</code> 是 AQS 的典型应用，它提供了两种锁模式：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left">模式</th>
+<th style="text-align: left">特性</th>
+<th style="text-align: left">性能考量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left"><strong>非公平锁</strong>（默认）</td>
+<td style="text-align: left">线程尝试获取锁时，<strong>不会</strong>检查等待队列中是否有线程等待。如果锁是空闲的，新线程可以直接抢占。</td>
+<td style="text-align: left"><strong>性能更高</strong>。减少了线程切换和入队出队的开销，但可能导致队列中的线程<strong>饥饿</strong>。</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>公平锁</strong></td>
+<td style="text-align: left">线程尝试获取锁时，<strong>会</strong>检查等待队列。如果队列中有线程等待，新线程必须排队。</td>
+<td style="text-align: left"><strong>性能略低</strong>。保证了线程获取锁的顺序性，避免饥饿，但增加了额外的检查开销。</td>
+</tr>
+</tbody>
+</table>
+<p><strong>实践建议：</strong> 在绝大多数高并发场景中，应优先使用<strong>非公平锁</strong>，因为其吞吐量更高。只有在对线程公平性有严格要求的场景下，才考虑使用公平锁。</p>
+<h2 id="3-并发容器concurrenthashmap-与-copyonwrite">3. 并发容器：ConcurrentHashMap 与 CopyOnWrite</h2>
+<h3 id="31-concurrenthashmapjdk-18">3.1 ConcurrentHashMap（JDK 1.8）</h3>
+<p><code>ConcurrentHashMap</code> 是 Java 中使用最广泛的并发 Map，其设计经历了从分段锁（JDK 1.7）到 <strong>CAS + Synchronized</strong>（JDK 1.8）的演变。</p>
+<h4 id="311-jdk-18-的核心结构">3.1.1 JDK 1.8 的核心结构</h4>
+<p>JDK 1.8 的 <code>ConcurrentHashMap</code> 采用<strong>数组 + 链表 + 红黑树</strong>的结构，其并发控制机制是：</p>
+<ul>
+<li><strong>写操作（put/remove）</strong>：只对<strong>当前操作的桶（Bucket）<strong>加锁。锁的粒度是</strong>桶级别</strong>的，使用的是 <code>synchronized</code> 关键字。</li>
+<li><strong>读操作（get）</strong>：完全<strong>无锁</strong>。通过 <code>volatile</code> 关键字保证可见性，直接读取数据。</li>
+<li><strong>扩容</strong>：采用<strong>多线程协助扩容</strong>机制，将扩容过程分散到多个线程的写操作中，避免了单线程扩容带来的长时间阻塞。</li>
+</ul>
+<h4 id="312-锁的细节cas-与-synchronized">3.1.2 锁的细节：CAS 与 Synchronized</h4>
+<ol>
+<li><strong>初始化/扩容</strong>：使用 <strong>CAS</strong> 机制来控制对数组的初始化和扩容操作，确保只有一个线程能成功执行。</li>
+<li><strong>链表/红黑树操作</strong>：使用 <strong><code>synchronized</code></strong> 锁住当前 <code>Node</code> 或 <code>TreeBin</code> 的头节点，实现对桶内数据的并发控制。</li>
+</ol>
+<p><strong>设计哲学：</strong> 读操作完全无锁，写操作只锁住必要的最小范围，最大化了并发性能。</p>
+<h3 id="32-copyonwritearraylist">3.2 CopyOnWriteArrayList</h3>
+<p><code>CopyOnWriteArrayList</code>（写时复制列表）是一种特殊的并发容器，适用于<strong>读多写少</strong>的场景。</p>
+<ul>
+<li><strong>写操作（add/set/remove）</strong>：
+<ol>
+<li>获取一个全局锁（<code>ReentrantLock</code>）。</li>
+<li><strong>复制</strong>底层数组。</li>
+<li>在新数组上执行修改操作。</li>
+<li>将底层数组的引用指向新数组。</li>
+<li>释放锁。</li>
+</ol>
+</li>
+<li><strong>读操作（get）</strong>：完全<strong>无锁</strong>。直接读取当前数组的引用。</li>
+</ul>
+<p><strong>数据一致性：</strong> 读操作读取的是<strong>旧数组</strong>，因此 <code>CopyOnWriteArrayList</code> 提供了<strong>最终一致性</strong>。它牺牲了写操作的性能（因为涉及数组复制），换取了读操作的极致性能。</p>
+<h2 id="4-原子操作与-cas-机制">4. 原子操作与 CAS 机制</h2>
+<h3 id="41-cascompare-and-swap">4.1 CAS（Compare-And-Swap）</h3>
+<p>CAS 是一种乐观锁机制，由 CPU 硬件指令支持，用于实现无锁（Lock-Free）编程。</p>
+<ul>
+<li><strong>操作过程</strong>：它包含三个操作数：
+<ol>
+<li><strong>V</strong>（Value）：内存位置的当前值。</li>
+<li><strong>A</strong>（Expected）：预期的旧值。</li>
+<li><strong>B</strong>（New）：要写入的新值。</li>
+</ol>
+</li>
+<li><strong>逻辑</strong>：只有当内存位置 V 的值等于预期值 A 时，才将 V 的值更新为 B。否则，不做任何操作。</li>
+</ul>
+<p><strong>优势：</strong> 避免了使用重量级的锁（如 <code>synchronized</code>），减少了线程上下文切换的开销。</p>
+<h3 id="42-aba-问题与解决方案">4.2 ABA 问题与解决方案</h3>
+<p>CAS 机制存在一个著名的漏洞：<strong>ABA 问题</strong>。</p>
+<ul>
+<li><strong>问题描述</strong>：
+<ol>
+<li>线程 T1 读取 V 的值为 A。</li>
+<li>线程 T2 将 V 的值修改为 B，然后又改回 A。</li>
+<li>线程 T1 执行 CAS 操作时，发现 V 的值仍然是 A，认为没有发生变化，成功执行更新。</li>
+</ol>
+</li>
+<li><strong>危害</strong>：虽然值没有变，但过程中的变化可能导致逻辑错误（例如，链表中的节点被删除又重新添加）。</li>
+</ul>
+<p><strong>解决方案：</strong> 使用 <strong><code>AtomicStampedReference</code></strong>。</p>
+<ul>
+<li><strong>原理</strong>：在 CAS 比较时，不仅比较值 V，还引入一个<strong>版本号（Stamp）</strong>。</li>
+<li><strong>逻辑</strong>：只有当 V 的值等于预期值 A <strong>且</strong>版本号等于预期版本号时，才执行更新，并将版本号加 1。这样，即使值从 A 变为 B 又变回 A，版本号也已经改变，CAS 操作会失败，从而避免了 ABA 问题。</li>
+</ul>
+<h2 id="5-线程池核心原理threadpoolexecutor">5. 线程池核心原理：ThreadPoolExecutor</h2>
+<p><code>ThreadPoolExecutor</code> 是 JUC 中管理线程的核心组件，其设计目标是<strong>复用线程</strong>，避免线程频繁创建和销毁的开销。</p>
+<h3 id="51-线程池的七大参数与工作流程">5.1 线程池的七大参数与工作流程</h3>
+<p>线程池的工作流程围绕以下七个核心参数展开：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left">参数</th>
+<th style="text-align: left">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left"><code>corePoolSize</code></td>
+<td style="text-align: left">核心线程数。线程池中始终保持存活的线程数量。</td>
+</tr>
+<tr>
+<td style="text-align: left"><code>maximumPoolSize</code></td>
+<td style="text-align: left">最大线程数。线程池允许创建的最大线程数量。</td>
+</tr>
+<tr>
+<td style="text-align: left"><code>keepAliveTime</code></td>
+<td style="text-align: left">非核心线程的空闲存活时间。</td>
+</tr>
+<tr>
+<td style="text-align: left"><code>unit</code></td>
+<td style="text-align: left"><code>keepAliveTime</code> 的时间单位。</td>
+</tr>
+<tr>
+<td style="text-align: left"><code>workQueue</code></td>
+<td style="text-align: left">任务队列。用于存放等待执行的任务。</td>
+</tr>
+<tr>
+<td style="text-align: left"><code>threadFactory</code></td>
+<td style="text-align: left">线程工厂。用于创建新线程。</td>
+</tr>
+<tr>
+<td style="text-align: left"><code>handler</code></td>
+<td style="text-align: left">拒绝策略。当任务队列和线程池都满时，采取的拒绝措施。</td>
+</tr>
+</tbody>
+</table>
+<p><strong>工作流程（优先级）：</strong></p>
+<ol>
+<li><strong>核心线程</strong>：当新任务提交时，如果当前运行的线程数小于 <code>corePoolSize</code>，则创建核心线程执行任务。</li>
+<li><strong>任务队列</strong>：如果当前运行的线程数等于 <code>corePoolSize</code>，新任务会被放入 <code>workQueue</code> 等待。</li>
+<li><strong>非核心线程</strong>：如果任务队列已满，且当前运行的线程数小于 <code>maximumPoolSize</code>，则创建非核心线程执行任务。</li>
+<li><strong>拒绝策略</strong>：如果线程数达到 <code>maximumPoolSize</code> 且任务队列已满，则执行<strong>拒绝策略</strong>。</li>
+</ol>
+<h3 id="52-任务队列的选择与影响">5.2 任务队列的选择与影响</h3>
+<p><code>workQueue</code> 的选择直接影响线程池的行为和性能：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left">队列类型</th>
+<th style="text-align: left">特性</th>
+<th style="text-align: left">影响</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left"><strong><code>LinkedBlockingQueue</code></strong></td>
+<td style="text-align: left">无界队列（默认容量为 <code>Integer.MAX_VALUE</code>）。</td>
+<td style="text-align: left">任务会无限排队，导致线程数永远不会超过 <code>corePoolSize</code>。<code>maximumPoolSize</code> 参数失效。适用于任务提交速度稳定且可控的场景。</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong><code>ArrayBlockingQueue</code></strong></td>
+<td style="text-align: left">有界队列。</td>
+<td style="text-align: left">任务排队达到上限后，会触发创建非核心线程，直到达到 <code>maximumPoolSize</code>。适用于需要控制资源消耗的场景。</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong><code>SynchronousQueue</code></strong></td>
+<td style="text-align: left">不存储元素的阻塞队列。</td>
+<td style="text-align: left">任务提交后，必须等待一个工作线程立即接收。如果当前没有空闲线程，则创建新线程（直到 <code>maximumPoolSize</code>），否则执行拒绝策略。适用于任务提交速度极快，且需要快速响应的场景。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="53-拒绝策略handler">5.3 拒绝策略（Handler）</h3>
+<p>当线程池和任务队列都满时，<code>ThreadPoolExecutor</code> 会执行拒绝策略。JUC 提供了四种内置策略：</p>
+<ol>
+<li><strong><code>AbortPolicy</code></strong>（默认）：直接抛出 <code>RejectedExecutionException</code> 异常。</li>
+<li><strong><code>CallerRunsPolicy</code></strong>：由提交任务的线程（Caller）自己执行该任务。</li>
+<li><strong><code>DiscardPolicy</code></strong>：直接丢弃任务，不抛出异常。</li>
+<li><strong><code>DiscardOldestPolicy</code></strong>：丢弃任务队列中最旧的任务，然后尝试重新提交当前任务。</li>
+</ol>
+<p><strong>实践建议：</strong> 在生产环境中，应根据业务需求<strong>自定义拒绝策略</strong>，例如将任务记录到日志或持久化到数据库，以确保任务不会无声无息地丢失。</p>
+<h2 id="6-总结">6. 总结</h2>
+<p>JUC 的设计哲学是<strong>将并发控制的复杂性封装在底层</strong>，通过 AQS、CAS 等机制，为上层应用提供了高效、可靠的并发工具。理解这些底层原理，不仅能帮助我们正确使用 JUC 组件，更能指导我们在遇到并发问题时，快速定位和解决问题。</p>
+<p><strong>知识体系回顾：</strong></p>
+<ul>
+<li><strong>JVM 基础</strong>：<code>synchronized</code> 锁升级、<code>volatile</code> 内存屏障。</li>
+<li><strong>并发基石</strong>：AQS 队列、状态、<code>park/unpark</code>。</li>
+<li><strong>核心工具</strong>：<code>ReentrantLock</code>、<code>ConcurrentHashMap</code>、<code>ThreadPoolExecutor</code>。</li>
+<li><strong>原子操作</strong>：CAS、ABA 问题与 <code>AtomicStampedReference</code>。</li>
+</ul>
+</div></article></main><footer data-astro-cid-jo6i4kqk><div data-astro-cid-jo6i4kqk>Goppop 的博客</div><p data-astro-cid-jo6i4kqk>&copy; 2026 Goppop. 记录技术学习、系统设计和长期思考。</p></footer></body></html>

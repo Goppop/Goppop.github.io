@@ -1,0 +1,339 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-tldeq5d5><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" href="/favicon.ico"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Goppop 的博客" href="https://goppop.github.io/rss.xml"><meta name="generator" content="Astro v7.0.3"><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/7443039bbc50ce9a.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/0edeceb0e4e5adfc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/7443039bbc50ce9a.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/0edeceb0e4e5adfc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/sms%E7%9F%AD%E4%BF%A1%E6%9C%8D%E5%8A%A1%E6%95%B4%E5%90%88%E6%96%87%E6%A1%A3/"><!-- Primary Meta Tags --><title>SMS短信服务</title><meta name="description" content="文章描述"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/sms%E7%9F%AD%E4%BF%A1%E6%9C%8D%E5%8A%A1%E6%95%B4%E5%90%88%E6%96%87%E6%A1%A3/"><meta property="og:title" content="SMS短信服务"><meta property="og:description" content="文章描述"><meta property="og:image" content="https://goppop.github.io/_astro/blog-placeholder-1.Bx0Zcyzv.jpg"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/sms%E7%9F%AD%E4%BF%A1%E6%9C%8D%E5%8A%A1%E6%95%B4%E5%90%88%E6%96%87%E6%A1%A3/"><meta property="twitter:title" content="SMS短信服务"><meta property="twitter:description" content="文章描述"><meta property="twitter:image" content="https://goppop.github.io/_astro/blog-placeholder-1.Bx0Zcyzv.jpg"><link rel="stylesheet" href="/_astro/Header.DHc1oVwj.css"><style>main[data-astro-cid-tldeq5d5]{width:100%;max-width:none;margin:0;padding:0}.article-shell[data-astro-cid-tldeq5d5]{max-width:1120px;margin:0 auto;padding:3rem 1rem 1rem}.article-head[data-astro-cid-tldeq5d5]{border-bottom:1px solid #e1d2bbe6;grid-template-columns:minmax(0,1fr) 260px;align-items:end;gap:1.5rem;padding-bottom:1.4rem;display:grid}.title[data-astro-cid-tldeq5d5]{margin:0;line-height:1}.title[data-astro-cid-tldeq5d5] h1[data-astro-cid-tldeq5d5]{max-width:12em;color:var(--accent-dark);margin:0;font-size:3.6rem;line-height:1.08}.date-card[data-astro-cid-tldeq5d5]{color:var(--muted);background:#fff9eeb3;border-radius:8px;padding:1rem;font-size:.9rem;box-shadow:0 12px 28px #58422314}.date-card[data-astro-cid-tldeq5d5] strong[data-astro-cid-tldeq5d5]{color:var(--clay);letter-spacing:0;text-transform:uppercase;margin-bottom:.4rem;font-size:.82rem;display:block}.last-updated-on[data-astro-cid-tldeq5d5]{border-top:1px solid #e1d2bbc7;margin-top:.8rem;padding-top:.8rem}.meta-row[data-astro-cid-tldeq5d5]{flex-wrap:wrap;gap:.55rem;margin-top:1rem;display:flex}.hero-image[data-astro-cid-tldeq5d5]{width:100%;max-width:1120px;margin:2rem auto 0}.hero-image[data-astro-cid-tldeq5d5] img[data-astro-cid-tldeq5d5]{box-shadow:var(--box-shadow);border-radius:6px;margin:0 auto;display:block}.prose[data-astro-cid-tldeq5d5]{width:780px;max-width:100%;color:var(--ink);margin:2.2rem auto 0;padding:0 1rem}.prose[data-astro-cid-tldeq5d5] h2{border-top:1px solid var(--line);margin-top:3.4rem;padding-top:1rem}.prose[data-astro-cid-tldeq5d5] h2:first-child{border-top:0;margin-top:0;padding-top:0}.prose[data-astro-cid-tldeq5d5] h3{color:var(--accent-dark)}.prose[data-astro-cid-tldeq5d5] p,.prose[data-astro-cid-tldeq5d5] li{font-size:1.02rem}.prose[data-astro-cid-tldeq5d5] ul,.prose[data-astro-cid-tldeq5d5] ol{padding-left:1.4rem}.prose[data-astro-cid-tldeq5d5] table{display:block;overflow-x:auto}.prose[data-astro-cid-tldeq5d5] li+li{margin-top:.35rem}@media (width<=820px){.article-shell[data-astro-cid-tldeq5d5]{padding:2rem .75rem 1rem}.article-head[data-astro-cid-tldeq5d5]{grid-template-columns:1fr}.title[data-astro-cid-tldeq5d5] h1[data-astro-cid-tldeq5d5]{font-size:2.25rem}.prose[data-astro-cid-tldeq5d5]{margin-top:2rem;padding:0 .75rem}}
+</style></head><body data-astro-cid-tldeq5d5><header data-astro-cid-nen7h5rs><nav data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs>Goppop 的博客</a><div class="internal-links" data-astro-cid-nen7h5rs><a href="/" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>首页</a><a href="/blog" class="active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>文章</a><a href="/about" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>关于</a></div><div class="social-links" data-astro-cid-nen7h5rs><a href="https://github.com/Goppop" target="_blank" data-astro-cid-nen7h5rs><span class="sr-only" data-astro-cid-nen7h5rs>Goppop GitHub</span><svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" data-astro-cid-nen7h5rs><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" data-astro-cid-nen7h5rs></path></svg></a></div></nav></header><main data-astro-cid-tldeq5d5><article data-astro-cid-tldeq5d5><div class="article-shell" data-astro-cid-tldeq5d5><header class="article-head" data-astro-cid-tldeq5d5><div class="title" data-astro-cid-tldeq5d5><p class="eyebrow" data-astro-cid-tldeq5d5>Article</p><h1 data-astro-cid-tldeq5d5>SMS短信服务</h1><div class="meta-row" data-astro-cid-tldeq5d5><span class="label" data-astro-cid-tldeq5d5>代码开发学习</span><span class="label" data-astro-cid-tldeq5d5>SMS短信服务</span></div></div><aside class="date-card" aria-label="文章日期" data-astro-cid-tldeq5d5><strong data-astro-cid-tldeq5d5>Published</strong><time datetime="2025-09-11T00:00:00.000Z">Sep 11, 2025</time><div class="last-updated-on" data-astro-cid-tldeq5d5><strong data-astro-cid-tldeq5d5>Updated</strong><time datetime="2025-11-21T00:00:00.000Z">Nov 21, 2025</time></div></aside></header></div><div class="prose" data-astro-cid-tldeq5d5><h1 id="sms短信服务整合文档">SMS短信服务整合文档</h1>
+<h2 id="概述">概述</h2>
+<p>本文档详细介绍了项目中SMS短信服务的整合架构、实现方式和使用方法。项目采用了模块化设计，支持多种短信渠道，具备完整的短信发送、模板管理、日志记录和验证码功能。</p>
+<h2 id="1-架构设计">1. 架构设计</h2>
+<h3 id="11-核心组件">1.1 核心组件</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>SMS短信服务架构</span></span>
+<span class="line"><span>├── 短信发送服务 (SmsSendService)</span></span>
+<span class="line"><span>├── 短信模板管理 (SmsTemplateService)</span></span>
+<span class="line"><span>├── 短信渠道管理 (SmsChannelService)</span></span>
+<span class="line"><span>├── 短信日志管理 (SmsLogService)</span></span>
+<span class="line"><span>├── 短信验证码服务 (SmsCodeService)</span></span>
+<span class="line"><span>├── 短信客户端工厂 (SmsClientFactory)</span></span>
+<span class="line"><span>└── 消息队列处理 (SmsProducer/SmsConsumer)</span></span></code></pre>
+<h3 id="12-数据表结构">1.2 数据表结构</h3>
+<h4 id="短信渠道表-system_sms_channel">短信渠道表 (system_sms_channel)</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#F97583">CREATE</span><span style="color:#F97583"> TABLE</span><span style="color:#E1E4E8"> `</span><span style="color:#B392F0">system_sms_channel</span><span style="color:#E1E4E8">` (</span></span>
+<span class="line"><span style="color:#9ECBFF">  `id`</span><span style="color:#F97583"> bigint</span><span style="color:#F97583"> NOT NULL</span><span style="color:#E1E4E8"> AUTO_INCREMENT COMMENT </span><span style="color:#9ECBFF">'编号'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `signature`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">12</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'短信签名'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `code`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">63</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'渠道编码'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `status`</span><span style="color:#F97583"> tinyint</span><span style="color:#F97583"> NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'开启状态'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `remark`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">255</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'备注'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `api_key`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">128</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'短信 API 的账号'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `api_secret`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">128</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'短信 API 的秘钥'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `callback_url`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">255</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'短信发送回调 URL'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#6A737D">  -- 其他基础字段...</span></span>
+<span class="line"><span style="color:#E1E4E8">);</span></span></code></pre>
+<h4 id="短信模板表-system_sms_template">短信模板表 (system_sms_template)</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#F97583">CREATE</span><span style="color:#F97583"> TABLE</span><span style="color:#E1E4E8"> `</span><span style="color:#B392F0">system_sms_template</span><span style="color:#E1E4E8">` (</span></span>
+<span class="line"><span style="color:#9ECBFF">  `id`</span><span style="color:#F97583"> bigint</span><span style="color:#F97583"> NOT NULL</span><span style="color:#E1E4E8"> AUTO_INCREMENT COMMENT </span><span style="color:#9ECBFF">'编号'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `type`</span><span style="color:#F97583"> tinyint</span><span style="color:#F97583"> NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'模板类型'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `status`</span><span style="color:#F97583"> tinyint</span><span style="color:#F97583"> NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'开启状态'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `code`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">63</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'模板编码'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `name`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">63</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'模板名称'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `content`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">255</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'模板内容'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `params`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">255</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'参数数组'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `api_template_id`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">63</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'短信 API 的模板编号'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `channel_id`</span><span style="color:#F97583"> bigint</span><span style="color:#F97583"> NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'短信渠道编号'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `channel_code`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">63</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'短信渠道编码'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#6A737D">  -- 其他基础字段...</span></span>
+<span class="line"><span style="color:#E1E4E8">);</span></span></code></pre>
+<h4 id="短信日志表-system_sms_log">短信日志表 (system_sms_log)</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#F97583">CREATE</span><span style="color:#F97583"> TABLE</span><span style="color:#E1E4E8"> `</span><span style="color:#B392F0">system_sms_log</span><span style="color:#E1E4E8">` (</span></span>
+<span class="line"><span style="color:#9ECBFF">  `id`</span><span style="color:#F97583"> bigint</span><span style="color:#F97583"> NOT NULL</span><span style="color:#E1E4E8"> AUTO_INCREMENT COMMENT </span><span style="color:#9ECBFF">'编号'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `channel_id`</span><span style="color:#F97583"> bigint</span><span style="color:#F97583"> NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'短信渠道编号'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `template_id`</span><span style="color:#F97583"> bigint</span><span style="color:#F97583"> NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'模板编号'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `mobile`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">11</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'手机号'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `user_id`</span><span style="color:#F97583"> bigint</span><span style="color:#F97583"> DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'用户编号'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `user_type`</span><span style="color:#F97583"> tinyint</span><span style="color:#F97583"> DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'用户类型'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `send_status`</span><span style="color:#F97583"> tinyint</span><span style="color:#F97583"> NOT NULL</span><span style="color:#F97583"> DEFAULT</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'发送状态'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `send_time`</span><span style="color:#F97583"> datetime</span><span style="color:#F97583"> DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'发送时间'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `api_send_code`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">63</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'短信 API 发送结果的编码'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `api_send_msg`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">255</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'短信 API 发送失败的提示'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `receive_status`</span><span style="color:#F97583"> tinyint</span><span style="color:#F97583"> NOT NULL</span><span style="color:#F97583"> DEFAULT</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'接收状态'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `receive_time`</span><span style="color:#F97583"> datetime</span><span style="color:#F97583"> DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'接收时间'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#6A737D">  -- 其他字段...</span></span>
+<span class="line"><span style="color:#E1E4E8">);</span></span></code></pre>
+<h4 id="短信验证码表-system_sms_code">短信验证码表 (system_sms_code)</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#F97583">CREATE</span><span style="color:#F97583"> TABLE</span><span style="color:#E1E4E8"> `</span><span style="color:#B392F0">system_sms_code</span><span style="color:#E1E4E8">` (</span></span>
+<span class="line"><span style="color:#9ECBFF">  `id`</span><span style="color:#F97583"> bigint</span><span style="color:#F97583"> NOT NULL</span><span style="color:#E1E4E8"> AUTO_INCREMENT COMMENT </span><span style="color:#9ECBFF">'编号'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `mobile`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">11</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'手机号'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `code`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">6</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'验证码'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `create_ip`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">15</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'创建 IP'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `scene`</span><span style="color:#F97583"> tinyint</span><span style="color:#F97583"> NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'发送场景'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `today_index`</span><span style="color:#F97583"> tinyint</span><span style="color:#F97583"> NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'今日发送的第几条'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `used`</span><span style="color:#F97583"> tinyint</span><span style="color:#F97583"> NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'是否使用'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `used_time`</span><span style="color:#F97583"> datetime</span><span style="color:#F97583"> DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'使用时间'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `used_ip`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">255</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'使用 IP'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `tenant_id`</span><span style="color:#F97583"> bigint</span><span style="color:#F97583"> NOT NULL</span><span style="color:#F97583"> DEFAULT</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'租户编号'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#6A737D">  -- 其他基础字段...</span></span>
+<span class="line"><span style="color:#E1E4E8">);</span></span></code></pre>
+<h2 id="2-核心服务实现">2. 核心服务实现</h2>
+<h3 id="21-短信发送服务-smssendservice">2.1 短信发送服务 (SmsSendService)</h3>
+<h4 id="主要功能">主要功能</h4>
+<ul>
+<li>发送单条短信给管理员用户</li>
+<li>发送单条短信给会员用户</li>
+<li>异步短信发送处理</li>
+<li>短信状态回调处理</li>
+</ul>
+<h4 id="核心方法">核心方法</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">// 发送短信给管理员</span></span>
+<span class="line"><span style="color:#E1E4E8">Long </span><span style="color:#B392F0">sendSingleSmsToAdmin</span><span style="color:#E1E4E8">(String mobile, Long userId, </span></span>
+<span class="line"><span style="color:#E1E4E8">                         String templateCode, Map</span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8">String, Object</span><span style="color:#F97583">></span><span style="color:#E1E4E8"> templateParams);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 发送短信给会员</span></span>
+<span class="line"><span style="color:#E1E4E8">Long </span><span style="color:#B392F0">sendSingleSmsToMember</span><span style="color:#E1E4E8">(String mobile, Long userId, </span></span>
+<span class="line"><span style="color:#E1E4E8">                          String templateCode, Map</span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8">String, Object</span><span style="color:#F97583">></span><span style="color:#E1E4E8"> templateParams);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 异步发送短信</span></span>
+<span class="line"><span style="color:#F97583">void</span><span style="color:#B392F0"> doSendSms</span><span style="color:#E1E4E8">(SmsSendMessage message);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 处理短信状态回调</span></span>
+<span class="line"><span style="color:#F97583">void</span><span style="color:#B392F0"> receiveSmsStatus</span><span style="color:#E1E4E8">(String channelCode, String text);</span></span></code></pre>
+<h4 id="发送流程">发送流程</h4>
+<ol>
+<li>验证短信模板和渠道</li>
+<li>校验手机号码</li>
+<li>构建模板参数</li>
+<li>创建发送日志</li>
+<li>发送MQ消息进行异步处理</li>
+<li>更新发送结果</li>
+</ol>
+<h3 id="22-短信渠道管理-smschannelservice">2.2 短信渠道管理 (SmsChannelService)</h3>
+<h4 id="支持的渠道类型">支持的渠道类型</h4>
+<ul>
+<li><strong>阿里云短信</strong> (ALIYUN)</li>
+<li><strong>腾讯云短信</strong> (TENCENT)</li>
+<li><strong>华为云短信</strong> (HUAWEI)</li>
+<li><strong>七牛云短信</strong> (QINIU)</li>
+<li><strong>钉钉调试</strong> (DEBUG_DING_TALK)</li>
+</ul>
+<h4 id="渠道配置">渠道配置</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">// 渠道配置示例</span></span>
+<span class="line"><span style="color:#E1E4E8">SmsChannelDO channel </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> SmsChannelDO</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">channel.</span><span style="color:#B392F0">setSignature</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"您的签名"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">channel.</span><span style="color:#B392F0">setCode</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"ALIYUN"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">channel.</span><span style="color:#B392F0">setApiKey</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"your_api_key"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">channel.</span><span style="color:#B392F0">setApiSecret</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"your_api_secret"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">channel.</span><span style="color:#B392F0">setStatus</span><span style="color:#E1E4E8">(CommonStatusEnum.ENABLE.</span><span style="color:#B392F0">getStatus</span><span style="color:#E1E4E8">());</span></span></code></pre>
+<h3 id="23-短信模板管理-smstemplateservice">2.3 短信模板管理 (SmsTemplateService)</h3>
+<h4 id="模板类型">模板类型</h4>
+<ul>
+<li><strong>验证码短信</strong> (type=1)</li>
+<li><strong>通知短信</strong> (type=2)</li>
+<li><strong>营销短信</strong> (type=3)</li>
+</ul>
+<h4 id="模板配置示例">模板配置示例</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">// 验证码模板</span></span>
+<span class="line"><span style="color:#E1E4E8">SmsTemplateDO template </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> SmsTemplateDO</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">template.</span><span style="color:#B392F0">setCode</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"user-sms-login"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">template.</span><span style="color:#B392F0">setName</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"用户短信登录"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">template.</span><span style="color:#B392F0">setContent</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"您的验证码是{code}"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">template.</span><span style="color:#B392F0">setParams</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"[</span><span style="color:#79B8FF">\"</span><span style="color:#9ECBFF">code</span><span style="color:#79B8FF">\"</span><span style="color:#9ECBFF">]"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">template.</span><span style="color:#B392F0">setApiTemplateId</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"4372216"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">template.</span><span style="color:#B392F0">setChannelId</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">4L</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">template.</span><span style="color:#B392F0">setChannelCode</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"DEBUG_DING_TALK"</span><span style="color:#E1E4E8">);</span></span></code></pre>
+<h3 id="24-短信验证码服务-smscodeservice">2.4 短信验证码服务 (SmsCodeService)</h3>
+<h4 id="主要功能-1">主要功能</h4>
+<ul>
+<li>发送验证码短信</li>
+<li>验证码校验</li>
+<li>验证码使用</li>
+<li>防刷机制</li>
+</ul>
+<h4 id="使用示例">使用示例</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">// 发送验证码</span></span>
+<span class="line"><span style="color:#E1E4E8">SmsCodeSendReqDTO sendReq </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> SmsCodeSendReqDTO</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">sendReq.</span><span style="color:#B392F0">setMobile</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"13800138000"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">sendReq.</span><span style="color:#B392F0">setScene</span><span style="color:#E1E4E8">(SmsSceneEnum.MEMBER_LOGIN.</span><span style="color:#B392F0">getScene</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">sendReq.</span><span style="color:#B392F0">setCreateIp</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"127.0.0.1"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">smsCodeService.</span><span style="color:#B392F0">sendSmsCode</span><span style="color:#E1E4E8">(sendReq);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 验证验证码</span></span>
+<span class="line"><span style="color:#E1E4E8">SmsCodeValidateReqDTO validateReq </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> SmsCodeValidateReqDTO</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">validateReq.</span><span style="color:#B392F0">setMobile</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"13800138000"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">validateReq.</span><span style="color:#B392F0">setCode</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"123456"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">validateReq.</span><span style="color:#B392F0">setScene</span><span style="color:#E1E4E8">(SmsSceneEnum.MEMBER_LOGIN.</span><span style="color:#B392F0">getScene</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">smsCodeService.</span><span style="color:#B392F0">validateSmsCode</span><span style="color:#E1E4E8">(validateReq);</span></span></code></pre>
+<h2 id="3-短信客户端实现">3. 短信客户端实现</h2>
+<h3 id="31-客户端工厂-smsclientfactory">3.1 客户端工厂 (SmsClientFactory)</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> interface</span><span style="color:#B392F0"> SmsClient</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">    // 发送短信</span></span>
+<span class="line"><span style="color:#E1E4E8">    SmsSendRespDTO </span><span style="color:#B392F0">sendSms</span><span style="color:#E1E4E8">(Long </span><span style="color:#FFAB70">logId</span><span style="color:#E1E4E8">, String </span><span style="color:#FFAB70">mobile</span><span style="color:#E1E4E8">, String </span><span style="color:#FFAB70">apiTemplateId</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">                          List&#x3C;KeyValue&#x3C;</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">Object</span><span style="color:#E1E4E8">>> </span><span style="color:#FFAB70">templateParams</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">throws</span><span style="color:#E1E4E8"> Throwable;</span></span>
+<span class="line"><span style="color:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#6A737D">    // 解析接收状态</span></span>
+<span class="line"><span style="color:#E1E4E8">    List&#x3C;</span><span style="color:#F97583">SmsReceiveRespDTO</span><span style="color:#E1E4E8">> </span><span style="color:#B392F0">parseSmsReceiveStatus</span><span style="color:#E1E4E8">(String </span><span style="color:#FFAB70">text</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">throws</span><span style="color:#E1E4E8"> Throwable;</span></span>
+<span class="line"><span style="color:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#6A737D">    // 查询短信模板</span></span>
+<span class="line"><span style="color:#E1E4E8">    SmsTemplateRespDTO </span><span style="color:#B392F0">getSmsTemplate</span><span style="color:#E1E4E8">(String </span><span style="color:#FFAB70">apiTemplateId</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">throws</span><span style="color:#E1E4E8"> Throwable;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="32-客户端工厂实现">3.2 客户端工厂实现</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> SmsClientFactoryImpl</span><span style="color:#F97583"> implements</span><span style="color:#B392F0"> SmsClientFactory</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> SmsClient </span><span style="color:#B392F0">createOrUpdateSmsClient</span><span style="color:#E1E4E8">(SmsChannelProperties </span><span style="color:#FFAB70">properties</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        SmsChannelEnum channelEnum </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> SmsChannelEnum.</span><span style="color:#B392F0">getByCode</span><span style="color:#E1E4E8">(properties.</span><span style="color:#B392F0">getCode</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#F97583">        switch</span><span style="color:#E1E4E8"> (channelEnum) {</span></span>
+<span class="line"><span style="color:#F97583">            case</span><span style="color:#E1E4E8"> ALIYUN</span><span style="color:#F97583">:</span><span style="color:#F97583"> return</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> AliyunSmsClient</span><span style="color:#E1E4E8">(properties);</span></span>
+<span class="line"><span style="color:#F97583">            case</span><span style="color:#E1E4E8"> TENCENT</span><span style="color:#F97583">:</span><span style="color:#F97583"> return</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> TencentSmsClient</span><span style="color:#E1E4E8">(properties);</span></span>
+<span class="line"><span style="color:#F97583">            case</span><span style="color:#E1E4E8"> HUAWEI</span><span style="color:#F97583">:</span><span style="color:#F97583"> return</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> HuaweiSmsClient</span><span style="color:#E1E4E8">(properties);</span></span>
+<span class="line"><span style="color:#F97583">            case</span><span style="color:#E1E4E8"> QINIU</span><span style="color:#F97583">:</span><span style="color:#F97583"> return</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> QiniuSmsClient</span><span style="color:#E1E4E8">(properties);</span></span>
+<span class="line"><span style="color:#F97583">            case</span><span style="color:#E1E4E8"> DEBUG_DING_TALK</span><span style="color:#F97583">:</span><span style="color:#F97583"> return</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> DebugDingTalkSmsClient</span><span style="color:#E1E4E8">(properties);</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="4-消息队列处理">4. 消息队列处理</h2>
+<h3 id="41-短信发送生产者-smsproducer">4.1 短信发送生产者 (SmsProducer)</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Component</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> SmsProducer</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> sendSmsSendMessage</span><span style="color:#E1E4E8">(Long </span><span style="color:#FFAB70">logId</span><span style="color:#E1E4E8">, String </span><span style="color:#FFAB70">mobile</span><span style="color:#E1E4E8">, Long </span><span style="color:#FFAB70">channelId</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">                                  String </span><span style="color:#FFAB70">apiTemplateId</span><span style="color:#E1E4E8">, List&#x3C;KeyValue&#x3C;</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">Object</span><span style="color:#E1E4E8">>> </span><span style="color:#FFAB70">templateParams</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        SmsSendMessage message </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> SmsSendMessage</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        message.</span><span style="color:#B392F0">setLogId</span><span style="color:#E1E4E8">(logId);</span></span>
+<span class="line"><span style="color:#E1E4E8">        message.</span><span style="color:#B392F0">setMobile</span><span style="color:#E1E4E8">(mobile);</span></span>
+<span class="line"><span style="color:#E1E4E8">        message.</span><span style="color:#B392F0">setChannelId</span><span style="color:#E1E4E8">(channelId);</span></span>
+<span class="line"><span style="color:#E1E4E8">        message.</span><span style="color:#B392F0">setApiTemplateId</span><span style="color:#E1E4E8">(apiTemplateId);</span></span>
+<span class="line"><span style="color:#E1E4E8">        message.</span><span style="color:#B392F0">setTemplateParams</span><span style="color:#E1E4E8">(templateParams);</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D">        // 发送到消息队列</span></span>
+<span class="line"><span style="color:#E1E4E8">        rocketMQTemplate.</span><span style="color:#B392F0">asyncSend</span><span style="color:#E1E4E8">(SMS_SEND_TOPIC, message);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="42-短信发送消费者-smssendconsumer">4.2 短信发送消费者 (SmsSendConsumer)</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Component</span></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">RocketMQMessageListener</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">topic</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> SMS_SEND_TOPIC, </span><span style="color:#79B8FF">consumerGroup</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> "sms-send-consumer"</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> SmsSendConsumer</span><span style="color:#F97583"> implements</span><span style="color:#B392F0"> RocketMQListener</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#F97583">SmsSendMessage</span><span style="color:#E1E4E8">> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> onMessage</span><span style="color:#E1E4E8">(SmsSendMessage </span><span style="color:#FFAB70">message</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        smsSendService.</span><span style="color:#B392F0">doSendSms</span><span style="color:#E1E4E8">(message);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="5-使用指南">5. 使用指南</h2>
+<h3 id="51-配置短信渠道">5.1 配置短信渠道</h3>
+<ol>
+<li>在管理后台进入“系统管理” -&gt; “短信管理” -&gt; “短信渠道”</li>
+<li>添加新的短信渠道，配置相应的API密钥</li>
+<li>启用渠道状态</li>
+</ol>
+<h3 id="52-配置短信模板">5.2 配置短信模板</h3>
+<ol>
+<li>进入“短信管理” -&gt; “短信模板”</li>
+<li>创建短信模板，设置模板内容和参数</li>
+<li>关联到对应的短信渠道</li>
+<li>启用模板状态</li>
+</ol>
+<h3 id="53-发送短信">5.3 发送短信</h3>
+<h4 id="方式一直接调用服务">方式一：直接调用服务</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Resource</span></span>
+<span class="line"><span style="color:#F97583">private</span><span style="color:#E1E4E8"> SmsSendService smsSendService;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 发送验证码短信</span></span>
+<span class="line"><span style="color:#E1E4E8">Map&#x3C;</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">Object</span><span style="color:#E1E4E8">> params </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#E1E4E8"> HashMap&#x3C;>();</span></span>
+<span class="line"><span style="color:#E1E4E8">params.</span><span style="color:#B392F0">put</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"code"</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"123456"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">Long logId </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> smsSendService.</span><span style="color:#B392F0">sendSingleSmsToMember</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"11111111111"</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">1L</span><span style="color:#E1E4E8">, </span></span>
+<span class="line"><span style="color:#9ECBFF">                                                  "user-sms-login"</span><span style="color:#E1E4E8">, params);</span></span></code></pre>
+<h4 id="方式二使用验证码服务">方式二：使用验证码服务</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Resource</span></span>
+<span class="line"><span style="color:#F97583">private</span><span style="color:#E1E4E8"> SmsCodeService smsCodeService;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 发送验证码</span></span>
+<span class="line"><span style="color:#E1E4E8">SmsCodeSendReqDTO sendReq </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> SmsCodeSendReqDTO</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">sendReq.</span><span style="color:#B392F0">setMobile</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"11111111111"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">sendReq.</span><span style="color:#B392F0">setScene</span><span style="color:#E1E4E8">(SmsSceneEnum.MEMBER_LOGIN.</span><span style="color:#B392F0">getScene</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">sendReq.</span><span style="color:#B392F0">setCreateIp</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"127.0.0.1"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">smsCodeService.</span><span style="color:#B392F0">sendSmsCode</span><span style="color:#E1E4E8">(sendReq);</span></span></code></pre>
+<h3 id="54-验证码校验">5.4 验证码校验</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">// 校验验证码</span></span>
+<span class="line"><span style="color:#E1E4E8">SmsCodeValidateReqDTO validateReq </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> SmsCodeValidateReqDTO</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">validateReq.</span><span style="color:#B392F0">setMobile</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"11111111111"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">validateReq.</span><span style="color:#B392F0">setCode</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"123456"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">validateReq.</span><span style="color:#B392F0">setScene</span><span style="color:#E1E4E8">(SmsSceneEnum.MEMBER_LOGIN.</span><span style="color:#B392F0">getScene</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">smsCodeService.</span><span style="color:#B392F0">validateSmsCode</span><span style="color:#E1E4E8">(validateReq);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 使用验证码（校验通过后标记为已使用）</span></span>
+<span class="line"><span style="color:#E1E4E8">SmsCodeUseReqDTO useReq </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> SmsCodeUseReqDTO</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">useReq.</span><span style="color:#B392F0">setMobile</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"11111111111"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">useReq.</span><span style="color:#B392F0">setCode</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"123456"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">useReq.</span><span style="color:#B392F0">setScene</span><span style="color:#E1E4E8">(SmsSceneEnum.MEMBER_LOGIN.</span><span style="color:#B392F0">getScene</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">useReq.</span><span style="color:#B392F0">setUsedIp</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"127.0.0.1"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">smsCodeService.</span><span style="color:#B392F0">useSmsCode</span><span style="color:#E1E4E8">(useReq);</span></span></code></pre>
+<h2 id="6-监控和日志">6. 监控和日志</h2>
+<h3 id="61-短信日志查询">6.1 短信日志查询</h3>
+<ol>
+<li>进入“短信管理” -&gt; “短信日志”</li>
+<li>可以查看所有短信发送记录</li>
+<li>支持按手机号、发送状态、时间范围等条件筛选</li>
+</ol>
+<h3 id="62-日志字段说明">6.2 日志字段说明</h3>
+<ul>
+<li><strong>发送状态</strong>：0-初始化，1-发送成功，2-发送失败，3-忽略发送</li>
+<li><strong>接收状态</strong>：0-初始化，1-接收成功，2-接收失败</li>
+<li><strong>API返回码</strong>：短信服务商返回的状态码</li>
+<li><strong>API返回消息</strong>：短信服务商返回的详细信息</li>
+</ul>
+<h2 id="7-配置参数">7. 配置参数</h2>
+<h3 id="71-短信验证码配置">7.1 短信验证码配置</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#6A737D"># application.yml</span></span>
+<span class="line"><span style="color:#85E89D">sms</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">  code</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">    expire-times</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">5m</span><span style="color:#6A737D">  # 验证码过期时间</span></span>
+<span class="line"><span style="color:#85E89D">    send-frequency</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">1m</span><span style="color:#6A737D">  # 发送频率限制</span></span>
+<span class="line"><span style="color:#85E89D">    send-maximum-quantity-per-day</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">10</span><span style="color:#6A737D">  # 每日最大发送次数</span></span></code></pre>
+<h3 id="72-消息队列配置">7.2 消息队列配置</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#85E89D">rocketmq</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">  name-server</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">localhost:9876</span></span>
+<span class="line"><span style="color:#85E89D">  producer</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">    group</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">sms-producer</span></span>
+<span class="line"><span style="color:#85E89D">  consumer</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">    group</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">sms-consumer</span></span></code></pre>
+<h2 id="8-扩展开发">8. 扩展开发</h2>
+<h3 id="81-添加新的短信渠道">8.1 添加新的短信渠道</h3>
+<ol>
+<li>在<code>SmsChannelEnum</code>中添加新的渠道类型</li>
+<li>实现对应的<code>SmsClient</code>客户端</li>
+<li>在<code>SmsClientFactoryImpl</code>中注册新的客户端</li>
+</ol>
+<h3 id="82-自定义短信模板">8.2 自定义短信模板</h3>
+<ol>
+<li>在数据库中创建新的模板记录</li>
+<li>设置模板内容和参数</li>
+<li>关联到对应的短信渠道</li>
+</ol>
+<h2 id="9-常见问题">9. 常见问题</h2>
+<h3 id="91-短信发送失败">9.1 短信发送失败</h3>
+<ol>
+<li>检查短信渠道配置是否正确</li>
+<li>确认短信模板是否已审核通过</li>
+<li>查看短信日志中的错误信息</li>
+<li>检查手机号格式是否正确</li>
+</ol>
+<h3 id="92-验证码相关问题">9.2 验证码相关问题</h3>
+<ol>
+<li>确认验证码未过期（默认5分钟）</li>
+<li>检查验证码是否已被使用</li>
+<li>确认手机号与验证码匹配</li>
+<li>检查发送频率限制</li>
+</ol>
+<h3 id="93-性能优化">9.3 性能优化</h3>
+<ol>
+<li>使用消息队列异步发送短信</li>
+<li>合理设置短信发送频率限制</li>
+<li>定期清理过期的短信日志</li>
+<li>监控短信发送成功率</li>
+</ol>
+<h2 id="10-总结">10. 总结</h2>
+<p>本项目提供了完整的SMS短信服务解决方案，包括：</p>
+<ul>
+<li><strong>多渠道支持</strong>：支持阿里云、腾讯云、华为云等主流短信服务商</li>
+<li><strong>模板管理</strong>：灵活的短信模板配置和管理</li>
+<li><strong>验证码功能</strong>：完整的验证码发送、校验和使用流程</li>
+<li><strong>日志记录</strong>：详细的短信发送和接收日志</li>
+<li><strong>异步处理</strong>：基于消息队列的异步短信发送</li>
+<li><strong>防刷机制</strong>：验证码发送频率和数量限制</li>
+<li><strong>监控管理</strong>：完整的短信发送状态监控</li>
+</ul>
+</div></article></main><footer data-astro-cid-jo6i4kqk><div data-astro-cid-jo6i4kqk>Goppop 的博客</div><p data-astro-cid-jo6i4kqk>&copy; 2026 Goppop. 记录技术学习、系统设计和长期思考。</p></footer></body></html>

@@ -1,0 +1,732 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-tldeq5d5><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" href="/favicon.ico"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Goppop 的博客" href="https://goppop.github.io/rss.xml"><meta name="generator" content="Astro v7.0.3"><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/7443039bbc50ce9a.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/0edeceb0e4e5adfc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/7443039bbc50ce9a.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/0edeceb0e4e5adfc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/redis/"><!-- Primary Meta Tags --><title>Redis使用总结</title><meta name="description" content="文章描述"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/redis/"><meta property="og:title" content="Redis使用总结"><meta property="og:description" content="文章描述"><meta property="og:image" content="https://goppop.github.io/_astro/blog-placeholder-1.Bx0Zcyzv.jpg"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/redis/"><meta property="twitter:title" content="Redis使用总结"><meta property="twitter:description" content="文章描述"><meta property="twitter:image" content="https://goppop.github.io/_astro/blog-placeholder-1.Bx0Zcyzv.jpg"><link rel="stylesheet" href="/_astro/Header.DHc1oVwj.css"><style>main[data-astro-cid-tldeq5d5]{width:100%;max-width:none;margin:0;padding:0}.article-shell[data-astro-cid-tldeq5d5]{max-width:1120px;margin:0 auto;padding:3rem 1rem 1rem}.article-head[data-astro-cid-tldeq5d5]{border-bottom:1px solid #e1d2bbe6;grid-template-columns:minmax(0,1fr) 260px;align-items:end;gap:1.5rem;padding-bottom:1.4rem;display:grid}.title[data-astro-cid-tldeq5d5]{margin:0;line-height:1}.title[data-astro-cid-tldeq5d5] h1[data-astro-cid-tldeq5d5]{max-width:12em;color:var(--accent-dark);margin:0;font-size:3.6rem;line-height:1.08}.date-card[data-astro-cid-tldeq5d5]{color:var(--muted);background:#fff9eeb3;border-radius:8px;padding:1rem;font-size:.9rem;box-shadow:0 12px 28px #58422314}.date-card[data-astro-cid-tldeq5d5] strong[data-astro-cid-tldeq5d5]{color:var(--clay);letter-spacing:0;text-transform:uppercase;margin-bottom:.4rem;font-size:.82rem;display:block}.last-updated-on[data-astro-cid-tldeq5d5]{border-top:1px solid #e1d2bbc7;margin-top:.8rem;padding-top:.8rem}.meta-row[data-astro-cid-tldeq5d5]{flex-wrap:wrap;gap:.55rem;margin-top:1rem;display:flex}.hero-image[data-astro-cid-tldeq5d5]{width:100%;max-width:1120px;margin:2rem auto 0}.hero-image[data-astro-cid-tldeq5d5] img[data-astro-cid-tldeq5d5]{box-shadow:var(--box-shadow);border-radius:6px;margin:0 auto;display:block}.prose[data-astro-cid-tldeq5d5]{width:780px;max-width:100%;color:var(--ink);margin:2.2rem auto 0;padding:0 1rem}.prose[data-astro-cid-tldeq5d5] h2{border-top:1px solid var(--line);margin-top:3.4rem;padding-top:1rem}.prose[data-astro-cid-tldeq5d5] h2:first-child{border-top:0;margin-top:0;padding-top:0}.prose[data-astro-cid-tldeq5d5] h3{color:var(--accent-dark)}.prose[data-astro-cid-tldeq5d5] p,.prose[data-astro-cid-tldeq5d5] li{font-size:1.02rem}.prose[data-astro-cid-tldeq5d5] ul,.prose[data-astro-cid-tldeq5d5] ol{padding-left:1.4rem}.prose[data-astro-cid-tldeq5d5] table{display:block;overflow-x:auto}.prose[data-astro-cid-tldeq5d5] li+li{margin-top:.35rem}@media (width<=820px){.article-shell[data-astro-cid-tldeq5d5]{padding:2rem .75rem 1rem}.article-head[data-astro-cid-tldeq5d5]{grid-template-columns:1fr}.title[data-astro-cid-tldeq5d5] h1[data-astro-cid-tldeq5d5]{font-size:2.25rem}.prose[data-astro-cid-tldeq5d5]{margin-top:2rem;padding:0 .75rem}}
+</style></head><body data-astro-cid-tldeq5d5><header data-astro-cid-nen7h5rs><nav data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs>Goppop 的博客</a><div class="internal-links" data-astro-cid-nen7h5rs><a href="/" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>首页</a><a href="/blog" class="active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>文章</a><a href="/about" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>关于</a></div><div class="social-links" data-astro-cid-nen7h5rs><a href="https://github.com/Goppop" target="_blank" data-astro-cid-nen7h5rs><span class="sr-only" data-astro-cid-nen7h5rs>Goppop GitHub</span><svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" data-astro-cid-nen7h5rs><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" data-astro-cid-nen7h5rs></path></svg></a></div></nav></header><main data-astro-cid-tldeq5d5><article data-astro-cid-tldeq5d5><div class="article-shell" data-astro-cid-tldeq5d5><header class="article-head" data-astro-cid-tldeq5d5><div class="title" data-astro-cid-tldeq5d5><p class="eyebrow" data-astro-cid-tldeq5d5>Article</p><h1 data-astro-cid-tldeq5d5>Redis使用总结</h1><div class="meta-row" data-astro-cid-tldeq5d5><span class="label" data-astro-cid-tldeq5d5>代码开发学习</span><span class="label" data-astro-cid-tldeq5d5>Redis</span></div></div><aside class="date-card" aria-label="文章日期" data-astro-cid-tldeq5d5><strong data-astro-cid-tldeq5d5>Published</strong><time datetime="2025-04-14T00:00:00.000Z">Apr 14, 2025</time></aside></header></div><div class="prose" data-astro-cid-tldeq5d5><h2 id="第一部分redis常用场景"><strong>第一部分：Redis常用场景</strong></h2>
+<h3 id="1-缓存存储最常用"><strong>1. 缓存存储（最常用）</strong></h3>
+<h3 id="场景1oauth2-token缓存"><strong>场景1：OAuth2 Token缓存</strong></h3>
+<p><strong>需求：</strong> 用户登录后，将access token缓存到Redis，避免每次都查数据库</p>
+<p><strong>实现：</strong> <code>OAuth2AccessTokenRedisDAO.java</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Repository</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> OAuth2AccessTokenRedisDAO</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Resource</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#E1E4E8"> StringRedisTemplate stringRedisTemplate;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    /**</span></span>
+<span class="line"><span style="color:#6A737D">     * 获取Token</span></span>
+<span class="line"><span style="color:#6A737D">     */</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> OAuth2AccessTokenDO </span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(String </span><span style="color:#FFAB70">accessToken</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        String redisKey </span><span style="color:#F97583">=</span><span style="color:#B392F0"> formatKey</span><span style="color:#E1E4E8">(accessToken);</span></span>
+<span class="line"><span style="color:#E1E4E8">        String value </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> stringRedisTemplate.</span><span style="color:#B392F0">opsForValue</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(redisKey);</span></span>
+<span class="line"><span style="color:#6A737D">        // JSON字符串转对象</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> JsonUtils.</span><span style="color:#B392F0">parseObject</span><span style="color:#E1E4E8">(value, OAuth2AccessTokenDO.class);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    /**</span></span>
+<span class="line"><span style="color:#6A737D">     * 设置Token（带过期时间）</span></span>
+<span class="line"><span style="color:#6A737D">     */</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> set</span><span style="color:#E1E4E8">(OAuth2AccessTokenDO </span><span style="color:#FFAB70">accessTokenDO</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        String redisKey </span><span style="color:#F97583">=</span><span style="color:#B392F0"> formatKey</span><span style="color:#E1E4E8">(accessTokenDO.</span><span style="color:#B392F0">getAccessToken</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#6A737D">        // 计算过期时间</span></span>
+<span class="line"><span style="color:#F97583">        long</span><span style="color:#E1E4E8"> expireSeconds </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> LocalDateTimeUtil.</span><span style="color:#B392F0">between</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">            LocalDateTime.</span><span style="color:#B392F0">now</span><span style="color:#E1E4E8">(),</span></span>
+<span class="line"><span style="color:#E1E4E8">            accessTokenDO.</span><span style="color:#B392F0">getExpiresTime</span><span style="color:#E1E4E8">(),</span></span>
+<span class="line"><span style="color:#E1E4E8">            ChronoUnit.SECONDS</span></span>
+<span class="line"><span style="color:#E1E4E8">        );</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (expireSeconds </span><span style="color:#F97583">></span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">            // 设置缓存，带过期时间</span></span>
+<span class="line"><span style="color:#E1E4E8">            stringRedisTemplate.</span><span style="color:#B392F0">opsForValue</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">set</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">                redisKey,</span></span>
+<span class="line"><span style="color:#E1E4E8">                JsonUtils.</span><span style="color:#B392F0">toJsonString</span><span style="color:#E1E4E8">(accessTokenDO),</span></span>
+<span class="line"><span style="color:#E1E4E8">                expireSeconds,</span></span>
+<span class="line"><span style="color:#E1E4E8">                TimeUnit.SECONDS</span></span>
+<span class="line"><span style="color:#E1E4E8">            );</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    /**</span></span>
+<span class="line"><span style="color:#6A737D">     * 删除Token</span></span>
+<span class="line"><span style="color:#6A737D">     */</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> delete</span><span style="color:#E1E4E8">(String </span><span style="color:#FFAB70">accessToken</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        String redisKey </span><span style="color:#F97583">=</span><span style="color:#B392F0"> formatKey</span><span style="color:#E1E4E8">(accessToken);</span></span>
+<span class="line"><span style="color:#E1E4E8">        stringRedisTemplate.</span><span style="color:#B392F0">delete</span><span style="color:#E1E4E8">(redisKey);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>关键点：</strong></p>
+<ul>
+<li><code>opsForValue()</code>：操作String类型</li>
+<li><code>set(key, value, timeout, timeUnit)</code>：设置带过期时间</li>
+<li>使用JSON序列化存储对象</li>
+</ul>
+<hr>
+<h3 id="场景2验证码缓存"><strong>场景2：验证码缓存</strong></h3>
+<p><strong>需求：</strong> 验证码需要临时存储，5分钟后过期</p>
+<p><strong>实现：</strong> <code>RedisCaptchaServiceImpl.java</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> RedisCaptchaServiceImpl</span><span style="color:#F97583"> implements</span><span style="color:#B392F0"> CaptchaCacheService</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#E1E4E8"> StringRedisTemplate stringRedisTemplate;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> set</span><span style="color:#E1E4E8">(String </span><span style="color:#FFAB70">key</span><span style="color:#E1E4E8">, String </span><span style="color:#FFAB70">value</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">long</span><span style="color:#FFAB70"> expiresInSeconds</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">        // 设置验证码，带过期时间</span></span>
+<span class="line"><span style="color:#E1E4E8">        stringRedisTemplate.</span><span style="color:#B392F0">opsForValue</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">set</span><span style="color:#E1E4E8">(key, value, expiresInSeconds, TimeUnit.SECONDS);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> String </span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(String </span><span style="color:#FFAB70">key</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">        // 获取验证码</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> stringRedisTemplate.</span><span style="color:#B392F0">opsForValue</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(key);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> boolean</span><span style="color:#B392F0"> exists</span><span style="color:#E1E4E8">(String </span><span style="color:#FFAB70">key</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">        // 检查key是否存在</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> stringRedisTemplate.</span><span style="color:#B392F0">hasKey</span><span style="color:#E1E4E8">(key);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> delete</span><span style="color:#E1E4E8">(String </span><span style="color:#FFAB70">key</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">        // 删除验证码</span></span>
+<span class="line"><span style="color:#E1E4E8">        stringRedisTemplate.</span><span style="color:#B392F0">delete</span><span style="color:#E1E4E8">(key);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>使用场景：</strong></p>
+<ul>
+<li>图形验证码：5分钟过期</li>
+<li>短信验证码：3分钟过期</li>
+<li>邮箱验证码：10分钟过期</li>
+</ul>
+<hr>
+<h3 id="场景3计费会话缓存"><strong>场景3：计费会话缓存</strong></h3>
+<p><strong>需求：</strong> 计算实例的计费会话需要缓存，7天过期</p>
+<p><strong>实现：</strong> <code>BillingSessionRedisDAO.java</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Repository</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> BillingSessionRedisDAO</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Resource</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#E1E4E8"> StringRedisTemplate stringRedisTemplate;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#F97583"> static</span><span style="color:#F97583"> final</span><span style="color:#E1E4E8"> Duration BILLING_SESSION_TIMEOUT </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Duration.</span><span style="color:#B392F0">ofDays</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">7</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    /**</span></span>
+<span class="line"><span style="color:#6A737D">     * 保存计费会话</span></span>
+<span class="line"><span style="color:#6A737D">     */</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> saveBillingSession</span><span style="color:#E1E4E8">(Long </span><span style="color:#FFAB70">instanceId</span><span style="color:#E1E4E8">, BillingSession </span><span style="color:#FFAB70">session</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        String key </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> RedisKeyConstants.</span><span style="color:#B392F0">getBillingSessionKey</span><span style="color:#E1E4E8">(instanceId);</span></span>
+<span class="line"><span style="color:#E1E4E8">        String value </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> JsonUtils.</span><span style="color:#B392F0">toJsonString</span><span style="color:#E1E4E8">(session);</span></span>
+<span class="line"><span style="color:#6A737D">        // 设置缓存，7天过期</span></span>
+<span class="line"><span style="color:#E1E4E8">        stringRedisTemplate.</span><span style="color:#B392F0">opsForValue</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">set</span><span style="color:#E1E4E8">(key, value, BILLING_SESSION_TIMEOUT);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    /**</span></span>
+<span class="line"><span style="color:#6A737D">     * 获取计费会话</span></span>
+<span class="line"><span style="color:#6A737D">     */</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> BillingSession </span><span style="color:#B392F0">getBillingSession</span><span style="color:#E1E4E8">(Long </span><span style="color:#FFAB70">instanceId</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        String key </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> RedisKeyConstants.</span><span style="color:#B392F0">getBillingSessionKey</span><span style="color:#E1E4E8">(instanceId);</span></span>
+<span class="line"><span style="color:#E1E4E8">        String value </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> stringRedisTemplate.</span><span style="color:#B392F0">opsForValue</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(key);</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> JsonUtils.</span><span style="color:#B392F0">parseObject</span><span style="color:#E1E4E8">(value, BillingSession.class);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<hr>
+<h3 id="2-原子操作保证并发安全"><strong>2. 原子操作（保证并发安全）</strong></h3>
+<h3 id="场景4幂等性保证setifabsent"><strong>场景4：幂等性保证（setIfAbsent）</strong></h3>
+<p><strong>需求：</strong> 防止重复请求，保证接口幂等性</p>
+<p><strong>实现：</strong> <code>IdempotentRedisDAO.java</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> IdempotentRedisDAO</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#F97583"> final</span><span style="color:#E1E4E8"> StringRedisTemplate redisTemplate;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    /**</span></span>
+<span class="line"><span style="color:#6A737D">     * 尝试设置Key（如果不存在）</span></span>
+<span class="line"><span style="color:#6A737D">     * 相当于分布式锁的简单实现</span></span>
+<span class="line"><span style="color:#6A737D">     */</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> Boolean </span><span style="color:#B392F0">setIfAbsent</span><span style="color:#E1E4E8">(String </span><span style="color:#FFAB70">key</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">long</span><span style="color:#FFAB70"> timeout</span><span style="color:#E1E4E8">, TimeUnit </span><span style="color:#FFAB70">timeUnit</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        String redisKey </span><span style="color:#F97583">=</span><span style="color:#B392F0"> formatKey</span><span style="color:#E1E4E8">(key);</span></span>
+<span class="line"><span style="color:#6A737D">        // setIfAbsent：如果key不存在才设置，返回true</span></span>
+<span class="line"><span style="color:#6A737D">        // 如果key已存在，返回false（说明是重复请求）</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> redisTemplate.</span><span style="color:#B392F0">opsForValue</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">setIfAbsent</span><span style="color:#E1E4E8">(redisKey, </span><span style="color:#9ECBFF">""</span><span style="color:#E1E4E8">, timeout, timeUnit);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    /**</span></span>
+<span class="line"><span style="color:#6A737D">     * 删除Key</span></span>
+<span class="line"><span style="color:#6A737D">     */</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> delete</span><span style="color:#E1E4E8">(String </span><span style="color:#FFAB70">key</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        String redisKey </span><span style="color:#F97583">=</span><span style="color:#B392F0"> formatKey</span><span style="color:#E1E4E8">(key);</span></span>
+<span class="line"><span style="color:#E1E4E8">        redisTemplate.</span><span style="color:#B392F0">delete</span><span style="color:#E1E4E8">(redisKey);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>使用方式：</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">// 在切面中使用</span></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Around</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"@annotation(idempotent)"</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> Object </span><span style="color:#B392F0">aroundPointCut</span><span style="color:#E1E4E8">(ProceedingJoinPoint joinPoint, Idempotent idempotent) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    String key </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> keyResolver.</span><span style="color:#B392F0">resolver</span><span style="color:#E1E4E8">(joinPoint, idempotent);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 尝试设置Key（原子操作）</span></span>
+<span class="line"><span style="color:#F97583">    boolean</span><span style="color:#E1E4E8"> success </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> idempotentRedisDAO.</span><span style="color:#B392F0">setIfAbsent</span><span style="color:#E1E4E8">(key, timeout, timeUnit);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">success) {</span></span>
+<span class="line"><span style="color:#6A737D">        // 重复请求，抛出异常</span></span>
+<span class="line"><span style="color:#F97583">        throw</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ServiceException</span><span style="color:#E1E4E8">(REPEATED_REQUESTS);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    try</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> joinPoint.</span><span style="color:#B392F0">proceed</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">catch</span><span style="color:#E1E4E8"> (Throwable </span><span style="color:#FFAB70">e</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">        // 异常时删除Key</span></span>
+<span class="line"><span style="color:#E1E4E8">        idempotentRedisDAO.</span><span style="color:#B392F0">delete</span><span style="color:#E1E4E8">(key);</span></span>
+<span class="line"><span style="color:#F97583">        throw</span><span style="color:#E1E4E8"> e;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>关键点：</strong></p>
+<ul>
+<li><code>setIfAbsent</code>：原子操作，保证并发安全</li>
+<li>设置过期时间，避免Key永久存在</li>
+<li>异常时删除Key，允许重试</li>
+</ul>
+<hr>
+<h3 id="场景5防止重复下单setifabsent"><strong>场景5：防止重复下单（setIfAbsent）</strong></h3>
+<p><strong>需求：</strong> 防止用户同时创建多个未支付的充值订单</p>
+<p><strong>实现：</strong> <code>AccountRechargeRedisDAO.java</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Repository</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> AccountRechargeRedisDAO</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Resource</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#E1E4E8"> StringRedisTemplate stringRedisTemplate;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#F97583"> static</span><span style="color:#F97583"> final</span><span style="color:#F97583"> long</span><span style="color:#E1E4E8"> TIMEOUT_MINUTES </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 30</span><span style="color:#E1E4E8">;  </span><span style="color:#6A737D">// 30分钟过期</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    /**</span></span>
+<span class="line"><span style="color:#6A737D">     * 检查用户是否有未支付的充值订单</span></span>
+<span class="line"><span style="color:#6A737D">     */</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> String </span><span style="color:#B392F0">getPendingRecharge</span><span style="color:#E1E4E8">(Long </span><span style="color:#FFAB70">userId</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        String key </span><span style="color:#F97583">=</span><span style="color:#B392F0"> formatKey</span><span style="color:#E1E4E8">(userId);</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> stringRedisTemplate.</span><span style="color:#B392F0">opsForValue</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(key);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    /**</span></span>
+<span class="line"><span style="color:#6A737D">     * 设置用户未支付的充值订单（原子操作）</span></span>
+<span class="line"><span style="color:#6A737D">     */</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> Boolean </span><span style="color:#B392F0">setPendingRecharge</span><span style="color:#E1E4E8">(Long </span><span style="color:#FFAB70">userId</span><span style="color:#E1E4E8">, String </span><span style="color:#FFAB70">rechargeNo</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        String key </span><span style="color:#F97583">=</span><span style="color:#B392F0"> formatKey</span><span style="color:#E1E4E8">(userId);</span></span>
+<span class="line"><span style="color:#6A737D">        // 使用setIfAbsent保证原子性</span></span>
+<span class="line"><span style="color:#6A737D">        // 如果用户已有未支付订单，返回false</span></span>
+<span class="line"><span style="color:#E1E4E8">        Boolean success </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> stringRedisTemplate.</span><span style="color:#B392F0">opsForValue</span><span style="color:#E1E4E8">()</span></span>
+<span class="line"><span style="color:#E1E4E8">                .</span><span style="color:#B392F0">setIfAbsent</span><span style="color:#E1E4E8">(key, rechargeNo, Duration.</span><span style="color:#B392F0">ofMinutes</span><span style="color:#E1E4E8">(TIMEOUT_MINUTES));</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (Boolean.TRUE.</span><span style="color:#B392F0">equals</span><span style="color:#E1E4E8">(success)) {</span></span>
+<span class="line"><span style="color:#E1E4E8">            log.</span><span style="color:#B392F0">info</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"[setPendingRecharge][设置成功] userId: {}, rechargeNo: {}"</span><span style="color:#E1E4E8">, userId, rechargeNo);</span></span>
+<span class="line"><span style="color:#E1E4E8">        } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">            log.</span><span style="color:#B392F0">warn</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"[setPendingRecharge][用户已存在未支付订单] userId: {}"</span><span style="color:#E1E4E8">, userId);</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> success;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    /**</span></span>
+<span class="line"><span style="color:#6A737D">     * 删除用户未支付的充值订单（支付成功后）</span></span>
+<span class="line"><span style="color:#6A737D">     */</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> deletePendingRecharge</span><span style="color:#E1E4E8">(Long </span><span style="color:#FFAB70">userId</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        String key </span><span style="color:#F97583">=</span><span style="color:#B392F0"> formatKey</span><span style="color:#E1E4E8">(userId);</span></span>
+<span class="line"><span style="color:#E1E4E8">        stringRedisTemplate.</span><span style="color:#B392F0">delete</span><span style="color:#E1E4E8">(key);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    /**</span></span>
+<span class="line"><span style="color:#6A737D">     * 获取订单剩余有效时间（秒）</span></span>
+<span class="line"><span style="color:#6A737D">     */</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> Long </span><span style="color:#B392F0">getExpireTime</span><span style="color:#E1E4E8">(Long </span><span style="color:#FFAB70">userId</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        String key </span><span style="color:#F97583">=</span><span style="color:#B392F0"> formatKey</span><span style="color:#E1E4E8">(userId);</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> stringRedisTemplate.</span><span style="color:#B392F0">getExpire</span><span style="color:#E1E4E8">(key);  </span><span style="color:#6A737D">// 返回剩余秒数</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>使用场景：</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Service</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> AccountRechargeService</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Resource</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#E1E4E8"> AccountRechargeRedisDAO rechargeRedisDAO;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> Long </span><span style="color:#B392F0">createRecharge</span><span style="color:#E1E4E8">(Long </span><span style="color:#FFAB70">userId</span><span style="color:#E1E4E8">, BigDecimal </span><span style="color:#FFAB70">amount</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">        // 检查是否有未支付订单</span></span>
+<span class="line"><span style="color:#E1E4E8">        String existingOrder </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> rechargeRedisDAO.</span><span style="color:#B392F0">getPendingRecharge</span><span style="color:#E1E4E8">(userId);</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (existingOrder </span><span style="color:#F97583">!=</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">            throw</span><span style="color:#B392F0"> exception</span><span style="color:#E1E4E8">(REPEATED_RECHARGE_REQUEST);</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">        // 创建订单</span></span>
+<span class="line"><span style="color:#E1E4E8">        AccountRechargeDO recharge </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> AccountRechargeDO</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#6A737D">        // ... 设置订单信息</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">        // 设置到Redis（原子操作，防止并发）</span></span>
+<span class="line"><span style="color:#E1E4E8">        Boolean success </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> rechargeRedisDAO.</span><span style="color:#B392F0">setPendingRecharge</span><span style="color:#E1E4E8">(userId, recharge.</span><span style="color:#B392F0">getRechargeNo</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">success) {</span></span>
+<span class="line"><span style="color:#6A737D">            // 并发情况下，另一个请求已经设置了</span></span>
+<span class="line"><span style="color:#F97583">            throw</span><span style="color:#B392F0"> exception</span><span style="color:#E1E4E8">(REPEATED_RECHARGE_REQUEST);</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">        // 保存到数据库</span></span>
+<span class="line"><span style="color:#E1E4E8">        rechargeMapper.</span><span style="color:#B392F0">insert</span><span style="color:#E1E4E8">(recharge);</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> recharge.</span><span style="color:#B392F0">getId</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> onPaySuccess</span><span style="color:#E1E4E8">(Long </span><span style="color:#FFAB70">rechargeId</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">        // 支付成功后，删除Redis中的订单记录</span></span>
+<span class="line"><span style="color:#E1E4E8">        AccountRechargeDO recharge </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> rechargeMapper.</span><span style="color:#B392F0">selectById</span><span style="color:#E1E4E8">(rechargeId);</span></span>
+<span class="line"><span style="color:#E1E4E8">        rechargeRedisDAO.</span><span style="color:#B392F0">deletePendingRecharge</span><span style="color:#E1E4E8">(recharge.</span><span style="color:#B392F0">getUserId</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>关键点：</strong></p>
+<ul>
+<li><code>setIfAbsent</code>：保证并发安全</li>
+<li>设置过期时间：30分钟自动过期</li>
+<li>支付成功后删除：释放限制</li>
+</ul>
+<hr>
+<h3 id="3-计数器incr"><strong>3. 计数器（incr）</strong></h3>
+<h3 id="场景6验证码发送次数限制"><strong>场景6：验证码发送次数限制</strong></h3>
+<p><strong>需求：</strong> 限制用户每天发送验证码的次数</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Repository</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> SmsCodeRedisDAO</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Resource</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#E1E4E8"> StringRedisTemplate stringRedisTemplate;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    /**</span></span>
+<span class="line"><span style="color:#6A737D">     * 增加发送次数</span></span>
+<span class="line"><span style="color:#6A737D">     */</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> Long </span><span style="color:#B392F0">increment</span><span style="color:#E1E4E8">(String </span><span style="color:#FFAB70">key</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">        // 增加1，如果key不存在，从0开始</span></span>
+<span class="line"><span style="color:#E1E4E8">        Long count </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> stringRedisTemplate.</span><span style="color:#B392F0">opsForValue</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">increment</span><span style="color:#E1E4E8">(key);</span></span>
+<span class="line"><span style="color:#6A737D">        // 设置过期时间（24小时）</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (count </span><span style="color:#F97583">==</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">            stringRedisTemplate.</span><span style="color:#B392F0">expire</span><span style="color:#E1E4E8">(key, </span><span style="color:#79B8FF">24</span><span style="color:#E1E4E8">, TimeUnit.HOURS);</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> count;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    /**</span></span>
+<span class="line"><span style="color:#6A737D">     * 检查是否超过限制</span></span>
+<span class="line"><span style="color:#6A737D">     */</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> boolean</span><span style="color:#B392F0"> isExceedLimit</span><span style="color:#E1E4E8">(String </span><span style="color:#FFAB70">key</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">int</span><span style="color:#FFAB70"> maxCount</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        String countStr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> stringRedisTemplate.</span><span style="color:#B392F0">opsForValue</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(key);</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (countStr </span><span style="color:#F97583">==</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">            return</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">;  </span><span style="color:#6A737D">// 还没发送过</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#F97583">        int</span><span style="color:#E1E4E8"> count </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Integer.</span><span style="color:#B392F0">parseInt</span><span style="color:#E1E4E8">(countStr);</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> count </span><span style="color:#F97583">>=</span><span style="color:#E1E4E8"> maxCount;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>使用方式：</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> sendSmsCode</span><span style="color:#E1E4E8">(String phone) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    String key </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> "sms:code:"</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> phone;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 检查是否超过限制（每天最多5次）</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (smsCodeRedisDAO.</span><span style="color:#B392F0">isExceedLimit</span><span style="color:#E1E4E8">(key, </span><span style="color:#79B8FF">5</span><span style="color:#E1E4E8">)) {</span></span>
+<span class="line"><span style="color:#F97583">        throw</span><span style="color:#B392F0"> exception</span><span style="color:#E1E4E8">(SMS_CODE_SEND_LIMIT_EXCEEDED);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 发送验证码</span></span>
+<span class="line"><span style="color:#E1E4E8">    smsService.</span><span style="color:#B392F0">sendCode</span><span style="color:#E1E4E8">(phone);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 增加计数</span></span>
+<span class="line"><span style="color:#E1E4E8">    smsCodeRedisDAO.</span><span style="color:#B392F0">increment</span><span style="color:#E1E4E8">(key);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<hr>
+<h3 id="4-限流ratelimiter"><strong>4. 限流（RateLimiter）</strong></h3>
+<h3 id="场景7接口限流"><strong>场景7：接口限流</strong></h3>
+<p><strong>需求：</strong> 限制接口的访问频率，防止被刷</p>
+<p><strong>实现：</strong> <code>RateLimiterRedisDAO.java</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> RateLimiterRedisDAO</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#F97583"> final</span><span style="color:#E1E4E8"> RedissonClient redissonClient;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    /**</span></span>
+<span class="line"><span style="color:#6A737D">     * 尝试获取限流令牌</span></span>
+<span class="line"><span style="color:#6A737D">     * </span><span style="color:#F97583">@param</span><span style="color:#FFAB70"> key</span><span style="color:#6A737D"> 限流Key</span></span>
+<span class="line"><span style="color:#6A737D">     * </span><span style="color:#F97583">@param</span><span style="color:#FFAB70"> count</span><span style="color:#6A737D"> 时间窗口内允许的次数</span></span>
+<span class="line"><span style="color:#6A737D">     * </span><span style="color:#F97583">@param</span><span style="color:#FFAB70"> time</span><span style="color:#6A737D"> 时间窗口</span></span>
+<span class="line"><span style="color:#6A737D">     * </span><span style="color:#F97583">@param</span><span style="color:#FFAB70"> timeUnit</span><span style="color:#6A737D"> 时间单位</span></span>
+<span class="line"><span style="color:#6A737D">     */</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> Boolean </span><span style="color:#B392F0">tryAcquire</span><span style="color:#E1E4E8">(String </span><span style="color:#FFAB70">key</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">int</span><span style="color:#FFAB70"> count</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">int</span><span style="color:#FFAB70"> time</span><span style="color:#E1E4E8">, TimeUnit </span><span style="color:#FFAB70">timeUnit</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">        // 1. 获取限流器</span></span>
+<span class="line"><span style="color:#E1E4E8">        RRateLimiter rateLimiter </span><span style="color:#F97583">=</span><span style="color:#B392F0"> getRRateLimiter</span><span style="color:#E1E4E8">(key, count, time, timeUnit);</span></span>
+<span class="line"><span style="color:#6A737D">        // 2. 尝试获取1个令牌</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> rateLimiter.</span><span style="color:#B392F0">tryAcquire</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#E1E4E8"> RRateLimiter </span><span style="color:#B392F0">getRRateLimiter</span><span style="color:#E1E4E8">(String </span><span style="color:#FFAB70">key</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">long</span><span style="color:#FFAB70"> count</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">int</span><span style="color:#FFAB70"> time</span><span style="color:#E1E4E8">, TimeUnit </span><span style="color:#FFAB70">timeUnit</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        String redisKey </span><span style="color:#F97583">=</span><span style="color:#B392F0"> formatKey</span><span style="color:#E1E4E8">(key);</span></span>
+<span class="line"><span style="color:#E1E4E8">        RRateLimiter rateLimiter </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> redissonClient.</span><span style="color:#B392F0">getRateLimiter</span><span style="color:#E1E4E8">(redisKey);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">        // 设置限流规则：时间窗口内允许count次</span></span>
+<span class="line"><span style="color:#F97583">        long</span><span style="color:#E1E4E8"> rateInterval </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> timeUnit.</span><span style="color:#B392F0">toSeconds</span><span style="color:#E1E4E8">(time);</span></span>
+<span class="line"><span style="color:#E1E4E8">        Duration duration </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Duration.</span><span style="color:#B392F0">ofSeconds</span><span style="color:#E1E4E8">(rateInterval);</span></span>
+<span class="line"><span style="color:#E1E4E8">        rateLimiter.</span><span style="color:#B392F0">trySetRate</span><span style="color:#E1E4E8">(RateType.OVERALL, count, duration);</span></span>
+<span class="line"><span style="color:#E1E4E8">        rateLimiter.</span><span style="color:#B392F0">expire</span><span style="color:#E1E4E8">(duration);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> rateLimiter;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>使用方式：</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Aspect</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> RateLimiterAspect</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Before</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"@annotation(rateLimiter)"</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> beforePointCut</span><span style="color:#E1E4E8">(JoinPoint </span><span style="color:#FFAB70">joinPoint</span><span style="color:#E1E4E8">, RateLimiter </span><span style="color:#FFAB70">rateLimiter</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        String key </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> keyResolver.</span><span style="color:#B392F0">resolver</span><span style="color:#E1E4E8">(joinPoint, rateLimiter);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">        // 尝试获取限流令牌</span></span>
+<span class="line"><span style="color:#F97583">        boolean</span><span style="color:#E1E4E8"> success </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> rateLimiterRedisDAO.</span><span style="color:#B392F0">tryAcquire</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">            key,</span></span>
+<span class="line"><span style="color:#E1E4E8">            rateLimiter.</span><span style="color:#B392F0">count</span><span style="color:#E1E4E8">(),  </span><span style="color:#6A737D">// 60秒内</span></span>
+<span class="line"><span style="color:#E1E4E8">            rateLimiter.</span><span style="color:#B392F0">time</span><span style="color:#E1E4E8">(),    </span><span style="color:#6A737D">// 10次</span></span>
+<span class="line"><span style="color:#E1E4E8">            rateLimiter.</span><span style="color:#B392F0">timeUnit</span><span style="color:#E1E4E8">()</span></span>
+<span class="line"><span style="color:#E1E4E8">        );</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">success) {</span></span>
+<span class="line"><span style="color:#6A737D">            // 超过限流，抛出异常</span></span>
+<span class="line"><span style="color:#F97583">            throw</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ServiceException</span><span style="color:#E1E4E8">(TOO_MANY_REQUESTS);</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>使用示例：</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">RestController</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> ApiController</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">RateLimiter</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">count</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> 10</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">time</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> 60</span><span style="color:#E1E4E8">)  </span><span style="color:#6A737D">// 60秒内最多10次</span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">GetMapping</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"/api"</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> Result </span><span style="color:#B392F0">api</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#6A737D">        // 业务逻辑</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<hr>
+<h2 id="第二部分分布式锁常用场景"><strong>第二部分：分布式锁常用场景</strong></h2>
+<h3 id="1-钱包余额更新防止并发"><strong>1. 钱包余额更新（防止并发）</strong></h3>
+<h3 id="场景1钱包扣款分布式锁"><strong>场景1：钱包扣款（分布式锁）</strong></h3>
+<p><strong>需求：</strong> 多个请求同时扣款时，保证余额计算的准确性</p>
+<p><strong>实现：</strong> <code>PayWalletLockRedisDAO.java</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Repository</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> PayWalletLockRedisDAO</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Resource</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#E1E4E8"> RedissonClient redissonClient;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    /**</span></span>
+<span class="line"><span style="color:#6A737D">     * 加锁执行逻辑</span></span>
+<span class="line"><span style="color:#6A737D">     * </span><span style="color:#F97583">@param</span><span style="color:#FFAB70"> id</span><span style="color:#6A737D"> 钱包ID</span></span>
+<span class="line"><span style="color:#6A737D">     * </span><span style="color:#F97583">@param</span><span style="color:#FFAB70"> timeoutMillis</span><span style="color:#6A737D"> 锁超时时间（毫秒）</span></span>
+<span class="line"><span style="color:#6A737D">     * </span><span style="color:#F97583">@param</span><span style="color:#FFAB70"> callable</span><span style="color:#6A737D"> 需要执行的逻辑</span></span>
+<span class="line"><span style="color:#6A737D">     */</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#F97583">V</span><span style="color:#E1E4E8">> V </span><span style="color:#B392F0">lock</span><span style="color:#E1E4E8">(Long </span><span style="color:#FFAB70">id</span><span style="color:#E1E4E8">, Long </span><span style="color:#FFAB70">timeoutMillis</span><span style="color:#E1E4E8">, Callable&#x3C;</span><span style="color:#F97583">V</span><span style="color:#E1E4E8">> </span><span style="color:#FFAB70">callable</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">throws</span><span style="color:#E1E4E8"> Exception {</span></span>
+<span class="line"><span style="color:#E1E4E8">        String lockKey </span><span style="color:#F97583">=</span><span style="color:#B392F0"> formatKey</span><span style="color:#E1E4E8">(id);</span></span>
+<span class="line"><span style="color:#E1E4E8">        RLock lock </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> redissonClient.</span><span style="color:#B392F0">getLock</span><span style="color:#E1E4E8">(lockKey);</span></span>
+<span class="line"><span style="color:#F97583">        try</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">            // 加锁，设置超时时间</span></span>
+<span class="line"><span style="color:#E1E4E8">            lock.</span><span style="color:#B392F0">lock</span><span style="color:#E1E4E8">(timeoutMillis, TimeUnit.MILLISECONDS);</span></span>
+<span class="line"><span style="color:#6A737D">            // 执行逻辑</span></span>
+<span class="line"><span style="color:#F97583">            return</span><span style="color:#E1E4E8"> callable.</span><span style="color:#B392F0">call</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        } </span><span style="color:#F97583">finally</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">            // 释放锁</span></span>
+<span class="line"><span style="color:#E1E4E8">            lock.</span><span style="color:#B392F0">unlock</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>使用方式：</strong> <code>PayWalletServiceImpl.java</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Service</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> PayWalletServiceImpl</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Resource</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#E1E4E8"> PayWalletLockRedisDAO lockRedisDAO;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#F97583"> static</span><span style="color:#F97583"> final</span><span style="color:#F97583"> long</span><span style="color:#E1E4E8"> UPDATE_TIMEOUT_MILLIS </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 5000</span><span style="color:#E1E4E8">;  </span><span style="color:#6A737D">// 5秒超时</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    /**</span></span>
+<span class="line"><span style="color:#6A737D">     * 扣减钱包余额</span></span>
+<span class="line"><span style="color:#6A737D">     */</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> reduceWalletBalance</span><span style="color:#E1E4E8">(Long </span><span style="color:#FFAB70">walletId</span><span style="color:#E1E4E8">, BigDecimal </span><span style="color:#FFAB70">price</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">        // 加锁，保证并发安全</span></span>
+<span class="line"><span style="color:#E1E4E8">        lockRedisDAO.</span><span style="color:#B392F0">lock</span><span style="color:#E1E4E8">(walletId, UPDATE_TIMEOUT_MILLIS, () </span><span style="color:#F97583">-></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">            // 1. 重新获取最新的钱包信息</span></span>
+<span class="line"><span style="color:#E1E4E8">            PayWalletDO wallet </span><span style="color:#F97583">=</span><span style="color:#B392F0"> getWallet</span><span style="color:#E1E4E8">(walletId);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">            // 2. 检查余额是否充足</span></span>
+<span class="line"><span style="color:#F97583">            if</span><span style="color:#E1E4E8"> (wallet.</span><span style="color:#B392F0">getBalance</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">compareTo</span><span style="color:#E1E4E8">(price) </span><span style="color:#F97583">&#x3C;</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">                throw</span><span style="color:#B392F0"> exception</span><span style="color:#E1E4E8">(WALLET_BALANCE_NOT_ENOUGH);</span></span>
+<span class="line"><span style="color:#E1E4E8">            }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">            // 3. 扣除余额</span></span>
+<span class="line"><span style="color:#E1E4E8">            walletMapper.</span><span style="color:#B392F0">updateBalance</span><span style="color:#E1E4E8">(walletId, price.</span><span style="color:#B392F0">negate</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">            // 4. 记录流水</span></span>
+<span class="line"><span style="color:#E1E4E8">            walletTransactionMapper.</span><span style="color:#B392F0">insert</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">new</span><span style="color:#B392F0"> PayWalletTransactionDO</span><span style="color:#E1E4E8">()</span></span>
+<span class="line"><span style="color:#E1E4E8">                .</span><span style="color:#B392F0">setWalletId</span><span style="color:#E1E4E8">(walletId)</span></span>
+<span class="line"><span style="color:#E1E4E8">                .</span><span style="color:#B392F0">setAmount</span><span style="color:#E1E4E8">(price.</span><span style="color:#B392F0">negate</span><span style="color:#E1E4E8">())</span></span>
+<span class="line"><span style="color:#E1E4E8">                .</span><span style="color:#B392F0">setType</span><span style="color:#E1E4E8">(TransactionTypeEnum.DEDUCT.</span><span style="color:#B392F0">getType</span><span style="color:#E1E4E8">()));</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">            return</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">        });</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>为什么需要锁？</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">并发场景：</span></span>
+<span class="line"><span style="color:#E1E4E8">请求1：读取余额 100元</span></span>
+<span class="line"><span style="color:#E1E4E8">请求2：读取余额 100元</span></span>
+<span class="line"><span style="color:#E1E4E8">请求1：扣除 50元，余额 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> 50元</span></span>
+<span class="line"><span style="color:#E1E4E8">请求2：扣除 50元，余额 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> 50元  ❌ 应该是0元</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">使用锁后：</span></span>
+<span class="line"><span style="color:#E1E4E8">请求1：加锁 → 读取余额 100元 → 扣除 50元 → 余额 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> 50元 → 释放锁</span></span>
+<span class="line"><span style="color:#E1E4E8">请求2：等待锁 → 加锁 → 读取余额 50元 → 扣除 50元 → 余额 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> 0元 → 释放锁 ✅</span></span></code></pre>
+<p><strong>关键点：</strong></p>
+<ul>
+<li>锁的粒度：按钱包ID加锁，不同钱包可以并发</li>
+<li>超时时间：防止死锁，设置合理的超时时间</li>
+<li>重新查询：加锁后重新查询，确保数据最新</li>
+</ul>
+<hr>
+<h3 id="2-支付通知防止重复通知"><strong>2. 支付通知（防止重复通知）</strong></h3>
+<h3 id="场景2支付通知去重"><strong>场景2：支付通知去重</strong></h3>
+<p><strong>需求：</strong> 支付回调可能重复，需要保证只处理一次</p>
+<p><strong>实现：</strong> <code>PayNotifyLockRedisDAO.java</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Repository</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> PayNotifyLockRedisDAO</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Resource</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#E1E4E8"> RedissonClient redissonClient;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    /**</span></span>
+<span class="line"><span style="color:#6A737D">     * 加锁执行通知逻辑</span></span>
+<span class="line"><span style="color:#6A737D">     */</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> lock</span><span style="color:#E1E4E8">(Long </span><span style="color:#FFAB70">id</span><span style="color:#E1E4E8">, Long </span><span style="color:#FFAB70">timeoutMillis</span><span style="color:#E1E4E8">, Runnable </span><span style="color:#FFAB70">runnable</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        String lockKey </span><span style="color:#F97583">=</span><span style="color:#B392F0"> formatKey</span><span style="color:#E1E4E8">(id);</span></span>
+<span class="line"><span style="color:#E1E4E8">        RLock lock </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> redissonClient.</span><span style="color:#B392F0">getLock</span><span style="color:#E1E4E8">(lockKey);</span></span>
+<span class="line"><span style="color:#F97583">        try</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">            // 加锁</span></span>
+<span class="line"><span style="color:#E1E4E8">            lock.</span><span style="color:#B392F0">lock</span><span style="color:#E1E4E8">(timeoutMillis, TimeUnit.MILLISECONDS);</span></span>
+<span class="line"><span style="color:#6A737D">            // 执行通知逻辑</span></span>
+<span class="line"><span style="color:#E1E4E8">            runnable.</span><span style="color:#B392F0">run</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        } </span><span style="color:#F97583">finally</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">            // 释放锁</span></span>
+<span class="line"><span style="color:#E1E4E8">            lock.</span><span style="color:#B392F0">unlock</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>使用方式：</strong> <code>PayNotifyServiceImpl.java</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Service</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> PayNotifyServiceImpl</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Resource</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#E1E4E8"> PayNotifyLockRedisDAO notifyLockRedisDAO;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#F97583"> static</span><span style="color:#F97583"> final</span><span style="color:#F97583"> long</span><span style="color:#E1E4E8"> NOTIFY_TIMEOUT_MILLIS </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 120</span><span style="color:#F97583"> *</span><span style="color:#79B8FF"> 1000</span><span style="color:#E1E4E8">;  </span><span style="color:#6A737D">// 2分钟超时</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    /**</span></span>
+<span class="line"><span style="color:#6A737D">     * 执行支付通知</span></span>
+<span class="line"><span style="color:#6A737D">     */</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> executeNotify</span><span style="color:#E1E4E8">(PayNotifyTaskDO </span><span style="color:#FFAB70">task</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">        // 分布式锁，避免并发问题</span></span>
+<span class="line"><span style="color:#E1E4E8">        notifyLockRedisDAO.</span><span style="color:#B392F0">lock</span><span style="color:#E1E4E8">(task.</span><span style="color:#B392F0">getId</span><span style="color:#E1E4E8">(), NOTIFY_TIMEOUT_MILLIS, () </span><span style="color:#F97583">-></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">            // 1. 重新查询任务，检查通知次数</span></span>
+<span class="line"><span style="color:#E1E4E8">            PayNotifyTaskDO dbTask </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> notifyTaskMapper.</span><span style="color:#B392F0">selectById</span><span style="color:#E1E4E8">(task.</span><span style="color:#B392F0">getId</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#F97583">            if</span><span style="color:#E1E4E8"> (ObjectUtil.</span><span style="color:#B392F0">notEqual</span><span style="color:#E1E4E8">(task.</span><span style="color:#B392F0">getNotifyTimes</span><span style="color:#E1E4E8">(), dbTask.</span><span style="color:#B392F0">getNotifyTimes</span><span style="color:#E1E4E8">())) {</span></span>
+<span class="line"><span style="color:#6A737D">                // 通知次数不匹配，说明已经被其他线程处理过了</span></span>
+<span class="line"><span style="color:#E1E4E8">                log.</span><span style="color:#B392F0">warn</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"[executeNotify][任务已被处理] taskId: {}"</span><span style="color:#E1E4E8">, task.</span><span style="color:#B392F0">getId</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#F97583">                return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">            }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">            // 2. 执行通知</span></span>
+<span class="line"><span style="color:#B392F0">            getSelf</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">executeNotify0</span><span style="color:#E1E4E8">(dbTask);</span></span>
+<span class="line"><span style="color:#E1E4E8">        });</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>为什么需要锁？</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">并发场景：</span></span>
+<span class="line"><span style="color:#E1E4E8">回调1：接收到支付成功回调</span></span>
+<span class="line"><span style="color:#E1E4E8">回调2：接收到支付成功回调（重复）</span></span>
+<span class="line"><span style="color:#E1E4E8">回调1：处理通知 → 更新订单状态</span></span>
+<span class="line"><span style="color:#E1E4E8">回调2：处理通知 → 重复更新订单状态 ❌</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">使用锁后：</span></span>
+<span class="line"><span style="color:#E1E4E8">回调1：加锁 → 处理通知 → 更新订单状态 → 释放锁</span></span>
+<span class="line"><span style="color:#E1E4E8">回调2：等待锁 → 加锁 → 检查已处理 → 直接返回 ✅</span></span></code></pre>
+<p><strong>关键点：</strong></p>
+<ul>
+<li>双重检查：加锁后再次检查，避免重复处理</li>
+<li>超时时间：设置合理的超时时间（2分钟）</li>
+<li>幂等性：即使重复处理，也要保证结果一致</li>
+</ul>
+<hr>
+<h3 id="3-定时任务防止多实例重复执行"><strong>3. 定时任务（防止多实例重复执行）</strong></h3>
+<h3 id="场景3定时任务去重"><strong>场景3：定时任务去重</strong></h3>
+<p><strong>需求：</strong> 多个服务实例同时运行，定时任务只执行一次</p>
+<p><strong>实现：</strong> <code>RedisStreamMessageCleanupJob.java</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Slf4j</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> RedisStreamMessageCleanupJob</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#F97583"> static</span><span style="color:#F97583"> final</span><span style="color:#E1E4E8"> String LOCK_KEY </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> "redis:stream:message-cleanup:lock"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Resource</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#E1E4E8"> RedissonClient redissonClient;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    /**</span></span>
+<span class="line"><span style="color:#6A737D">     * 每小时执行一次清理任务</span></span>
+<span class="line"><span style="color:#6A737D">     */</span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Scheduled</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">cron</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> "0 0 * * * ?"</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> cleanup</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#E1E4E8">        RLock lock </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> redissonClient.</span><span style="color:#B392F0">getLock</span><span style="color:#E1E4E8">(LOCK_KEY);</span></span>
+<span class="line"><span style="color:#6A737D">        // 尝试加锁（非阻塞）</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (lock.</span><span style="color:#B392F0">tryLock</span><span style="color:#E1E4E8">()) {</span></span>
+<span class="line"><span style="color:#F97583">            try</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">                // 执行清理逻辑</span></span>
+<span class="line"><span style="color:#B392F0">                execute</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">            } </span><span style="color:#F97583">catch</span><span style="color:#E1E4E8"> (Exception </span><span style="color:#FFAB70">ex</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">                log.</span><span style="color:#B392F0">error</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"[cleanup][执行异常]"</span><span style="color:#E1E4E8">, ex);</span></span>
+<span class="line"><span style="color:#E1E4E8">            } </span><span style="color:#F97583">finally</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">                lock.</span><span style="color:#B392F0">unlock</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">            }</span></span>
+<span class="line"><span style="color:#E1E4E8">        } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">            // 其他实例正在执行，直接返回</span></span>
+<span class="line"><span style="color:#E1E4E8">            log.</span><span style="color:#B392F0">debug</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"[cleanup][其他实例正在执行，跳过]"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>关键点：</strong></p>
+<ul>
+<li><code>tryLock()</code>：非阻塞，获取不到锁直接返回</li>
+<li>多个实例：只有一个实例能执行任务</li>
+<li>避免重复：防止多个实例同时执行定时任务</li>
+</ul>
+<hr>
+<h2 id="第三部分redis和分布式锁的区别"><strong>第三部分：Redis和分布式锁的区别</strong></h2>
+<h3 id="redis原子操作-vs-分布式锁"><strong>Redis原子操作 vs 分布式锁</strong></h3>
+<h3 id="场景对比"><strong>场景对比</strong></h3>
+<table>
+<thead>
+<tr>
+<th><strong>场景</strong></th>
+<th><strong>使用方式</strong></th>
+<th><strong>适用条件</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>简单幂等性</strong></td>
+<td><code>setIfAbsent</code></td>
+<td>只需要判断是否存在，不需要执行复杂逻辑</td>
+</tr>
+<tr>
+<td><strong>复杂业务逻辑</strong></td>
+<td>分布式锁</td>
+<td>需要执行多步操作，需要保证原子性</td>
+</tr>
+</tbody>
+</table>
+<h3 id="示例对比"><strong>示例对比</strong></h3>
+<p><strong>使用setIfAbsent（简单）：</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">// 幂等性检查：只需要判断是否为重复请求</span></span>
+<span class="line"><span style="color:#F97583">boolean</span><span style="color:#E1E4E8"> success </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> redisTemplate.</span><span style="color:#B392F0">opsForValue</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">setIfAbsent</span><span style="color:#E1E4E8">(key, </span><span style="color:#9ECBFF">""</span><span style="color:#E1E4E8">, timeout, timeUnit);</span></span>
+<span class="line"><span style="color:#F97583">if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">success) {</span></span>
+<span class="line"><span style="color:#F97583">    throw</span><span style="color:#B392F0"> exception</span><span style="color:#E1E4E8">(REPEATED_REQUESTS);  </span><span style="color:#6A737D">// 重复请求，直接返回</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#6A737D">// 执行逻辑</span></span>
+<span class="line"><span style="color:#B392F0">doSomething</span><span style="color:#E1E4E8">();</span></span></code></pre>
+<p><strong>使用分布式锁（复杂）：</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">// 钱包扣款：需要执行多步操作</span></span>
+<span class="line"><span style="color:#E1E4E8">lock.</span><span style="color:#B392F0">lock</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">try</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">    // 1. 查询余额</span></span>
+<span class="line"><span style="color:#E1E4E8">    WalletDO wallet </span><span style="color:#F97583">=</span><span style="color:#B392F0"> getWallet</span><span style="color:#E1E4E8">(walletId);</span></span>
+<span class="line"><span style="color:#6A737D">    // 2. 检查余额</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (wallet.</span><span style="color:#B392F0">getBalance</span><span style="color:#E1E4E8">() </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> price) {</span></span>
+<span class="line"><span style="color:#F97583">        throw</span><span style="color:#B392F0"> exception</span><span style="color:#E1E4E8">(BALANCE_NOT_ENOUGH);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#6A737D">    // 3. 扣除余额</span></span>
+<span class="line"><span style="color:#B392F0">    updateBalance</span><span style="color:#E1E4E8">(walletId, price);</span></span>
+<span class="line"><span style="color:#6A737D">    // 4. 记录流水</span></span>
+<span class="line"><span style="color:#B392F0">    insertTransaction</span><span style="color:#E1E4E8">(...);</span></span>
+<span class="line"><span style="color:#E1E4E8">} </span><span style="color:#F97583">finally</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    lock.</span><span style="color:#B392F0">unlock</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="redis使用场景"><strong>Redis使用场景</strong></h3>
+<p>“<strong>在项目中，Redis主要用于以下几个方面：</strong></p>
+<p><strong>1. 缓存存储：</strong></p>
+<ul>
+<li>OAuth2 Token缓存：用户登录后，将access token缓存到Redis，设置过期时间，避免频繁查数据库</li>
+<li>验证码缓存：图形验证码、短信验证码缓存，设置5-10分钟过期</li>
+</ul>
+<p><strong>2. 原子操作：</strong></p>
+<ul>
+<li>幂等性保证：使用<code>setIfAbsent</code>，防止重复请求。如果key已存在，说明是重复请求，直接返回</li>
+<li>防止重复下单：使用<code>setIfAbsent</code>，保证用户同时只能有一个未支付订单</li>
+</ul>
+<p><strong>3. 限流：</strong></p>
+<ul>
+<li>接口限流：使用Redisson的<code>RRateLimiter</code>，限制接口访问频率，比如60秒内最多10次请求</li>
+</ul>
+<p><strong>4. 计数器：</strong></p>
+<ul>
+<li>验证码发送次数：使用<code>increment</code>，限制用户每天发送验证码的次数“</li>
+</ul>
+<h3 id="分布式锁使用场景1-2分钟"><strong>分布式锁使用场景（1-2分钟）</strong></h3>
+<p>“<strong>在项目中，分布式锁主要用于：</strong></p>
+<p><strong>1. 钱包余额更新：</strong></p>
+<ul>
+<li>多个请求同时扣款时，使用分布式锁保证余额计算的准确性</li>
+<li>按钱包ID加锁，不同钱包可以并发操作</li>
+<li>加锁后重新查询余额，确保数据最新</li>
+</ul>
+<p><strong>2. 支付通知去重：</strong></p>
+<ul>
+<li>支付回调可能重复，使用分布式锁保证只处理一次</li>
+<li>加锁后再次检查通知次数，避免重复处理</li>
+</ul>
+<p><strong>3. 定时任务去重：</strong></p>
+<ul>
+<li>多个服务实例同时运行，使用<code>tryLock()</code>保证定时任务只执行一次</li>
+</ul>
+<p><strong>技术选型：</strong></p>
+<ul>
+<li>使用Redisson实现分布式锁</li>
+<li>支持自动续期，防止业务执行时间过长导致锁过期</li>
+<li>使用<code>tryLock()</code>非阻塞方式，避免线程阻塞“</li>
+</ul>
+<hr>
+<h2 id="总结"><strong>总结</strong></h2>
+<h3 id="redis常用操作"><strong>Redis常用操作</strong></h3>
+<ol>
+<li>String操作
+<ul>
+<li><code>set(key, value, timeout, timeUnit)</code>：设置带过期时间</li>
+<li><code>get(key)</code>：获取值</li>
+<li><code>setIfAbsent(key, value, timeout, timeUnit)</code>：原子操作</li>
+<li><code>delete(key)</code>：删除</li>
+<li><code>increment(key)</code>：自增</li>
+</ul>
+</li>
+<li>应用场景
+<ul>
+<li>缓存：Token、验证码、会话</li>
+<li>原子操作：幂等性、防止重复</li>
+<li>限流：接口限流</li>
+<li>计数器：发送次数限制</li>
+</ul>
+</li>
+</ol>
+<h3 id="分布式锁常用操作"><strong>分布式锁常用操作</strong></h3>
+<ol>
+<li>Redisson锁
+<ul>
+<li><code>lock.lock(timeout, timeUnit)</code>：加锁</li>
+<li><code>lock.tryLock()</code>：非阻塞加锁</li>
+<li><code>lock.unlock()</code>：释放锁</li>
+</ul>
+</li>
+<li>应用场景
+<ul>
+<li>并发控制：钱包扣款、余额更新</li>
+<li>去重处理：支付通知、定时任务</li>
+<li>资源保护：防止并发操作</li>
+</ul>
+</li>
+</ol>
+<h3 id="选择原则"><strong>选择原则</strong></h3>
+<ul>
+<li><strong>简单场景</strong>：用Redis原子操作（<code>setIfAbsent</code>）</li>
+<li><strong>复杂场景</strong>：用分布式锁（需要执行多步操作）</li>
+</ul>
+</div></article></main><footer data-astro-cid-jo6i4kqk><div data-astro-cid-jo6i4kqk>Goppop 的博客</div><p data-astro-cid-jo6i4kqk>&copy; 2026 Goppop. 记录技术学习、系统设计和长期思考。</p></footer></body></html>

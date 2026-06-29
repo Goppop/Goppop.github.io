@@ -1,0 +1,614 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-tldeq5d5><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" href="/favicon.ico"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Goppop 的博客" href="https://goppop.github.io/rss.xml"><meta name="generator" content="Astro v7.0.3"><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/7443039bbc50ce9a.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/0edeceb0e4e5adfc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/7443039bbc50ce9a.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/0edeceb0e4e5adfc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/%E7%94%9F%E4%BA%A7%E9%97%AE%E9%A2%98%E5%A4%8D%E7%9B%98-%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8%E8%AF%AF%E5%88%A4%E5%AF%BC%E8%87%B4%E8%BF%9E%E6%8E%A5%E6%B1%A0%E8%80%97%E5%B0%BD-2a4335df240480d5b619e56d38e15eef/"><!-- Primary Meta Tags --><title>生产问题复盘-布隆过滤器误判导致连接池耗尽</title><meta name="description" content="文章描述"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/%E7%94%9F%E4%BA%A7%E9%97%AE%E9%A2%98%E5%A4%8D%E7%9B%98-%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8%E8%AF%AF%E5%88%A4%E5%AF%BC%E8%87%B4%E8%BF%9E%E6%8E%A5%E6%B1%A0%E8%80%97%E5%B0%BD-2a4335df240480d5b619e56d38e15eef/"><meta property="og:title" content="生产问题复盘-布隆过滤器误判导致连接池耗尽"><meta property="og:description" content="文章描述"><meta property="og:image" content="https://goppop.github.io/_astro/blog-placeholder-1.Bx0Zcyzv.jpg"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/%E7%94%9F%E4%BA%A7%E9%97%AE%E9%A2%98%E5%A4%8D%E7%9B%98-%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8%E8%AF%AF%E5%88%A4%E5%AF%BC%E8%87%B4%E8%BF%9E%E6%8E%A5%E6%B1%A0%E8%80%97%E5%B0%BD-2a4335df240480d5b619e56d38e15eef/"><meta property="twitter:title" content="生产问题复盘-布隆过滤器误判导致连接池耗尽"><meta property="twitter:description" content="文章描述"><meta property="twitter:image" content="https://goppop.github.io/_astro/blog-placeholder-1.Bx0Zcyzv.jpg"><link rel="stylesheet" href="/_astro/Header.DHc1oVwj.css"><style>main[data-astro-cid-tldeq5d5]{width:100%;max-width:none;margin:0;padding:0}.article-shell[data-astro-cid-tldeq5d5]{max-width:1120px;margin:0 auto;padding:3rem 1rem 1rem}.article-head[data-astro-cid-tldeq5d5]{border-bottom:1px solid #e1d2bbe6;grid-template-columns:minmax(0,1fr) 260px;align-items:end;gap:1.5rem;padding-bottom:1.4rem;display:grid}.title[data-astro-cid-tldeq5d5]{margin:0;line-height:1}.title[data-astro-cid-tldeq5d5] h1[data-astro-cid-tldeq5d5]{max-width:12em;color:var(--accent-dark);margin:0;font-size:3.6rem;line-height:1.08}.date-card[data-astro-cid-tldeq5d5]{color:var(--muted);background:#fff9eeb3;border-radius:8px;padding:1rem;font-size:.9rem;box-shadow:0 12px 28px #58422314}.date-card[data-astro-cid-tldeq5d5] strong[data-astro-cid-tldeq5d5]{color:var(--clay);letter-spacing:0;text-transform:uppercase;margin-bottom:.4rem;font-size:.82rem;display:block}.last-updated-on[data-astro-cid-tldeq5d5]{border-top:1px solid #e1d2bbc7;margin-top:.8rem;padding-top:.8rem}.meta-row[data-astro-cid-tldeq5d5]{flex-wrap:wrap;gap:.55rem;margin-top:1rem;display:flex}.hero-image[data-astro-cid-tldeq5d5]{width:100%;max-width:1120px;margin:2rem auto 0}.hero-image[data-astro-cid-tldeq5d5] img[data-astro-cid-tldeq5d5]{box-shadow:var(--box-shadow);border-radius:6px;margin:0 auto;display:block}.prose[data-astro-cid-tldeq5d5]{width:780px;max-width:100%;color:var(--ink);margin:2.2rem auto 0;padding:0 1rem}.prose[data-astro-cid-tldeq5d5] h2{border-top:1px solid var(--line);margin-top:3.4rem;padding-top:1rem}.prose[data-astro-cid-tldeq5d5] h2:first-child{border-top:0;margin-top:0;padding-top:0}.prose[data-astro-cid-tldeq5d5] h3{color:var(--accent-dark)}.prose[data-astro-cid-tldeq5d5] p,.prose[data-astro-cid-tldeq5d5] li{font-size:1.02rem}.prose[data-astro-cid-tldeq5d5] ul,.prose[data-astro-cid-tldeq5d5] ol{padding-left:1.4rem}.prose[data-astro-cid-tldeq5d5] table{display:block;overflow-x:auto}.prose[data-astro-cid-tldeq5d5] li+li{margin-top:.35rem}@media (width<=820px){.article-shell[data-astro-cid-tldeq5d5]{padding:2rem .75rem 1rem}.article-head[data-astro-cid-tldeq5d5]{grid-template-columns:1fr}.title[data-astro-cid-tldeq5d5] h1[data-astro-cid-tldeq5d5]{font-size:2.25rem}.prose[data-astro-cid-tldeq5d5]{margin-top:2rem;padding:0 .75rem}}
+</style></head><body data-astro-cid-tldeq5d5><header data-astro-cid-nen7h5rs><nav data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs>Goppop 的博客</a><div class="internal-links" data-astro-cid-nen7h5rs><a href="/" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>首页</a><a href="/blog" class="active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>文章</a><a href="/about" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>关于</a></div><div class="social-links" data-astro-cid-nen7h5rs><a href="https://github.com/Goppop" target="_blank" data-astro-cid-nen7h5rs><span class="sr-only" data-astro-cid-nen7h5rs>Goppop GitHub</span><svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" data-astro-cid-nen7h5rs><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" data-astro-cid-nen7h5rs></path></svg></a></div></nav></header><main data-astro-cid-tldeq5d5><article data-astro-cid-tldeq5d5><div class="article-shell" data-astro-cid-tldeq5d5><header class="article-head" data-astro-cid-tldeq5d5><div class="title" data-astro-cid-tldeq5d5><p class="eyebrow" data-astro-cid-tldeq5d5>Article</p><h1 data-astro-cid-tldeq5d5>生产问题复盘-布隆过滤器误判导致连接池耗尽</h1><div class="meta-row" data-astro-cid-tldeq5d5><span class="label" data-astro-cid-tldeq5d5>生产复盘</span><span class="label" data-astro-cid-tldeq5d5>生产问题</span><span class="label" data-astro-cid-tldeq5d5>布隆过滤器</span></div></div><aside class="date-card" aria-label="文章日期" data-astro-cid-tldeq5d5><strong data-astro-cid-tldeq5d5>Published</strong><time datetime="2025-08-19T00:00:00.000Z">Aug 19, 2025</time></aside></header></div><div class="prose" data-astro-cid-tldeq5d5><h1 id="生产问题复盘-布隆过滤器误判导致连接池耗尽">生产问题复盘-布隆过滤器误判导致连接池耗尽</h1>
+<h2 id="问题概述">问题概述</h2>
+<p><strong>问题类型</strong>：数据库连接池耗尽</p>
+<p><strong>影响范围</strong>：用户注册功能</p>
+<p><strong>严重程度</strong>：高</p>
+<p><strong>本文重点</strong>：展示从现象到根因的完整排查思路和过程</p>
+<hr>
+<h2 id="一问题现象">一、问题现象</h2>
+<h3 id="11-用户反馈">1.1 用户反馈</h3>
+<ul>
+<li><strong>用户注册失败</strong>：部分用户反馈注册时提示”系统繁忙，请稍后重试”</li>
+<li><strong>响应超时</strong>：注册接口响应时间过长，甚至超时</li>
+<li><strong>服务异常</strong>：部分功能无法正常使用</li>
+</ul>
+<h3 id="12-系统监控告警">1.2 系统监控告警</h3>
+<ul>
+<li><strong>数据库连接池告警</strong>：连接池使用率达到100%，无法获取新连接</li>
+<li><strong>接口超时告警</strong>：用户注册接口超时率上升</li>
+<li><strong>线程数告警</strong>：应用线程数异常增长</li>
+</ul>
+<h3 id="13-初步判断">1.3 初步判断</h3>
+<p><strong>看到的现象</strong>：</p>
+<ul>
+<li>数据库连接池被占满</li>
+<li>用户注册功能异常</li>
+<li>服务响应变慢</li>
+</ul>
+<p><strong>初步猜测</strong>（此时还不知道真正原因）：</p>
+<ul>
+<li>可能是数据库连接泄漏？</li>
+<li>可能是某个慢查询？</li>
+<li>可能是事务未提交？</li>
+<li>可能是死锁？</li>
+</ul>
+<hr>
+<h2 id="二排查思路">二、排查思路</h2>
+<h3 id="21-排查方法论">2.1 排查方法论</h3>
+<p><strong>排查原则</strong>：</p>
+<ol>
+<li><strong>从现象出发</strong>：先看监控数据，找到异常指标</li>
+<li><strong>层层深入</strong>：从表面现象找到深层原因</li>
+<li><strong>验证假设</strong>：每个假设都要有证据支撑</li>
+<li><strong>定位根因</strong>：找到问题的根本原因，而不是表面症状</li>
+</ol>
+<h3 id="22-排查路径设计">2.2 排查路径设计</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>现象：数据库连接池耗尽</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>问题1：为什么连接池会被占满？</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>假设1：连接泄漏（连接未释放）</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>验证1：查看连接池监控，连接是否正常释放？</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>问题2：为什么连接未释放？</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>假设2：事务执行时间过长</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>验证2：查看事务监控，是否有长时间运行的事务？</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>问题3：为什么事务执行时间过长？</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>假设3：某个操作耗时过长</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>验证3：查看接口日志、Redis监控等</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>定位：找到耗时操作</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>根因：分析为什么这个操作耗时</span></span></code></pre>
+<hr>
+<h2 id="三排查过程">三、排查过程</h2>
+<h3 id="31-第一步确认问题现象">3.1 第一步：确认问题现象</h3>
+<p><strong>操作</strong>：查看数据库连接池监控</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>监控指标：</span></span>
+<span class="line"><span>- 连接池最大连接数：100</span></span>
+<span class="line"><span>- 当前使用连接数：100（100%）</span></span>
+<span class="line"><span>- 等待获取连接的线程数：50+</span></span>
+<span class="line"><span>- 连接获取超时次数：持续增长</span></span></code></pre>
+<p><strong>结论</strong>：</p>
+<ul>
+<li>确认连接池确实被占满</li>
+<li>有大量线程在等待获取连接</li>
+<li><strong>问题</strong>：为什么连接没有被释放？</li>
+</ul>
+<p><strong>下一步</strong>：需要查看连接的使用情况</p>
+<hr>
+<h3 id="32-第二步分析连接使用情况">3.2 第二步：分析连接使用情况</h3>
+<p><strong>操作</strong>：查看数据库连接监控和线程堆栈</p>
+<p><strong>方法1：查看数据库连接状态</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#6A737D">-- 查看当前连接状态SHOW PROCESSLIST;</span></span>
+<span class="line"><span style="color:#6A737D">-- 发现大量连接处于：-- State: "executing" 或 "Sleep"-- Time: 长时间（如300秒+）</span></span></code></pre>
+<p><strong>方法2：查看线程堆栈</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D"># 使用jstack查看线程状态jstack &#x3C;pid> > thread_dump.txt</span></span>
+<span class="line"><span style="color:#6A737D"># 分析发现：# - 大量线程处于 "BLOCKED" 状态，等待获取数据库连接# - 部分线程处于 "RUNNABLE" 状态，正在执行某个方法</span></span></code></pre>
+<p><strong>发现</strong>：</p>
+<ul>
+<li>有大量连接长时间占用</li>
+<li>线程在等待获取连接</li>
+<li><strong>问题</strong>：这些连接在执行什么操作？为什么这么慢？</li>
+</ul>
+<p><strong>下一步</strong>：需要查看具体的业务操作</p>
+<hr>
+<h3 id="33-第三步定位慢操作">3.3 第三步：定位慢操作</h3>
+<p><strong>操作</strong>：查看应用日志和接口监控</p>
+<p><strong>方法1：查看接口日志</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>日志中发现：</span></span>
+<span class="line"><span>- 用户注册接口响应时间：30秒+（正常应该是100ms内）</span></span>
+<span class="line"><span>- 大量请求超时</span></span>
+<span class="line"><span>- 错误日志：数据库连接获取超时</span></span></code></pre>
+<p><strong>方法2：查看Redis监控</strong>（关键发现！）</p>
+<p><strong>操作</strong>：查看Redis监控面板</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>发现异常指标：</span></span>
+<span class="line"><span>- 某个Key的调用频率：3亿次/天</span></span>
+<span class="line"><span>- 这个Key的调用频率远超正常水平</span></span>
+<span class="line"><span>- 这个Key与用户注册流程相关</span></span></code></pre>
+<p><strong>关键问题</strong>：</p>
+<ul>
+<li><strong>为什么这个Key的调用频率这么高？</strong></li>
+<li><strong>这个Key对应什么操作？</strong></li>
+<li><strong>这个操作为什么会执行这么多次？</strong></li>
+</ul>
+<p><strong>下一步</strong>：需要找到这个Key对应的代码</p>
+<hr>
+<h3 id="34-第四步定位问题代码">3.4 第四步：定位问题代码</h3>
+<p><strong>操作</strong>：根据Redis Key找到对应的代码</p>
+<p><strong>方法1：搜索代码中的Redis操作</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">// 搜索代码，找到这个Key的使用位置</span></span>
+<span class="line"><span style="color:#6A737D">// 发现：这个Key对应布隆过滤器的查询操作</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Transactional</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> registerUser</span><span style="color:#E1E4E8">(UserRegisterDTO dto) {</span></span>
+<span class="line"><span style="color:#6A737D">    // ... 其他注册逻辑</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 问题代码：while循环判断clientCode是否在布隆过滤器中</span></span>
+<span class="line"><span style="color:#E1E4E8">    String clientCode;</span></span>
+<span class="line"><span style="color:#F97583">    do</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">        clientCode </span><span style="color:#F97583">=</span><span style="color:#B392F0"> generateClientCode</span><span style="color:#E1E4E8">();  </span><span style="color:#6A737D">// 生成clientCode</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">while</span><span style="color:#E1E4E8"> (bloomFilter.</span><span style="color:#B392F0">mightContain</span><span style="color:#E1E4E8">(clientCode));  </span><span style="color:#6A737D">// 如果存在则继续生成</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 将clientCode添加到布隆过滤器</span></span>
+<span class="line"><span style="color:#E1E4E8">    bloomFilter.</span><span style="color:#B392F0">put</span><span style="color:#E1E4E8">(clientCode);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 保存用户信息（包含clientCode）</span></span>
+<span class="line"><span style="color:#E1E4E8">    userService.</span><span style="color:#B392F0">save</span><span style="color:#E1E4E8">(user);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>发现</strong>：</p>
+<ul>
+<li>找到了问题代码：while循环中调用<code>bloomFilter.mightContain()</code></li>
+<li>这个操作会查询Redis（布隆过滤器存储在Redis中）</li>
+<li><strong>问题</strong>：为什么这个循环会执行这么多次？</li>
+</ul>
+<p><strong>分析</strong>：</p>
+<ul>
+<li>3亿/天 大概3500QPS</li>
+<li>但实际注册量远小于这个值</li>
+<li><strong>说明：循环次数异常高！</strong></li>
+</ul>
+<p><strong>下一步</strong>：需要分析为什么循环次数这么高</p>
+<hr>
+<h3 id="35-第五步分析循环逻辑">3.5 第五步：分析循环逻辑</h3>
+<p><strong>操作</strong>：分析while循环的执行逻辑</p>
+<p><strong>代码逻辑分析</strong>：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">do</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    clientCode </span><span style="color:#F97583">=</span><span style="color:#B392F0"> generateClientCode</span><span style="color:#E1E4E8">();  </span><span style="color:#6A737D">// 生成新的clientCode</span></span>
+<span class="line"><span style="color:#E1E4E8">} </span><span style="color:#F97583">while</span><span style="color:#E1E4E8"> (bloomFilter.</span><span style="color:#B392F0">mightContain</span><span style="color:#E1E4E8">(clientCode));  </span><span style="color:#6A737D">// 如果布隆过滤器判断"可能存在"，则继续循环</span></span></code></pre>
+<p><strong>问题分析</strong>：</p>
+<ol>
+<li><strong>循环条件</strong>：
+<ul>
+<li><code>bloomFilter.mightContain(clientCode)</code> 返回 <code>true</code> 时，继续循环</li>
+<li>返回 <code>false</code> 时，跳出循环</li>
+</ul>
+</li>
+<li><strong>正常情况</strong>：
+<ul>
+<li>生成的<code>clientCode</code>实际上不存在</li>
+<li>布隆过滤器判断”不存在”（返回false）</li>
+<li>循环1次就退出</li>
+</ul>
+</li>
+<li><strong>异常情况</strong>：
+<ul>
+<li>生成的<code>clientCode</code>实际上不存在</li>
+<li>但布隆过滤器<strong>误判</strong>为”可能存在”（返回true）</li>
+<li>导致继续循环，重新生成</li>
+<li><strong>如果误判率高，循环次数会大大增加</strong></li>
+</ul>
+</li>
+</ol>
+<p><strong>关键问题</strong>：</p>
+<ul>
+<li><strong>为什么布隆过滤器会误判？</strong></li>
+<li><strong>误判率有多高？</strong></li>
+</ul>
+<p><strong>下一步</strong>：需要分析布隆过滤器的配置和使用情况</p>
+<hr>
+<h3 id="36-第六步分析布隆过滤器配置">3.6 第六步：分析布隆过滤器配置</h3>
+<p><strong>操作</strong>：查看布隆过滤器的初始化代码</p>
+<p><strong>代码检查</strong>：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">// 布隆过滤器初始化代码</span></span>
+<span class="line"><span style="color:#E1E4E8">BloomFilter&#x3C;</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">> bloomFilter </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> BloomFilter.</span><span style="color:#B392F0">create</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">    Funnels.</span><span style="color:#B392F0">stringFunnel</span><span style="color:#E1E4E8">(Charset.</span><span style="color:#B392F0">defaultCharset</span><span style="color:#E1E4E8">()),</span></span>
+<span class="line"><span style="color:#79B8FF">    10000</span><span style="color:#E1E4E8">,  </span><span style="color:#6A737D">// 初始容量：1万</span></span>
+<span class="line"><span style="color:#79B8FF">    0.01</span><span style="color:#6A737D">    // 误判率：1%</span></span>
+<span class="line"><span style="color:#E1E4E8">);</span></span></code></pre>
+<p><strong>业务数据检查</strong>：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>当前业务数据：</span></span>
+<span class="line"><span>- 客户数量：5万</span></span>
+<span class="line"><span>- 布隆过滤器初始容量：1万</span></span>
+<span class="line"><span>- 实际使用量：5万（是初始容量的5倍！）</span></span></code></pre>
+<p><strong>关键发现</strong>：</p>
+<ul>
+<li>布隆过滤器容量严重不足！</li>
+<li>实际使用量是初始容量的5倍</li>
+<li><strong>问题</strong>：容量不足会导致什么后果？</li>
+</ul>
+<p><strong>下一步</strong>：需要理解布隆过滤器的误判率机制</p>
+<hr>
+<h3 id="37-第七步理解误判率机制">3.7 第七步：理解误判率机制</h3>
+<p><strong>操作</strong>：查阅布隆过滤器原理，分析误判率</p>
+<p><strong>布隆过滤器误判率公式</strong>：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>误判率 ≈ (1 - e^(-kn/m))^k</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>其中：</span></span>
+<span class="line"><span>- m：位数组长度（容量）</span></span>
+<span class="line"><span>- k：哈希函数个数</span></span>
+<span class="line"><span>- n：已插入元素个数</span></span></code></pre>
+<p><strong>计算分析</strong>：</p>
+<ol>
+<li>
+<p><strong>设计时的误判率</strong>（容量1万，插入1万）：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>误判率 ≈ 1%（设计值）</span></span></code></pre>
+</li>
+<li>
+<p><strong>实际误判率</strong>（容量1万，插入5万）：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>当 n（已插入元素）接近或超过 m（容量）时：</span></span>
+<span class="line"><span>- 位数组几乎全为1</span></span>
+<span class="line"><span>- 误判率急剧上升</span></span>
+<span class="line"><span>- 可能达到 10%+ 甚至更高</span></span></code></pre>
+</li>
+</ol>
+<p><strong>验证</strong>：</p>
+<ul>
+<li>如果误判率为10%，那么：</li>
+<li>平均循环次数 = 1 / (1 - 0.1) ≈ 1.11次</li>
+<li>如果误判率为20%，平均循环次数 = 1 / (1 - 0.2) = 1.25次</li>
+<li><strong>极端情况下，可能循环数十次甚至上百次</strong></li>
+</ul>
+<p><strong>关键发现</strong>：</p>
+<ul>
+<li>容量不足导致误判率急剧上升</li>
+<li>误判率高导致循环次数增加</li>
+<li>循环次数增加导致Redis查询频率异常高（3亿次/秒）</li>
+</ul>
+<p><strong>下一步</strong>：需要分析为什么会导致连接池耗尽</p>
+<hr>
+<h3 id="38-第八步分析连接池耗尽的原因">3.8 第八步：分析连接池耗尽的原因</h3>
+<p><strong>操作</strong>：分析事务超时和连接泄漏</p>
+<p><strong>代码分析</strong>：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Transactional</span><span style="color:#6A737D">  // 事务注解</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> registerUser</span><span style="color:#E1E4E8">(UserRegisterDTO dto) {</span></span>
+<span class="line"><span style="color:#6A737D">    // while循环可能执行很长时间</span></span>
+<span class="line"><span style="color:#F97583">    do</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">        clientCode </span><span style="color:#F97583">=</span><span style="color:#B392F0"> generateClientCode</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">while</span><span style="color:#E1E4E8"> (bloomFilter.</span><span style="color:#B392F0">mightContain</span><span style="color:#E1E4E8">(clientCode));  </span><span style="color:#6A737D">// 每次循环都查询Redis</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 如果循环时间过长，事务可能超时</span></span>
+<span class="line"><span style="color:#6A737D">    // 但线程还在执行，数据库连接未释放</span></span>
+<span class="line"><span style="color:#E1E4E8">    userService.</span><span style="color:#B392F0">save</span><span style="color:#E1E4E8">(user);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>问题链条分析</strong>：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>1. 用户发起注册请求</span></span>
+<span class="line"><span>   ↓</span></span>
+<span class="line"><span>2. 进入事务方法，获取数据库连接</span></span>
+<span class="line"><span>   ↓</span></span>
+<span class="line"><span>3. while循环执行（由于误判率高，循环次数多，如10+次）</span></span>
+<span class="line"><span>   ↓</span></span>
+<span class="line"><span>4. 每次循环都查询Redis（布隆过滤器）</span></span>
+<span class="line"><span>   ↓</span></span>
+<span class="line"><span>5. 循环时间过长（如5秒+），超过事务超时时间（如3秒）</span></span>
+<span class="line"><span>   ↓</span></span>
+<span class="line"><span>6. 事务超时，客户端连接断开</span></span>
+<span class="line"><span>   ↓</span></span>
+<span class="line"><span>7. 但线程还在执行while循环，数据库连接未释放</span></span>
+<span class="line"><span>   ↓</span></span>
+<span class="line"><span>8. 多个请求同时发生，多个连接被占用</span></span>
+<span class="line"><span>   ↓</span></span>
+<span class="line"><span>9. 数据库连接池被占满</span></span></code></pre>
+<p><strong>验证</strong>：</p>
+<ul>
+<li>查看事务超时配置：3秒</li>
+<li>查看接口响应时间：30秒+（远超事务超时时间）</li>
+<li>查看线程堆栈：大量线程处于RUNNABLE状态，正在执行while循环</li>
+<li>查看连接状态：大量连接长时间占用，未释放</li>
+</ul>
+<p><strong>关键发现</strong>：</p>
+<ul>
+<li>事务超时后，线程仍在执行，连接未释放</li>
+<li>多个并发请求导致多个连接被占用</li>
+<li>连接池容量有限，很快被占满</li>
+</ul>
+<p><strong>根因确认</strong>：</p>
+<ul>
+<li><strong>根本原因</strong>：布隆过滤器容量不足 → 误判率高 → 循环次数增加 → 事务超时 → 连接泄漏 → 连接池耗尽</li>
+</ul>
+<hr>
+<h2 id="四问题验证如何确认">四、问题验证（如何确认？）</h2>
+<h3 id="41-验证误判率假设">4.1 验证误判率假设</h3>
+<p><strong>方法</strong>：查看布隆过滤器的实际使用情况</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>检查结果：</span></span>
+<span class="line"><span>- 布隆过滤器初始容量：1万</span></span>
+<span class="line"><span>- 当前已插入元素数量：5万</span></span>
+<span class="line"><span>- 容量使用率：500%（严重超载）</span></span></code></pre>
+<p><strong>结论</strong>：</p>
+<ul>
+<li>容量确实严重不足</li>
+<li>误判率确实会急剧上升</li>
+</ul>
+<hr>
+<h3 id="42-验证循环次数假设">4.2 验证循环次数假设</h3>
+<p><strong>方法</strong>：分析Redis查询频率</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>监控数据：</span></span>
+<span class="line"><span>- Redis Key调用频率：3亿次/秒</span></span>
+<span class="line"><span>- 正常注册量：假设1000次/秒</span></span>
+<span class="line"><span>- 平均循环次数 = 3亿 / 1000 = 30万次（异常高！）</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>实际分析：</span></span>
+<span class="line"><span>- 如果每个注册循环10次，那么：</span></span>
+<span class="line"><span>  - 3亿次/秒 ÷ 10次 = 3000万次注册/秒（不可能）</span></span>
+<span class="line"><span>- 实际情况：</span></span>
+<span class="line"><span>  - 大量请求在循环中，导致查询频率异常高</span></span>
+<span class="line"><span>  - 循环次数确实异常高</span></span></code></pre>
+<p><strong>结论</strong>：</p>
+<ul>
+<li>循环次数确实异常高</li>
+<li>Redis查询频率异常高</li>
+</ul>
+<hr>
+<h3 id="43-验证连接泄漏假设">4.3 验证连接泄漏假设</h3>
+<p><strong>方法</strong>：查看连接池和线程状态</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>检查结果：</span></span>
+<span class="line"><span>- 连接池使用率：100%</span></span>
+<span class="line"><span>- 等待获取连接的线程数：50+</span></span>
+<span class="line"><span>- 线程堆栈：大量线程处于RUNNABLE状态，正在执行while循环</span></span>
+<span class="line"><span>- 连接状态：大量连接长时间占用（300秒+），未释放</span></span></code></pre>
+<p><strong>结论</strong>：</p>
+<ul>
+<li>连接确实未释放</li>
+<li>线程确实在执行长时间操作</li>
+</ul>
+<hr>
+<h2 id="五根因分析为什么会出现">五、根因分析（为什么会出现？）</h2>
+<h3 id="51-问题链条">5.1 问题链条</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>业务增长（客户数量从1万增长到5万）</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>布隆过滤器容量不足（初始容量1万，实际使用5万）</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>误判率急剧上升（从1%上升到10%+）</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>while循环次数增加（从1次增加到10+次）</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>事务执行时间过长（从100ms增加到5秒+）</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>事务超时（超过3秒超时时间）</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>客户端连接断开，但线程仍在执行</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>数据库连接未释放</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>多个并发请求导致多个连接被占用</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>数据库连接池被占满</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>服务不可用</span></span></code></pre>
+<h3 id="52-根本原因">5.2 根本原因</h3>
+<p><strong>直接原因</strong>：</p>
+<ul>
+<li>布隆过滤器容量不足，导致误判率高</li>
+</ul>
+<p><strong>深层原因</strong>：</p>
+<ol>
+<li><strong>容量规划不足</strong>：没有考虑业务增长，初始容量设置过小</li>
+<li><strong>监控缺失</strong>：没有监控布隆过滤器的使用率</li>
+<li><strong>代码设计缺陷</strong>：在事务中执行可能耗时的循环操作</li>
+<li><strong>缺乏保护机制</strong>：循环没有最大次数限制</li>
+</ol>
+<hr>
+<h2 id="六解决方案">六、解决方案</h2>
+<h3 id="61-立即修复">6.1 立即修复</h3>
+<p><strong>修改布隆过滤器容量</strong>：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">// 修改前</span></span>
+<span class="line"><span style="color:#E1E4E8">BloomFilter&#x3C;</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">> bloomFilter </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> BloomFilter.</span><span style="color:#B392F0">create</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">    Funnels.</span><span style="color:#B392F0">stringFunnel</span><span style="color:#E1E4E8">(Charset.</span><span style="color:#B392F0">defaultCharset</span><span style="color:#E1E4E8">()),</span></span>
+<span class="line"><span style="color:#79B8FF">    10000</span><span style="color:#E1E4E8">,  </span><span style="color:#6A737D">// 初始容量：1万</span></span>
+<span class="line"><span style="color:#79B8FF">    0.01</span><span style="color:#6A737D">    // 误判率：1%</span></span>
+<span class="line"><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 修改后</span></span>
+<span class="line"><span style="color:#E1E4E8">BloomFilter&#x3C;</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">> bloomFilter </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> BloomFilter.</span><span style="color:#B392F0">create</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">    Funnels.</span><span style="color:#B392F0">stringFunnel</span><span style="color:#E1E4E8">(Charset.</span><span style="color:#B392F0">defaultCharset</span><span style="color:#E1E4E8">()),</span></span>
+<span class="line"><span style="color:#79B8FF">    100000</span><span style="color:#E1E4E8">, </span><span style="color:#6A737D">// 初始容量：10万（预留2倍空间）</span></span>
+<span class="line"><span style="color:#79B8FF">    0.01</span><span style="color:#6A737D">    // 误判率：1%</span></span>
+<span class="line"><span style="color:#E1E4E8">);</span></span></code></pre>
+<p><strong>容量设计原则</strong>：</p>
+<ul>
+<li>初始容量应该 &gt;= 预期最大元素数量 × 1.5（预留50%空间）</li>
+<li>当前业务量5万，设置为10万，预留2倍空间</li>
+</ul>
+<h3 id="62-效果验证">6.2 效果验证</h3>
+<p><strong>修复后的效果</strong>：</p>
+<ol>
+<li><strong>误判率降低</strong>：
+<ul>
+<li>修改前：误判率可能达到10%+</li>
+<li>修改后：误判率保持在1%左右</li>
+</ul>
+</li>
+<li><strong>循环次数减少</strong>：
+<ul>
+<li>修改前：平均循环次数可能达到10+次</li>
+<li>修改后：平均循环次数接近1次（几乎不循环）</li>
+</ul>
+</li>
+<li><strong>Redis查询频率降低</strong>：
+<ul>
+<li>修改前：3亿次/秒</li>
+<li>修改后：正常水平（大幅降低）</li>
+</ul>
+</li>
+<li><strong>数据库连接池恢复正常</strong>：
+<ul>
+<li>修改前：连接池被占满</li>
+<li>修改后：连接池使用正常</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="七预防措施">七、预防措施</h2>
+<h3 id="71-设计阶段">7.1 设计阶段</h3>
+<ol>
+<li><strong>容量规划</strong>：
+<ul>
+<li>根据业务增长预测，合理设置布隆过滤器容量</li>
+<li>预留足够的空间（1.5-2倍）</li>
+</ul>
+</li>
+<li><strong>代码审查</strong>：
+<ul>
+<li>审查循环逻辑，避免无限循环</li>
+<li>审查事务使用，避免长时间操作</li>
+</ul>
+</li>
+<li><strong>性能测试</strong>：
+<ul>
+<li>测试布隆过滤器在高负载下的表现</li>
+<li>测试误判率对业务的影响</li>
+</ul>
+</li>
+</ol>
+<h3 id="72-运行阶段">7.2 运行阶段</h3>
+<ol>
+<li><strong>监控告警</strong>：
+<ul>
+<li>监控布隆过滤器使用率</li>
+<li>监控Redis热点key</li>
+<li>监控数据库连接池</li>
+</ul>
+</li>
+<li><strong>定期检查</strong>：
+<ul>
+<li>定期检查布隆过滤器容量是否充足</li>
+<li>定期检查代码逻辑是否有问题</li>
+</ul>
+</li>
+<li><strong>应急预案</strong>：
+<ul>
+<li>准备扩容方案</li>
+<li>准备降级方案（如临时禁用布隆过滤器）</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="八问题复盘总结">八、问题复盘总结</h2>
+<h3 id="81-问题链条">8.1 问题链条</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>业务增长（5万客户）</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>布隆过滤器容量不足（1万）</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>误判率急剧上升（10%+）</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>while循环次数增加（10+次）</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>事务执行时间过长</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>事务超时，连接未释放</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>数据库连接池耗尽</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>服务不可用</span></span></code></pre>
+<h3 id="82-关键教训">8.2 关键教训</h3>
+<ol>
+<li><strong>容量规划很重要</strong>：
+<ul>
+<li>布隆过滤器容量要预留足够空间</li>
+<li>不能只看当前数据量，要考虑未来增长</li>
+</ul>
+</li>
+<li><strong>监控很重要</strong>：
+<ul>
+<li>Redis热点key监控帮助快速定位问题</li>
+<li>数据库连接池监控可以提前发现问题</li>
+</ul>
+</li>
+<li><strong>代码设计很重要</strong>：
+<ul>
+<li>避免在事务中执行长时间操作</li>
+<li>循环逻辑要有退出机制</li>
+</ul>
+</li>
+<li><strong>误判率的影响</strong>：
+<ul>
+<li>布隆过滤器的误判率不是固定的</li>
+<li>当容量不足时，误判率会急剧上升</li>
+<li>误判率会影响业务逻辑的正确性和性能</li>
+</ul>
+</li>
+</ol>
+<h3 id="83-改进方向">8.3 改进方向</h3>
+<ol>
+<li><strong>技术改进</strong>：
+<ul>
+<li>优化布隆过滤器容量设计</li>
+<li>优化循环逻辑，增加重试限制</li>
+<li>考虑使用数据库唯一约束替代布隆过滤器</li>
+</ul>
+</li>
+<li><strong>流程改进</strong>：
+<ul>
+<li>加强代码审查</li>
+<li>加强性能测试</li>
+<li>加强监控告警</li>
+</ul>
+</li>
+<li><strong>知识积累</strong>：
+<ul>
+<li>深入理解布隆过滤器原理</li>
+<li>了解误判率的影响</li>
+<li>学习连接池管理最佳实践</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="九附录布隆过滤器基础知识">九、附录：布隆过滤器基础知识</h2>
+<h3 id="91-布隆过滤器适用场景">9.1 布隆过滤器适用场景</h3>
+<p><strong>适合使用</strong>：</p>
+<ul>
+<li>判断元素是否可能存在（允许误判）</li>
+<li>数据量大，需要节省内存</li>
+<li>查询频繁，需要快速响应</li>
+</ul>
+<p><strong>不适合使用</strong>：</p>
+<ul>
+<li>需要精确判断（不允许误判）</li>
+<li>需要删除元素（布隆过滤器不支持删除）</li>
+<li>数据量小（HashSet更合适）</li>
+</ul>
+<h3 id="92-布隆过滤器参数选择">9.2 布隆过滤器参数选择</h3>
+<p><strong>参数关系</strong>：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>误判率 ≈ (1 - e^(-kn/m))^k</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>其中：</span></span>
+<span class="line"><span>- m：位数组长度（容量）</span></span>
+<span class="line"><span>- k：哈希函数个数</span></span>
+<span class="line"><span>- n：已插入元素个数</span></span></code></pre>
+<p><strong>参数选择建议</strong>：</p>
+<ul>
+<li><strong>误判率</strong>：通常选择0.01（1%）或0.1（10%）</li>
+<li><strong>哈希函数个数k</strong>：通常选择3-5个</li>
+<li><strong>容量m</strong>：根据预期元素数量n和误判率计算</li>
+</ul>
+<p><strong>在线计算工具</strong>：</p>
+<ul>
+<li><a href="https://hur.st/bloomfilter/">https://hur.st/bloomfilter/</a></li>
+<li>输入预期元素数量和误判率，自动计算所需容量</li>
+</ul>
+<h3 id="93-布隆过滤器实现">9.3 布隆过滤器实现</h3>
+<p><strong>Guava实现</strong>：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> com.google.common.hash.BloomFilter;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> com.google.common.hash.Funnels;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 创建布隆过滤器</span></span>
+<span class="line"><span style="color:#E1E4E8">BloomFilter&#x3C;</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">> bloomFilter </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> BloomFilter.</span><span style="color:#B392F0">create</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">    Funnels.</span><span style="color:#B392F0">stringFunnel</span><span style="color:#E1E4E8">(Charset.</span><span style="color:#B392F0">defaultCharset</span><span style="color:#E1E4E8">()),</span></span>
+<span class="line"><span style="color:#79B8FF">    100000</span><span style="color:#E1E4E8">,  </span><span style="color:#6A737D">// 预期插入元素数量</span></span>
+<span class="line"><span style="color:#79B8FF">    0.01</span><span style="color:#6A737D">     // 误判率</span></span>
+<span class="line"><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 添加元素</span></span>
+<span class="line"><span style="color:#E1E4E8">bloomFilter.</span><span style="color:#B392F0">put</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"element"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 判断元素是否存在</span></span>
+<span class="line"><span style="color:#F97583">boolean</span><span style="color:#E1E4E8"> mightContain </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> bloomFilter.</span><span style="color:#B392F0">mightContain</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"element"</span><span style="color:#E1E4E8">);</span></span></code></pre>
+<p><strong>Redis实现（RedisBloom）</strong>：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8"># 创建布隆过滤器</span></span>
+<span class="line"><span style="color:#E1E4E8">BF.RESERVE myfilter </span><span style="color:#79B8FF">0.01</span><span style="color:#79B8FF"> 100000</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8"># 添加元素</span></span>
+<span class="line"><span style="color:#E1E4E8">BF.ADD myfilter element</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8"># 判断元素是否存在</span></span>
+<span class="line"><span style="color:#E1E4E8">BF.EXISTS myfilter element</span></span></code></pre>
+<hr>
+<p><strong>文档完</strong></p>
+</div></article></main><footer data-astro-cid-jo6i4kqk><div data-astro-cid-jo6i4kqk>Goppop 的博客</div><p data-astro-cid-jo6i4kqk>&copy; 2026 Goppop. 记录技术学习、系统设计和长期思考。</p></footer></body></html>

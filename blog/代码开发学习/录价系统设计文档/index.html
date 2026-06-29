@@ -1,0 +1,565 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-tldeq5d5><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" href="/favicon.ico"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Goppop 的博客" href="https://goppop.github.io/rss.xml"><meta name="generator" content="Astro v7.0.3"><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/7443039bbc50ce9a.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/0edeceb0e4e5adfc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/7443039bbc50ce9a.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/0edeceb0e4e5adfc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/%E5%BD%95%E4%BB%B7%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3/"><!-- Primary Meta Tags --><title>录价系统设计方案v1.1</title><meta name="description" content="文章描述"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/%E5%BD%95%E4%BB%B7%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3/"><meta property="og:title" content="录价系统设计方案v1.1"><meta property="og:description" content="文章描述"><meta property="og:image" content="https://goppop.github.io/_astro/blog-placeholder-1.Bx0Zcyzv.jpg"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/%E5%BD%95%E4%BB%B7%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3/"><meta property="twitter:title" content="录价系统设计方案v1.1"><meta property="twitter:description" content="文章描述"><meta property="twitter:image" content="https://goppop.github.io/_astro/blog-placeholder-1.Bx0Zcyzv.jpg"><link rel="stylesheet" href="/_astro/Header.DHc1oVwj.css"><style>main[data-astro-cid-tldeq5d5]{width:100%;max-width:none;margin:0;padding:0}.article-shell[data-astro-cid-tldeq5d5]{max-width:1120px;margin:0 auto;padding:3rem 1rem 1rem}.article-head[data-astro-cid-tldeq5d5]{border-bottom:1px solid #e1d2bbe6;grid-template-columns:minmax(0,1fr) 260px;align-items:end;gap:1.5rem;padding-bottom:1.4rem;display:grid}.title[data-astro-cid-tldeq5d5]{margin:0;line-height:1}.title[data-astro-cid-tldeq5d5] h1[data-astro-cid-tldeq5d5]{max-width:12em;color:var(--accent-dark);margin:0;font-size:3.6rem;line-height:1.08}.date-card[data-astro-cid-tldeq5d5]{color:var(--muted);background:#fff9eeb3;border-radius:8px;padding:1rem;font-size:.9rem;box-shadow:0 12px 28px #58422314}.date-card[data-astro-cid-tldeq5d5] strong[data-astro-cid-tldeq5d5]{color:var(--clay);letter-spacing:0;text-transform:uppercase;margin-bottom:.4rem;font-size:.82rem;display:block}.last-updated-on[data-astro-cid-tldeq5d5]{border-top:1px solid #e1d2bbc7;margin-top:.8rem;padding-top:.8rem}.meta-row[data-astro-cid-tldeq5d5]{flex-wrap:wrap;gap:.55rem;margin-top:1rem;display:flex}.hero-image[data-astro-cid-tldeq5d5]{width:100%;max-width:1120px;margin:2rem auto 0}.hero-image[data-astro-cid-tldeq5d5] img[data-astro-cid-tldeq5d5]{box-shadow:var(--box-shadow);border-radius:6px;margin:0 auto;display:block}.prose[data-astro-cid-tldeq5d5]{width:780px;max-width:100%;color:var(--ink);margin:2.2rem auto 0;padding:0 1rem}.prose[data-astro-cid-tldeq5d5] h2{border-top:1px solid var(--line);margin-top:3.4rem;padding-top:1rem}.prose[data-astro-cid-tldeq5d5] h2:first-child{border-top:0;margin-top:0;padding-top:0}.prose[data-astro-cid-tldeq5d5] h3{color:var(--accent-dark)}.prose[data-astro-cid-tldeq5d5] p,.prose[data-astro-cid-tldeq5d5] li{font-size:1.02rem}.prose[data-astro-cid-tldeq5d5] ul,.prose[data-astro-cid-tldeq5d5] ol{padding-left:1.4rem}.prose[data-astro-cid-tldeq5d5] table{display:block;overflow-x:auto}.prose[data-astro-cid-tldeq5d5] li+li{margin-top:.35rem}@media (width<=820px){.article-shell[data-astro-cid-tldeq5d5]{padding:2rem .75rem 1rem}.article-head[data-astro-cid-tldeq5d5]{grid-template-columns:1fr}.title[data-astro-cid-tldeq5d5] h1[data-astro-cid-tldeq5d5]{font-size:2.25rem}.prose[data-astro-cid-tldeq5d5]{margin-top:2rem;padding:0 .75rem}}
+</style></head><body data-astro-cid-tldeq5d5><header data-astro-cid-nen7h5rs><nav data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs>Goppop 的博客</a><div class="internal-links" data-astro-cid-nen7h5rs><a href="/" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>首页</a><a href="/blog" class="active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>文章</a><a href="/about" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>关于</a></div><div class="social-links" data-astro-cid-nen7h5rs><a href="https://github.com/Goppop" target="_blank" data-astro-cid-nen7h5rs><span class="sr-only" data-astro-cid-nen7h5rs>Goppop GitHub</span><svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" data-astro-cid-nen7h5rs><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" data-astro-cid-nen7h5rs></path></svg></a></div></nav></header><main data-astro-cid-tldeq5d5><article data-astro-cid-tldeq5d5><div class="article-shell" data-astro-cid-tldeq5d5><header class="article-head" data-astro-cid-tldeq5d5><div class="title" data-astro-cid-tldeq5d5><p class="eyebrow" data-astro-cid-tldeq5d5>Article</p><h1 data-astro-cid-tldeq5d5>录价系统设计方案v1.1</h1><div class="meta-row" data-astro-cid-tldeq5d5><span class="label" data-astro-cid-tldeq5d5>录价系统</span><span class="label" data-astro-cid-tldeq5d5>录价系统</span></div></div><aside class="date-card" aria-label="文章日期" data-astro-cid-tldeq5d5><strong data-astro-cid-tldeq5d5>Published</strong><time datetime="2025-11-21T00:00:00.000Z">Nov 21, 2025</time><div class="last-updated-on" data-astro-cid-tldeq5d5><strong data-astro-cid-tldeq5d5>Updated</strong><time datetime="2025-11-21T00:00:00.000Z">Nov 21, 2025</time></div></aside></header></div><div class="prose" data-astro-cid-tldeq5d5><h1 id="录价系统设计文档">录价系统设计文档</h1>
+<h2 id="1-背景与目标">1. 背景与目标</h2>
+<h3 id="11-背景">1.1 背景</h3>
+<p>当前算力租赁系统中，价格管理存在以下问题：</p>
+<ul>
+<li>价格数据分散，缺少统一管理界面</li>
+<li>价格模型过于简单，无法支持细粒度定价</li>
+<li>缺少价格录入、修改、查询的后台管理功能</li>
+<li>无法支持多维度组合计费（CPU规格、GPU规格、地区、附加资源等）</li>
+</ul>
+<h3 id="12-目标">1.2 目标</h3>
+<p>设计并实现一个完整的录价系统，支持：</p>
+<ul>
+<li><strong>细粒度规格定价</strong>：CPU规格、GPU规格的精确定价</li>
+<li><strong>地区差异定价</strong>：不同地区的价格差异</li>
+<li><strong>附加资源定价</strong>：数据盘、独立IP、收费镜像等</li>
+<li><strong>价格管理功能</strong>：录入、修改、查询、历史记录</li>
+<li><strong>价格计算引擎</strong>：自动组合多个维度计算总价</li>
+</ul>
+<hr>
+<h2 id="2-需求分析">2. 需求分析</h2>
+<h3 id="21-cpu创建计费项">2.1 CPU创建计费项</h3>
+<table>
+<thead>
+<tr>
+<th>计费项</th>
+<th>说明</th>
+<th>计费方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CPU规格（细粒度）</td>
+<td>不同CPU核数/型号不同价格</td>
+<td>按小时/天/周/月</td>
+</tr>
+<tr>
+<td>额外数据盘</td>
+<td>按容量（GB）计费</td>
+<td>按小时/天/周/月</td>
+</tr>
+<tr>
+<td>地区计费</td>
+<td>不同地区价格不同</td>
+<td>按小时/天/周/月</td>
+</tr>
+<tr>
+<td>独立IP</td>
+<td>独立IP的额外费用</td>
+<td>按小时/天/周/月</td>
+</tr>
+<tr>
+<td>收费镜像</td>
+<td>某些镜像需要额外收费</td>
+<td>按小时/天/周/月</td>
+</tr>
+</tbody>
+</table>
+<h3 id="22-gpu创建计费项">2.2 GPU创建计费项</h3>
+<table>
+<thead>
+<tr>
+<th>计费项</th>
+<th>说明</th>
+<th>计费方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPU规格（细粒度）</td>
+<td>不同GPU型号/数量不同价格</td>
+<td>按小时/天/周/月</td>
+</tr>
+<tr>
+<td>额外数据盘</td>
+<td>按容量（GB）计费</td>
+<td>按小时/天/周/月</td>
+</tr>
+<tr>
+<td>地区计费</td>
+<td>不同地区价格不同</td>
+<td>按小时/天/周/月</td>
+</tr>
+<tr>
+<td>独立IP</td>
+<td>独立IP的额外费用</td>
+<td>按小时/天/周/月</td>
+</tr>
+<tr>
+<td>收费镜像</td>
+<td>某些镜像需要额外收费</td>
+<td>按小时/天/周/月</td>
+</tr>
+</tbody>
+</table>
+<h3 id="23-功能需求">2.3 功能需求</h3>
+<ol>
+<li><strong>价格录入</strong>：支持批量录入多种规格的价格</li>
+<li><strong>价格修改</strong>：支持价格调整，支持生效时间管理</li>
+<li><strong>价格查询</strong>：支持多条件查询、分页查询</li>
+<li><strong>价格历史</strong>：记录价格变更历史，支持审计</li>
+<li><strong>价格计算</strong>：根据配置自动计算总价</li>
+</ol>
+<hr>
+<h2 id="3-数据模型设计">3. 数据模型设计</h2>
+<h3 id="31-核心设计理念">3.1 核心设计理念</h3>
+<p>采用<strong>组合计费模型</strong>，将价格拆分为多个维度：</p>
+<ul>
+<li><strong>基础规格价格</strong>：CPU/GPU规格的基础价格</li>
+<li><strong>地区价格系数</strong>：不同地区的价格调整系数</li>
+<li><strong>附加资源价格</strong>：数据盘、IP、镜像等附加资源价格</li>
+</ul>
+<h3 id="32-数据表设计">3.2 数据表设计</h3>
+<h4 id="321-基础规格价格表tgwk_compute_spec_price">3.2.1 基础规格价格表（tgwk_compute_spec_price）</h4>
+<p>存储CPU/GPU规格的价格（<strong>按地区存储，每个规格+地区+计费方式一条记录</strong>）</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#F97583">CREATE</span><span style="color:#F97583"> TABLE</span><span style="color:#E1E4E8"> `</span><span style="color:#B392F0">tgwk_compute_spec_price</span><span style="color:#E1E4E8">` (</span></span>
+<span class="line"><span style="color:#9ECBFF">  `id`</span><span style="color:#F97583"> bigint</span><span style="color:#F97583"> NOT NULL</span><span style="color:#E1E4E8"> AUTO_INCREMENT COMMENT </span><span style="color:#9ECBFF">'主键ID'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `resource_type`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">50</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'资源类型：CPU/GPU'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `spec_code`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">100</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'规格编码：如 CPU_4C8G、GPU_RTX4090_1'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `spec_name`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">200</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'规格名称：如 4核8G、RTX4090×1'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `cpu_cores`</span><span style="color:#F97583"> int</span><span style="color:#F97583"> DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'CPU核数（CPU资源时使用）'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `memory_gb`</span><span style="color:#F97583"> int</span><span style="color:#F97583"> DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'内存大小GB（CPU资源时使用）'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `gpu_model`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">100</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'GPU型号（GPU资源时使用）'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `gpu_count`</span><span style="color:#F97583"> int</span><span style="color:#F97583"> DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'GPU数量（GPU资源时使用）'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `region_code`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">50</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'地区编码：如 CN_EAST_1（新增字段）'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `region_name`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">100</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'地区名称：如 华东1区（新增字段）'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `billing_method_code`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">50</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'计费方式编码：按量计费/按天/按周/按月'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `base_price`</span><span style="color:#F97583"> decimal</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">10</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'基础价格（元/单位）'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `currency`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">10</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#F97583"> DEFAULT</span><span style="color:#9ECBFF"> 'CNY'</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'货币单位'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `status`</span><span style="color:#F97583"> tinyint</span><span style="color:#F97583"> NOT NULL</span><span style="color:#F97583"> DEFAULT</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'状态：1=启用，0=禁用'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `effective_date`</span><span style="color:#F97583"> datetime</span><span style="color:#F97583"> DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'生效日期'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `expire_date`</span><span style="color:#F97583"> datetime</span><span style="color:#F97583"> DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'失效日期'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `remark`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">500</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'备注'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `creator`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">64</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">DEFAULT</span><span style="color:#9ECBFF"> ''</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'创建者'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `create_time`</span><span style="color:#F97583"> datetime</span><span style="color:#F97583"> NOT NULL</span><span style="color:#F97583"> DEFAULT</span><span style="color:#E1E4E8"> CURRENT_TIMESTAMP COMMENT </span><span style="color:#9ECBFF">'创建时间'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `updater`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">64</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">DEFAULT</span><span style="color:#9ECBFF"> ''</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'更新者'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `update_time`</span><span style="color:#F97583"> datetime</span><span style="color:#F97583"> NOT NULL</span><span style="color:#F97583"> DEFAULT</span><span style="color:#E1E4E8"> CURRENT_TIMESTAMP </span><span style="color:#F97583">ON UPDATE</span><span style="color:#E1E4E8"> CURRENT_TIMESTAMP COMMENT </span><span style="color:#9ECBFF">'更新时间'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `deleted`</span><span style="color:#F97583"> bit</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#F97583"> DEFAULT</span><span style="color:#E1E4E8"> b</span><span style="color:#9ECBFF">'0'</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'是否删除'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `tenant_id`</span><span style="color:#F97583"> bigint</span><span style="color:#F97583"> NOT NULL</span><span style="color:#F97583"> DEFAULT</span><span style="color:#9ECBFF"> '0'</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'租户编号'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#F97583">  PRIMARY KEY</span><span style="color:#E1E4E8"> (</span><span style="color:#9ECBFF">`id`</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#F97583">  UNIQUE</span><span style="color:#F97583"> KEY</span><span style="color:#9ECBFF"> `uk_spec_region_billing`</span><span style="color:#E1E4E8"> (</span><span style="color:#9ECBFF">`spec_code`</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">`region_code`</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">`billing_method_code`</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">`tenant_id`</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">`deleted`</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#F97583">  KEY</span><span style="color:#9ECBFF"> `idx_resource_type`</span><span style="color:#E1E4E8"> (</span><span style="color:#9ECBFF">`resource_type`</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#F97583">  KEY</span><span style="color:#9ECBFF"> `idx_region_code`</span><span style="color:#E1E4E8"> (</span><span style="color:#9ECBFF">`region_code`</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#F97583">  KEY</span><span style="color:#9ECBFF"> `idx_billing_method`</span><span style="color:#E1E4E8"> (</span><span style="color:#9ECBFF">`billing_method_code`</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#F97583">  KEY</span><span style="color:#9ECBFF"> `idx_status`</span><span style="color:#E1E4E8"> (</span><span style="color:#9ECBFF">`status`</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#F97583">  KEY</span><span style="color:#9ECBFF"> `idx_tenant_id`</span><span style="color:#E1E4E8"> (</span><span style="color:#9ECBFF">`tenant_id`</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">) ENGINE</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">InnoDB </span><span style="color:#F97583">DEFAULT</span><span style="color:#E1E4E8"> CHARSET</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">utf8mb4 </span><span style="color:#F97583">COLLATE=</span><span style="color:#E1E4E8">utf8mb4_unicode_ci COMMENT</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">'算力规格价格表'</span><span style="color:#E1E4E8">;</span></span></code></pre>
+<p><strong>设计说明</strong>：</p>
+<ul>
+<li><code>spec_code</code>：规格唯一编码，如 <code>CPU_4C8G</code>、<code>GPU_RTX4090_1</code></li>
+<li><code>region_code</code>：<strong>地区编码，每个规格在不同地区可以有不同价格</strong></li>
+<li><code>resource_type</code>：区分CPU和GPU资源</li>
+<li><code>billing_method_code</code>：支持多种计费方式</li>
+<li><code>base_price</code>：<strong>该规格在该地区的直接价格</strong>（不再使用系数计算）</li>
+<li><strong>唯一索引</strong>：<code>spec_code + region_code + billing_method_code</code>，确保同一规格在同一地区同一计费方式只有一条记录</li>
+</ul>
+<p><strong>设计变更说明</strong>：</p>
+<ul>
+<li><strong>去掉地区系数表</strong>：因为不同规格在同一地区的倍率可能不同，统一倍率表不适用</li>
+<li><strong>在规格价格表中加入地区字段</strong>：每个规格+地区+计费方式组合一条记录，价格直接存储</li>
+<li><strong>更灵活</strong>：支持每个规格在不同地区有完全独立的价格</li>
+<li><strong>数据量增加</strong>：如果规格多、地区多，数据量会增大，但这是业务需求决定的</li>
+</ul>
+<h4 id="323-附加资源价格表tgwk_addon_resource_price">3.2.3 附加资源价格表（tgwk_addon_resource_price）</h4>
+<p>存储附加资源（数据盘、IP、镜像等）的价格</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#F97583">CREATE</span><span style="color:#F97583"> TABLE</span><span style="color:#E1E4E8"> `</span><span style="color:#B392F0">tgwk_addon_resource_price</span><span style="color:#E1E4E8">` (</span></span>
+<span class="line"><span style="color:#9ECBFF">  `id`</span><span style="color:#F97583"> bigint</span><span style="color:#F97583"> NOT NULL</span><span style="color:#E1E4E8"> AUTO_INCREMENT COMMENT </span><span style="color:#9ECBFF">'主键ID'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `resource_type`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">50</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'附加资源类型：DATA_DISK/IP/IMAGE'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `resource_code`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">100</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'资源编码'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `resource_name`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">200</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'资源名称'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `billing_method_code`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">50</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'计费方式编码'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `price_type`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">50</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'价格类型：FIXED（固定价格）/PER_UNIT（按单位）'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `unit_price`</span><span style="color:#F97583"> decimal</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">10</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'单价（元/单位）'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `unit`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">50</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'单位：如 GB（数据盘）、个（IP）、小时（镜像）'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `currency`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">10</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#F97583"> DEFAULT</span><span style="color:#9ECBFF"> 'CNY'</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'货币单位'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `status`</span><span style="color:#F97583"> tinyint</span><span style="color:#F97583"> NOT NULL</span><span style="color:#F97583"> DEFAULT</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'状态：1=启用，0=禁用'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `effective_date`</span><span style="color:#F97583"> datetime</span><span style="color:#F97583"> DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'生效日期'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `expire_date`</span><span style="color:#F97583"> datetime</span><span style="color:#F97583"> DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'失效日期'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `remark`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">500</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'备注'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `creator`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">64</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">DEFAULT</span><span style="color:#9ECBFF"> ''</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'创建者'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `create_time`</span><span style="color:#F97583"> datetime</span><span style="color:#F97583"> NOT NULL</span><span style="color:#F97583"> DEFAULT</span><span style="color:#E1E4E8"> CURRENT_TIMESTAMP COMMENT </span><span style="color:#9ECBFF">'创建时间'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `updater`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">64</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">DEFAULT</span><span style="color:#9ECBFF"> ''</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'更新者'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `update_time`</span><span style="color:#F97583"> datetime</span><span style="color:#F97583"> NOT NULL</span><span style="color:#F97583"> DEFAULT</span><span style="color:#E1E4E8"> CURRENT_TIMESTAMP </span><span style="color:#F97583">ON UPDATE</span><span style="color:#E1E4E8"> CURRENT_TIMESTAMP COMMENT </span><span style="color:#9ECBFF">'更新时间'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `deleted`</span><span style="color:#F97583"> bit</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#F97583"> DEFAULT</span><span style="color:#E1E4E8"> b</span><span style="color:#9ECBFF">'0'</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'是否删除'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `tenant_id`</span><span style="color:#F97583"> bigint</span><span style="color:#F97583"> NOT NULL</span><span style="color:#F97583"> DEFAULT</span><span style="color:#9ECBFF"> '0'</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'租户编号'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#F97583">  PRIMARY KEY</span><span style="color:#E1E4E8"> (</span><span style="color:#9ECBFF">`id`</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#F97583">  UNIQUE</span><span style="color:#F97583"> KEY</span><span style="color:#9ECBFF"> `uk_resource_billing`</span><span style="color:#E1E4E8"> (</span><span style="color:#9ECBFF">`resource_type`</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">`resource_code`</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">`billing_method_code`</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">`tenant_id`</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">`deleted`</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#F97583">  KEY</span><span style="color:#9ECBFF"> `idx_resource_type`</span><span style="color:#E1E4E8"> (</span><span style="color:#9ECBFF">`resource_type`</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#F97583">  KEY</span><span style="color:#9ECBFF"> `idx_billing_method`</span><span style="color:#E1E4E8"> (</span><span style="color:#9ECBFF">`billing_method_code`</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#F97583">  KEY</span><span style="color:#9ECBFF"> `idx_status`</span><span style="color:#E1E4E8"> (</span><span style="color:#9ECBFF">`status`</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#F97583">  KEY</span><span style="color:#9ECBFF"> `idx_tenant_id`</span><span style="color:#E1E4E8"> (</span><span style="color:#9ECBFF">`tenant_id`</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">) ENGINE</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">InnoDB </span><span style="color:#F97583">DEFAULT</span><span style="color:#E1E4E8"> CHARSET</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">utf8mb4 </span><span style="color:#F97583">COLLATE=</span><span style="color:#E1E4E8">utf8mb4_unicode_ci COMMENT</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">'附加资源价格表'</span><span style="color:#E1E4E8">;</span></span></code></pre>
+<p><strong>设计说明</strong>：</p>
+<ul>
+<li><code>resource_type</code>：附加资源类型
+<ul>
+<li><code>DATA_DISK</code>：数据盘（按GB计费）</li>
+<li><code>IP</code>：独立IP（按个计费）</li>
+<li><code>IMAGE</code>：收费镜像（按小时计费）</li>
+</ul>
+</li>
+<li><code>price_type</code>：
+<ul>
+<li><code>FIXED</code>：固定价格（如独立IP，每个10元/月）</li>
+<li><code>PER_UNIT</code>：按单位计费（如数据盘，每GB 0.1元/小时）</li>
+</ul>
+</li>
+</ul>
+<h4 id="324-价格历史记录表tgwk_price_history">3.2.4 价格历史记录表（tgwk_price_history）</h4>
+<p>记录价格变更历史，用于审计</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#F97583">CREATE</span><span style="color:#F97583"> TABLE</span><span style="color:#E1E4E8"> `</span><span style="color:#B392F0">tgwk_price_history</span><span style="color:#E1E4E8">` (</span></span>
+<span class="line"><span style="color:#9ECBFF">  `id`</span><span style="color:#F97583"> bigint</span><span style="color:#F97583"> NOT NULL</span><span style="color:#E1E4E8"> AUTO_INCREMENT COMMENT </span><span style="color:#9ECBFF">'主键ID'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `price_table`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">50</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'价格表名：spec_price/region_factor/addon_price'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `price_id`</span><span style="color:#F97583"> bigint</span><span style="color:#F97583"> NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'价格记录ID'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `operation_type`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">20</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">NOT NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'操作类型：CREATE/UPDATE/DELETE'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `old_value`</span><span style="color:#F97583"> json</span><span style="color:#F97583"> DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'旧值（JSON格式）'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `new_value`</span><span style="color:#F97583"> json</span><span style="color:#F97583"> DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'新值（JSON格式）'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `operator_id`</span><span style="color:#F97583"> bigint</span><span style="color:#F97583"> DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'操作人ID'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `operator_name`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">64</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'操作人姓名'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `operation_time`</span><span style="color:#F97583"> datetime</span><span style="color:#F97583"> NOT NULL</span><span style="color:#F97583"> DEFAULT</span><span style="color:#E1E4E8"> CURRENT_TIMESTAMP COMMENT </span><span style="color:#9ECBFF">'操作时间'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `remark`</span><span style="color:#F97583"> varchar</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">500</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">DEFAULT</span><span style="color:#F97583"> NULL</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'备注'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  `tenant_id`</span><span style="color:#F97583"> bigint</span><span style="color:#F97583"> NOT NULL</span><span style="color:#F97583"> DEFAULT</span><span style="color:#9ECBFF"> '0'</span><span style="color:#E1E4E8"> COMMENT </span><span style="color:#9ECBFF">'租户编号'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#F97583">  PRIMARY KEY</span><span style="color:#E1E4E8"> (</span><span style="color:#9ECBFF">`id`</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#F97583">  KEY</span><span style="color:#9ECBFF"> `idx_price_table_id`</span><span style="color:#E1E4E8"> (</span><span style="color:#9ECBFF">`price_table`</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">`price_id`</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#F97583">  KEY</span><span style="color:#9ECBFF"> `idx_operation_time`</span><span style="color:#E1E4E8"> (</span><span style="color:#9ECBFF">`operation_time`</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#F97583">  KEY</span><span style="color:#9ECBFF"> `idx_operator_id`</span><span style="color:#E1E4E8"> (</span><span style="color:#9ECBFF">`operator_id`</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#F97583">  KEY</span><span style="color:#9ECBFF"> `idx_tenant_id`</span><span style="color:#E1E4E8"> (</span><span style="color:#9ECBFF">`tenant_id`</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">) ENGINE</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">InnoDB </span><span style="color:#F97583">DEFAULT</span><span style="color:#E1E4E8"> CHARSET</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">utf8mb4 </span><span style="color:#F97583">COLLATE=</span><span style="color:#E1E4E8">utf8mb4_unicode_ci COMMENT</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">'价格历史记录表'</span><span style="color:#E1E4E8">;</span></span></code></pre>
+<p><strong>设计说明</strong>：</p>
+<ul>
+<li>记录所有价格变更操作</li>
+<li>使用JSON格式存储变更前后的值</li>
+<li>支持审计和回滚</li>
+</ul>
+<h3 id="33-数据表关系图">3.3 数据表关系图</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>┌──────────────────────────────┐</span></span>
+<span class="line"><span>│ tgwk_compute_spec_price      │  规格地区价格（已包含地区）</span></span>
+<span class="line"><span>│ - spec_code                  │</span></span>
+<span class="line"><span>│ - region_code          │</span></span>
+<span class="line"><span>│ - base_price                 │</span></span>
+<span class="line"><span>└──────────────────────────────┘</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>┌─────────────────────────┐</span></span>
+<span class="line"><span>│ tgwk_addon_resource_price│  附加资源价格</span></span>
+<span class="line"><span>│ - resource_type        │</span></span>
+<span class="line"><span>│ - unit_price           │</span></span>
+<span class="line"><span>└─────────────────────────┘</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>┌─────────────────────────┐</span></span>
+<span class="line"><span>│ tgwk_price_history      │  价格历史记录</span></span>
+<span class="line"><span>│ - price_table          │</span></span>
+<span class="line"><span>│ - old_value/new_value  │</span></span>
+<span class="line"><span>└─────────────────────────┘</span></span></code></pre>
+<p><strong>设计变更说明</strong>：</p>
+<ul>
+<li><strong>已删除地区价格系数表</strong>：因为不同规格在同一地区的倍率可能不同</li>
+<li><strong>规格价格表直接包含地区字段</strong>：每个规格+地区+计费方式一条记录</li>
+</ul>
+<hr>
+<h2 id="4-价格计算引擎设计">4. 价格计算引擎设计</h2>
+<h3 id="41-价格计算公式">4.1 价格计算公式</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>总价 = 规格地区价格 + 附加资源价格总和</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>其中：</span></span>
+<span class="line"><span>- 规格地区价格 = 从 tgwk_compute_spec_price 查询（已包含地区信息）</span></span>
+<span class="line"><span>- 附加资源价格 = Σ(附加资源单价 × 数量 × 时长)</span></span></code></pre>
+<p><strong>设计变更</strong>：</p>
+<ul>
+<li><strong>不再使用地区系数表</strong>：因为不同规格在同一地区的倍率可能不同</li>
+<li><strong>直接查询规格+地区的价格</strong>：每个规格在不同地区有独立的价格记录</li>
+</ul>
+<h3 id="42-价格计算流程">4.2 价格计算流程</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>1. 查询规格地区价格</span></span>
+<span class="line"><span>   ├─ 根据 resource_type（CPU/GPU）</span></span>
+<span class="line"><span>   ├─ 根据 spec_code（规格编码）</span></span>
+<span class="line"><span>   ├─ 根据 region_code（地区编码）⭐ 新增</span></span>
+<span class="line"><span>   └─ 根据 billing_method_code（计费方式）</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>2. 获取基础价格</span></span>
+<span class="line"><span>   └─ 直接使用查询到的 base_price（已包含地区差异）</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>3. 计算附加资源价格</span></span>
+<span class="line"><span>   ├─ 数据盘价格 = 数据盘单价 × 容量(GB) × 时长</span></span>
+<span class="line"><span>   ├─ 独立IP价格 = IP单价 × IP数量 × 时长</span></span>
+<span class="line"><span>   └─ 镜像价格 = 镜像单价 × 时长</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>4. 计算总价</span></span>
+<span class="line"><span>   └─ 基础价格 + 附加资源价格总和</span></span></code></pre>
+<h3 id="43-价格计算示例">4.3 价格计算示例</h3>
+<p><strong>场景</strong>：创建GPU实例</p>
+<ul>
+<li>GPU规格：RTX4090 × 1</li>
+<li>地区：华东1区</li>
+<li>计费方式：按量计费</li>
+<li>时长：10小时</li>
+<li>额外数据盘：100GB</li>
+<li>独立IP：1个</li>
+<li>收费镜像：无</li>
+</ul>
+<p><strong>计算过程</strong>：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>1. 查询规格地区价格</span></span>
+<span class="line"><span>   - spec_code = "GPU_RTX4090_1"</span></span>
+<span class="line"><span>   - region_code = "CN_EAST_1"  ⭐ 直接查询该规格在该地区的价格</span></span>
+<span class="line"><span>   - billing_method_code = "按量计费"</span></span>
+<span class="line"><span>   - base_price = 2.50 元/小时（已包含地区差异）</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>2. 基础价格计算</span></span>
+<span class="line"><span>   - 10小时总价 = 2.50 × 10 = 25.00 元</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>3. 附加资源价格计算</span></span>
+<span class="line"><span>   - 数据盘：0.1 元/GB/小时 × 100GB × 10小时 = 100.00 元</span></span>
+<span class="line"><span>   - 独立IP：0.5 元/个/小时 × 1个 × 10小时 = 5.00 元</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>4. 总价计算</span></span>
+<span class="line"><span>   - 总价 = 25.00 + 100.00 + 5.00 = 130.00 元</span></span></code></pre>
+<p><strong>说明</strong>：</p>
+<ul>
+<li>如果 RTX4090 在华南1区（CN_SOUTH_1）的价格是 2.30 元/小时，需要单独配置一条记录</li>
+<li>如果 RTX3090 在华东1区的价格是 1.80 元/小时，也需要单独配置</li>
+<li><strong>每个规格+地区组合都有独立的价格记录，不再使用统一的地区系数</strong></li>
+</ul>
+<hr>
+<h2 id="5-功能模块设计">5. 功能模块设计</h2>
+<h3 id="51-价格管理模块">5.1 价格管理模块</h3>
+<h4 id="511-基础规格价格管理">5.1.1 基础规格价格管理</h4>
+<ul>
+<li><strong>录入价格</strong>：支持批量录入CPU/GPU规格价格</li>
+<li><strong>修改价格</strong>：支持价格调整，支持生效时间</li>
+<li><strong>查询价格</strong>：支持按资源类型、规格、计费方式查询</li>
+<li><strong>启用/禁用</strong>：支持价格启用和禁用</li>
+</ul>
+<h4 id="512-规格地区价格管理">5.1.2 规格地区价格管理</h4>
+<ul>
+<li><strong>录入价格</strong>：为每个规格在不同地区配置价格（规格+地区+计费方式）</li>
+<li><strong>批量设置</strong>：支持批量设置同一规格在多个地区的价格</li>
+<li><strong>查询价格</strong>：支持按规格、地区、计费方式查询</li>
+<li><strong>价格对比</strong>：支持对比同一规格在不同地区的价格差异</li>
+</ul>
+<h4 id="513-附加资源价格管理">5.1.3 附加资源价格管理</h4>
+<ul>
+<li><strong>数据盘价格</strong>：配置数据盘按GB计费的价格</li>
+<li><strong>独立IP价格</strong>：配置独立IP的价格</li>
+<li><strong>镜像价格</strong>：配置收费镜像的价格</li>
+</ul>
+<h4 id="514-价格历史查询">5.1.4 价格历史查询</h4>
+<ul>
+<li><strong>历史记录</strong>：查看价格变更历史</li>
+<li><strong>对比查看</strong>：对比价格变更前后的差异</li>
+<li><strong>导出记录</strong>：支持导出价格历史记录</li>
+</ul>
+<h3 id="52-价格计算模块">5.2 价格计算模块</h3>
+<h4 id="521-价格预估接口">5.2.1 价格预估接口</h4>
+<ul>
+<li><strong>输入</strong>：资源类型、规格、地区、计费方式、时长、附加资源</li>
+<li><strong>输出</strong>：价格明细、总价</li>
+</ul>
+<h4 id="522-价格计算服务">5.2.2 价格计算服务</h4>
+<ul>
+<li><strong>实时计算</strong>：根据配置实时计算价格</li>
+<li><strong>缓存优化</strong>：缓存常用价格配置，提升性能</li>
+</ul>
+<hr>
+<h2 id="6-api设计">6. API设计</h2>
+<h3 id="61-基础规格价格管理api">6.1 基础规格价格管理API</h3>
+<h4 id="611-创建规格价格">6.1.1 创建规格价格</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>POST /admin-api/compute/price/spec/create</span></span>
+<span class="line"><span>Request Body:</span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>  "resourceType": "CPU",  // CPU/GPU</span></span>
+<span class="line"><span>  "specCode": "CPU_4C8G",</span></span>
+<span class="line"><span>  "specName": "4核8G",</span></span>
+<span class="line"><span>  "cpuCores": 4,</span></span>
+<span class="line"><span>  "memoryGb": 8,</span></span>
+<span class="line"><span>  "regionCode": "CN_EAST_1",  // ⭐ 新增：地区编码</span></span>
+<span class="line"><span>  "regionName": "华东1区",     // ⭐ 新增：地区名称</span></span>
+<span class="line"><span>  "billingMethodCode": "按量计费",</span></span>
+<span class="line"><span>  "basePrice": 0.5,</span></span>
+<span class="line"><span>  "effectiveDate": "2025-01-01 00:00:00",</span></span>
+<span class="line"><span>  "expireDate": null,</span></span>
+<span class="line"><span>  "remark": "CPU规格价格（华东1区）"</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>Response:</span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>  "code": 0,</span></span>
+<span class="line"><span>  "data": 1,  // 价格ID</span></span>
+<span class="line"><span>  "msg": "操作成功"</span></span>
+<span class="line"><span>}</span></span></code></pre>
+<h4 id="612-更新规格价格">6.1.2 更新规格价格</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>PUT /admin-api/compute/price/spec/update</span></span>
+<span class="line"><span>Request Body:</span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>  "id": 1,</span></span>
+<span class="line"><span>  "basePrice": 0.6,</span></span>
+<span class="line"><span>  "effectiveDate": "2025-02-01 00:00:00",</span></span>
+<span class="line"><span>  "remark": "价格调整"</span></span>
+<span class="line"><span>}</span></span></code></pre>
+<h4 id="613-查询规格价格列表">6.1.3 查询规格价格列表</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>GET /admin-api/compute/price/spec/page?resourceType=CPU&#x26;regionCode=CN_EAST_1&#x26;billingMethodCode=按量计费&#x26;pageNo=1&#x26;pageSize=10</span></span>
+<span class="line"><span>Response:</span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>  "code": 0,</span></span>
+<span class="line"><span>  "data": {</span></span>
+<span class="line"><span>    "list": [</span></span>
+<span class="line"><span>      {</span></span>
+<span class="line"><span>        "id": 1,</span></span>
+<span class="line"><span>        "resourceType": "CPU",</span></span>
+<span class="line"><span>        "specCode": "CPU_4C8G",</span></span>
+<span class="line"><span>        "specName": "4核8G",</span></span>
+<span class="line"><span>        "cpuCores": 4,</span></span>
+<span class="line"><span>        "memoryGb": 8,</span></span>
+<span class="line"><span>        "regionCode": "CN_EAST_1",      // ⭐ 新增</span></span>
+<span class="line"><span>        "regionName": "华东1区",         // ⭐ 新增</span></span>
+<span class="line"><span>        "billingMethodCode": "按量计费",</span></span>
+<span class="line"><span>        "basePrice": 0.5,</span></span>
+<span class="line"><span>        "status": 1,</span></span>
+<span class="line"><span>        "effectiveDate": "2025-01-01 00:00:00",</span></span>
+<span class="line"><span>        "expireDate": null</span></span>
+<span class="line"><span>      }</span></span>
+<span class="line"><span>    ],</span></span>
+<span class="line"><span>    "total": 100</span></span>
+<span class="line"><span>  }</span></span>
+<span class="line"><span>}</span></span></code></pre>
+<p><strong>说明</strong>：</p>
+<ul>
+<li>查询时可以按 <code>regionCode</code> 过滤，查看某个地区的所有规格价格</li>
+<li>也可以按 <code>specCode</code> 过滤，查看某个规格在所有地区的价格</li>
+</ul>
+<h3 id="63-附加资源价格管理api">6.3 附加资源价格管理API</h3>
+<h4 id="631-创建附加资源价格">6.3.1 创建附加资源价格</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>POST /admin-api/compute/price/addon/create</span></span>
+<span class="line"><span>Request Body:</span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>  "resourceType": "DATA_DISK",  // DATA_DISK/IP/IMAGE</span></span>
+<span class="line"><span>  "resourceCode": "DATA_DISK_SSD",</span></span>
+<span class="line"><span>  "resourceName": "SSD数据盘",</span></span>
+<span class="line"><span>  "billingMethodCode": "按量计费",</span></span>
+<span class="line"><span>  "priceType": "PER_UNIT",  // FIXED/PER_UNIT</span></span>
+<span class="line"><span>  "unitPrice": 0.1,</span></span>
+<span class="line"><span>  "unit": "GB",</span></span>
+<span class="line"><span>  "effectiveDate": "2025-01-01 00:00:00"</span></span>
+<span class="line"><span>}</span></span></code></pre>
+<h3 id="64-价格计算api">6.4 价格计算API</h3>
+<h4 id="641-价格预估">6.4.1 价格预估</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>POST /admin-api/compute/price/estimate</span></span>
+<span class="line"><span>Request Body:</span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>  "resourceType": "GPU",</span></span>
+<span class="line"><span>  "specCode": "GPU_RTX4090_1",</span></span>
+<span class="line"><span>  "regionCode": "CN_EAST_1",</span></span>
+<span class="line"><span>  "billingMethodCode": "按量计费",</span></span>
+<span class="line"><span>  "duration": "10h",</span></span>
+<span class="line"><span>  "addonResources": [</span></span>
+<span class="line"><span>    {</span></span>
+<span class="line"><span>      "resourceType": "DATA_DISK",</span></span>
+<span class="line"><span>      "resourceCode": "DATA_DISK_SSD",</span></span>
+<span class="line"><span>      "quantity": 100  // 100GB</span></span>
+<span class="line"><span>    },</span></span>
+<span class="line"><span>    {</span></span>
+<span class="line"><span>      "resourceType": "IP",</span></span>
+<span class="line"><span>      "resourceCode": "INDEPENDENT_IP",</span></span>
+<span class="line"><span>      "quantity": 1</span></span>
+<span class="line"><span>    }</span></span>
+<span class="line"><span>  ]</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>Response:</span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>  "code": 0,</span></span>
+<span class="line"><span>  "data": {</span></span>
+<span class="line"><span>    "basePrice": 25.00,  // 基础价格（已包含地区差异）</span></span>
+<span class="line"><span>    "addonPrice": 105.00,  // 附加资源价格</span></span>
+<span class="line"><span>    "totalPrice": 130.00,  // 总价</span></span>
+<span class="line"><span>    "priceDetails": [</span></span>
+<span class="line"><span>      {</span></span>
+<span class="line"><span>        "item": "GPU基础价格（华东1区）",</span></span>
+<span class="line"><span>        "price": 25.00,</span></span>
+<span class="line"><span>        "description": "RTX4090×1 × 10小时 × 2.50元/小时"</span></span>
+<span class="line"><span>      },</span></span>
+<span class="line"><span>      {</span></span>
+<span class="line"><span>        "item": "数据盘",</span></span>
+<span class="line"><span>        "price": 100.00,</span></span>
+<span class="line"><span>        "description": "100GB × 10小时"</span></span>
+<span class="line"><span>      },</span></span>
+<span class="line"><span>      {</span></span>
+<span class="line"><span>        "item": "独立IP",</span></span>
+<span class="line"><span>        "price": 5.00,</span></span>
+<span class="line"><span>        "description": "1个 × 10小时"</span></span>
+<span class="line"><span>      }</span></span>
+<span class="line"><span>    ]</span></span>
+<span class="line"><span>  }</span></span>
+<span class="line"><span>}</span></span></code></pre>
+<hr>
+<h2 id="7-实现计划">7. 实现计划</h2>
+<h3 id="71-第一阶段数据模型和基础功能">7.1 第一阶段：数据模型和基础功能</h3>
+<ol>
+<li>创建数据表（4张表）</li>
+<li>创建DO实体类</li>
+<li>创建Mapper接口</li>
+<li>实现基础的CRUD功能</li>
+</ol>
+<h3 id="72-第二阶段价格管理后台">7.2 第二阶段：价格管理后台</h3>
+<ol>
+<li>实现规格价格管理API</li>
+<li>实现地区系数管理API</li>
+<li>实现附加资源价格管理API</li>
+<li>实现价格历史查询API</li>
+</ol>
+<h3 id="73-第三阶段价格计算引擎">7.3 第三阶段：价格计算引擎</h3>
+<ol>
+<li>实现价格计算服务</li>
+<li>实现价格预估接口</li>
+<li>集成到实例创建流程</li>
+</ol>
+<h3 id="74-第四阶段优化和测试">7.4 第四阶段：优化和测试</h3>
+<ol>
+<li>性能优化（缓存、索引）</li>
+<li>单元测试</li>
+<li>集成测试</li>
+<li>文档完善</li>
+</ol>
+<hr>
+<h2 id="8-技术实现要点">8. 技术实现要点</h2>
+<h3 id="81-价格查询优化">8.1 价格查询优化</h3>
+<ul>
+<li>使用Redis缓存常用价格配置</li>
+<li>数据库索引优化（spec_code、region_code、billing_method_code）</li>
+</ul>
+<h3 id="82-价格计算优化">8.2 价格计算优化</h3>
+<ul>
+<li>价格计算服务使用缓存</li>
+<li>支持批量价格计算</li>
+</ul>
+<h3 id="83-价格历史记录">8.3 价格历史记录</h3>
+<ul>
+<li>使用AOP切面自动记录价格变更</li>
+<li>使用JSON存储变更前后值，便于对比</li>
+</ul>
+<h3 id="84-价格生效时间管理">8.4 价格生效时间管理</h3>
+<ul>
+<li>支持未来生效的价格配置</li>
+<li>定时任务检查并启用到期价格</li>
+</ul>
+<hr>
+<h2 id="9-扩展性考虑">9. 扩展性考虑</h2>
+<h3 id="91-支持更多资源类型">9.1 支持更多资源类型</h3>
+<ul>
+<li>当前支持CPU/GPU，后续可扩展支持存储、网络等</li>
+</ul>
+<h3 id="92-支持更多计费方式">9.2 支持更多计费方式</h3>
+<ul>
+<li>当前支持按量/按天/按周/按月，后续可扩展按年等</li>
+</ul>
+<h3 id="93-支持价格策略">9.3 支持价格策略</h3>
+<ul>
+<li>支持阶梯价格（用量越大单价越低）</li>
+<li>支持促销价格（限时优惠）</li>
+</ul>
+<h3 id="94-支持价格审批流程">9.4 支持价格审批流程</h3>
+<ul>
+<li>价格变更需要审批</li>
+<li>支持多级审批流程</li>
+</ul>
+</div></article></main><footer data-astro-cid-jo6i4kqk><div data-astro-cid-jo6i4kqk>Goppop 的博客</div><p data-astro-cid-jo6i4kqk>&copy; 2026 Goppop. 记录技术学习、系统设计和长期思考。</p></footer></body></html>

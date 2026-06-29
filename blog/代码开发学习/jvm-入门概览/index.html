@@ -1,0 +1,180 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-tldeq5d5><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" href="/favicon.ico"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Goppop 的博客" href="https://goppop.github.io/rss.xml"><meta name="generator" content="Astro v7.0.3"><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/7443039bbc50ce9a.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/0edeceb0e4e5adfc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/7443039bbc50ce9a.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/0edeceb0e4e5adfc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/jvm-%E5%85%A5%E9%97%A8%E6%A6%82%E8%A7%88/"><!-- Primary Meta Tags --><title>JVM-入门概览</title><meta name="description" content="JVM入门概览，了解JVM是什么、为什么重要、核心组件和实践应用。"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/jvm-%E5%85%A5%E9%97%A8%E6%A6%82%E8%A7%88/"><meta property="og:title" content="JVM-入门概览"><meta property="og:description" content="JVM入门概览，了解JVM是什么、为什么重要、核心组件和实践应用。"><meta property="og:image" content="https://goppop.github.io/_astro/blog-placeholder-1.Bx0Zcyzv.jpg"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/jvm-%E5%85%A5%E9%97%A8%E6%A6%82%E8%A7%88/"><meta property="twitter:title" content="JVM-入门概览"><meta property="twitter:description" content="JVM入门概览，了解JVM是什么、为什么重要、核心组件和实践应用。"><meta property="twitter:image" content="https://goppop.github.io/_astro/blog-placeholder-1.Bx0Zcyzv.jpg"><link rel="stylesheet" href="/_astro/Header.DHc1oVwj.css"><style>main[data-astro-cid-tldeq5d5]{width:100%;max-width:none;margin:0;padding:0}.article-shell[data-astro-cid-tldeq5d5]{max-width:1120px;margin:0 auto;padding:3rem 1rem 1rem}.article-head[data-astro-cid-tldeq5d5]{border-bottom:1px solid #e1d2bbe6;grid-template-columns:minmax(0,1fr) 260px;align-items:end;gap:1.5rem;padding-bottom:1.4rem;display:grid}.title[data-astro-cid-tldeq5d5]{margin:0;line-height:1}.title[data-astro-cid-tldeq5d5] h1[data-astro-cid-tldeq5d5]{max-width:12em;color:var(--accent-dark);margin:0;font-size:3.6rem;line-height:1.08}.date-card[data-astro-cid-tldeq5d5]{color:var(--muted);background:#fff9eeb3;border-radius:8px;padding:1rem;font-size:.9rem;box-shadow:0 12px 28px #58422314}.date-card[data-astro-cid-tldeq5d5] strong[data-astro-cid-tldeq5d5]{color:var(--clay);letter-spacing:0;text-transform:uppercase;margin-bottom:.4rem;font-size:.82rem;display:block}.last-updated-on[data-astro-cid-tldeq5d5]{border-top:1px solid #e1d2bbc7;margin-top:.8rem;padding-top:.8rem}.meta-row[data-astro-cid-tldeq5d5]{flex-wrap:wrap;gap:.55rem;margin-top:1rem;display:flex}.hero-image[data-astro-cid-tldeq5d5]{width:100%;max-width:1120px;margin:2rem auto 0}.hero-image[data-astro-cid-tldeq5d5] img[data-astro-cid-tldeq5d5]{box-shadow:var(--box-shadow);border-radius:6px;margin:0 auto;display:block}.prose[data-astro-cid-tldeq5d5]{width:780px;max-width:100%;color:var(--ink);margin:2.2rem auto 0;padding:0 1rem}.prose[data-astro-cid-tldeq5d5] h2{border-top:1px solid var(--line);margin-top:3.4rem;padding-top:1rem}.prose[data-astro-cid-tldeq5d5] h2:first-child{border-top:0;margin-top:0;padding-top:0}.prose[data-astro-cid-tldeq5d5] h3{color:var(--accent-dark)}.prose[data-astro-cid-tldeq5d5] p,.prose[data-astro-cid-tldeq5d5] li{font-size:1.02rem}.prose[data-astro-cid-tldeq5d5] ul,.prose[data-astro-cid-tldeq5d5] ol{padding-left:1.4rem}.prose[data-astro-cid-tldeq5d5] table{display:block;overflow-x:auto}.prose[data-astro-cid-tldeq5d5] li+li{margin-top:.35rem}@media (width<=820px){.article-shell[data-astro-cid-tldeq5d5]{padding:2rem .75rem 1rem}.article-head[data-astro-cid-tldeq5d5]{grid-template-columns:1fr}.title[data-astro-cid-tldeq5d5] h1[data-astro-cid-tldeq5d5]{font-size:2.25rem}.prose[data-astro-cid-tldeq5d5]{margin-top:2rem;padding:0 .75rem}}
+</style></head><body data-astro-cid-tldeq5d5><header data-astro-cid-nen7h5rs><nav data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs>Goppop 的博客</a><div class="internal-links" data-astro-cid-nen7h5rs><a href="/" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>首页</a><a href="/blog" class="active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>文章</a><a href="/about" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>关于</a></div><div class="social-links" data-astro-cid-nen7h5rs><a href="https://github.com/Goppop" target="_blank" data-astro-cid-nen7h5rs><span class="sr-only" data-astro-cid-nen7h5rs>Goppop GitHub</span><svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" data-astro-cid-nen7h5rs><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" data-astro-cid-nen7h5rs></path></svg></a></div></nav></header><main data-astro-cid-tldeq5d5><article data-astro-cid-tldeq5d5><div class="article-shell" data-astro-cid-tldeq5d5><header class="article-head" data-astro-cid-tldeq5d5><div class="title" data-astro-cid-tldeq5d5><p class="eyebrow" data-astro-cid-tldeq5d5>Article</p><h1 data-astro-cid-tldeq5d5>JVM-入门概览</h1><div class="meta-row" data-astro-cid-tldeq5d5><span class="label" data-astro-cid-tldeq5d5>代码开发学习</span><span class="label" data-astro-cid-tldeq5d5>01-编程语言基础</span><span class="label" data-astro-cid-tldeq5d5>JVM</span><span class="label" data-astro-cid-tldeq5d5>JVM</span><span class="label" data-astro-cid-tldeq5d5>入门概览</span></div></div><aside class="date-card" aria-label="文章日期" data-astro-cid-tldeq5d5><strong data-astro-cid-tldeq5d5>Published</strong><time datetime="2025-12-12T00:00:00.000Z">Dec 12, 2025</time><div class="last-updated-on" data-astro-cid-tldeq5d5><strong data-astro-cid-tldeq5d5>Updated</strong><time datetime="2025-12-15T00:00:00.000Z">Dec 15, 2025</time></div></aside></header></div><div class="prose" data-astro-cid-tldeq5d5><h1 id="jvm-入门概览">JVM-入门概览</h1>
+<blockquote>
+<p><strong>作者</strong>：
+<strong>文档状态</strong>：</p>
+</blockquote>
+<h2 id="概述">概述</h2>
+<p>Java 虚拟机（<strong>JVM</strong>，Java Virtual Machine）是 Java 平台的核心组成部分，它是一种抽象的计算机，通过在实际的计算机上模拟各种计算机功能来实现。JVM 的主要职责是执行 Java 字节码（Bytecode），将 Java 语言的“<strong>一次编写，到处运行</strong>”（Write Once, Run Anywhere, WORA）的理念变为现实。</p>
+<p>JVM 位于操作系统之上，为 Java 程序提供了一个统一的运行环境。无论是 Windows、Linux 还是 macOS，只要安装了对应的 JVM 实现，Java 程序就能无缝运行，这极大地提高了 Java 应用程序的跨平台能力和可移植性。对于 Java 开发者而言，深入理解 JVM 的工作原理是迈向高级开发和性能优化的必经之路。</p>
+<h2 id="核心内容">核心内容</h2>
+<p>JVM 的核心内容主要围绕其体系结构、运行时数据区、垃圾收集机制和类加载机制展开。</p>
+<h3 id="1-jvm-体系结构">1. JVM 体系结构</h3>
+<p>JVM 体系结构主要由以下几个部分组成：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left">组件</th>
+<th style="text-align: left">职责</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left"><strong>类加载器 (Class Loader)</strong></td>
+<td style="text-align: left">负责查找、加载和初始化 Java 类文件（<code>.class</code> 文件）。</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>运行时数据区 (Runtime Data Areas)</strong></td>
+<td style="text-align: left">内存区域，用于存储程序运行时的数据，如对象实例、方法信息、局部变量等。</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>执行引擎 (Execution Engine)</strong></td>
+<td style="text-align: left">负责执行字节码指令，包括解释器和即时编译器（JIT Compiler）。</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>本地方法接口 (Native Method Interface)</strong></td>
+<td style="text-align: left">允许 Java 代码调用本地（非 Java 语言编写）代码库。</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>本地方法库 (Native Method Libraries)</strong></td>
+<td style="text-align: left">供本地方法接口调用的库。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2-运行时数据区内存模型">2. 运行时数据区（内存模型）</h3>
+<p>运行时数据区是 JVM 内存管理的核心，它根据线程共享与否可以划分为以下几个区域：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left">区域</th>
+<th style="text-align: left">线程共享性</th>
+<th style="text-align: left">存储内容</th>
+<th style="text-align: left">常见问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left"><strong>方法区 (Method Area)</strong></td>
+<td style="text-align: left">共享</td>
+<td style="text-align: left">类信息、常量、静态变量、即时编译器编译后的代码。</td>
+<td style="text-align: left">OOM<sup><a href="#user-content-fn-3" id="user-content-fnref-3" data-footnote-ref aria-describedby="footnote-label">1</a></sup> (OutOfMemoryError)</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>堆 (Heap)</strong></td>
+<td style="text-align: left">共享</td>
+<td style="text-align: left">几乎所有的对象实例和数组。是 GC（垃圾收集）的主要区域。</td>
+<td style="text-align: left">OOM (OutOfMemoryError)</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>虚拟机栈 (VM Stack)</strong></td>
+<td style="text-align: left">独占</td>
+<td style="text-align: left">存储栈帧，每个栈帧包含局部变量表、操作数栈、动态链接、方法出口等。</td>
+<td style="text-align: left">StackOverflowError<sup><a href="#user-content-fn-4" id="user-content-fnref-4" data-footnote-ref aria-describedby="footnote-label">2</a></sup></td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>本地方法栈 (Native Method Stack)</strong></td>
+<td style="text-align: left">独占</td>
+<td style="text-align: left">为 <code>Native</code> 方法服务。</td>
+<td style="text-align: left">StackOverflowError</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>程序计数器 (Program Counter Register)</strong></td>
+<td style="text-align: left">独占</td>
+<td style="text-align: left">存储当前线程正在执行的字节码指令地址。</td>
+<td style="text-align: left">无 OOM 风险</td>
+</tr>
+</tbody>
+</table>
+<p>其中，<strong>堆</strong>是最大且最重要的内存区域，通常被划分为<strong>新生代</strong>（Young Generation）和<strong>老年代</strong>（Old Generation），这是进行垃圾回收时的主要依据。</p>
+<p><a href="https://mermaid-live.nodejs.cn/edit#pako:eNqdlO9P2kAYx_-Vy_lmS1ArSIFmMUHwR5Ywl23xxawvKr0CESg5ij8GJjjjXESHyeYUBwrZkrFMRWJiEDP9Y8YV-C92FYp2xsXRJs09vefzfZ779npx6JVFBDkoBeV5r1_ACnjl5sOAXtHYjA8LET94OulpXG01Chvqzpm6faJuHpONaivHkFevXtWLKbJarlV_Tt0Onszg_qHmXpoKka0SWS_2k9XT5s7R9I2IdjmneEjy78A4EiI8nAa9vUMJcrRL3hZJ6bxRLpDj_dplKgGGH_FwzAXI_grJXpIv--qnMx4-Nmq5qJb6-Vw93aa9Ag9S_LIInBgJRuF6-aJ2VVCXS7-Ty6RSaa6l6aCZy6g0TO_SkFa7EUZh8Sa414B66pBs5qduB7oBbVNaHtQvPqq5g788cNO-G5k9NXWgZqtq_j2Y9ICXiuCdNfZNZ0jlu9Z0OdlcKeq9jlBnrrMn5hDWvugIxjK-Y86oZk72kGRPWhZpdZ4JSmAO6U4ZStYqVX26nZ_dJOsFWs4oO0ZlteVV043jAt0oJFMEz13gBfIFogrCxhXUKqlaJanmCurGWu3iG-2F5JIJME5XoO7kJyY8za8fmpkfht47_ncGredwSzddaqz8AhRNAOd9E67bXFRZDCLDtgVSIBjkeiSHdpuiCpZnEddjsVja4975gKj4OXNk4a5C61PrCoxkl6QHKzh1TPJ6_wNzdYe52xiFHsyMdsGMdcEMd5aEWMQ-GBvpDhtvY4jVwH9i0AR9OCBCTsExZIIhhEOCFsK4JshDxY9CiIccHYpIEmJBhYd8eIliESH8WpZDOonlmM-vB7GIKCjIHRDoCdLJoADk4nABcma7o89sNbMMww5YbXazbdAEF-lrps9qsTGDzADLOLSpJRN8c12C6XPYGMbmsAw4rHYzYx0004L0d0HYJcfCCuRY1gSRGFBk7Gkd_Nfn_9IfGSFd8g"><img src="https://mermaid.ink/img/pako:eNqdlO9P2kAYx_-Vy_lmS1ArSIFmMUHwR5Ywl23xxawvKr0CESg5ij8GJjjjXESHyeYUBwrZkrFMRWJiEDP9Y8YV-C92FYp2xsXRJs09vefzfZ779npx6JVFBDkoBeV5r1_ACnjl5sOAXtHYjA8LET94OulpXG01Chvqzpm6faJuHpONaivHkFevXtWLKbJarlV_Tt0Onszg_qHmXpoKka0SWS_2k9XT5s7R9I2IdjmneEjy78A4EiI8nAa9vUMJcrRL3hZJ6bxRLpDj_dplKgGGH_FwzAXI_grJXpIv--qnMx4-Nmq5qJb6-Vw93aa9Ag9S_LIInBgJRuF6-aJ2VVCXS7-Ty6RSaa6l6aCZy6g0TO_SkFa7EUZh8Sa414B66pBs5qduB7oBbVNaHtQvPqq5g788cNO-G5k9NXWgZqtq_j2Y9ICXiuCdNfZNZ0jlu9Z0OdlcKeq9jlBnrrMn5hDWvugIxjK-Y86oZk72kGRPWhZpdZ4JSmAO6U4ZStYqVX26nZ_dJOsFWs4oO0ZlteVV043jAt0oJFMEz13gBfIFogrCxhXUKqlaJanmCurGWu3iG-2F5JIJME5XoO7kJyY8za8fmpkfht47_ncGredwSzddaqz8AhRNAOd9E67bXFRZDCLDtgVSIBjkeiSHdpuiCpZnEddjsVja4975gKj4OXNk4a5C61PrCoxkl6QHKzh1TPJ6_wNzdYe52xiFHsyMdsGMdcEMd5aEWMQ-GBvpDhtvY4jVwH9i0AR9OCBCTsExZIIhhEOCFsK4JshDxY9CiIccHYpIEmJBhYd8eIliESH8WpZDOonlmM-vB7GIKCjIHRDoCdLJoADk4nABcma7o89sNbMMww5YbXazbdAEF-lrps9qsTGDzADLOLSpJRN8c12C6XPYGMbmsAw4rHYzYx0004L0d0HYJcfCCuRY1gSRGFBk7Gkd_Nfn_9IfGSFd8g?type=png" alt=""></a></p>
+<h3 id="3-垃圾收集机制-gc">3. 垃圾收集机制 (GC)</h3>
+<p>垃圾收集（GC）是 JVM 自动管理内存的机制，它负责回收堆中不再被引用的对象所占用的内存空间。</p>
+<ul>
+<li><strong>目的</strong>：自动释放内存，避免手动管理内存带来的内存泄漏和<strong>野指针问题</strong><sup><a href="#user-content-fn-1" id="user-content-fnref-1" data-footnote-ref aria-describedby="footnote-label">3</a></sup>。</li>
+<li><strong>核心概念</strong>：
+<ul>
+<li><strong>可达性分析</strong>：通过一系列被称为 <strong>GC Roots</strong> 的对象作为起点，向下搜索，如果一个对象到 GC Roots 没有任何引用链相连，则证明此对象是不可用的，可以被回收。</li>
+<li><strong>GC Roots</strong> 包括虚拟机栈中的引用对象、方法区中的静态属性引用对象、本地方法栈中的引用对象等。</li>
+</ul>
+</li>
+<li><strong>常见垃圾收集器</strong>：Serial、ParNew、Parallel Scavenge、CMS、G1、ZGC 等。现代 JVM 默认倾向于使用 <strong>G1</strong>（Garbage-First）收集器，它旨在实现可预测的停顿时间。</li>
+</ul>
+<h3 id="4-类加载机制">4. 类加载机制</h3>
+<p>类加载机制是 JVM 将 <code>.class</code> 文件中的二进制数据读入内存，并将其转换为可用的 <code>java.lang.Class</code> 对象的过程。这个过程包括：</p>
+<ol>
+<li><strong>加载 (Loading)</strong>：通过类的全限定名获取定义此类的二进制字节流，并将其中的静态结构转换为方法区的运行时数据结构，最后在堆中生成一个代表该类的 <code>java.lang.Class</code> 对象。</li>
+<li><strong>链接 (Linking)</strong>：
+<ul>
+<li><strong>验证 (Verification)</strong>：确保加载的 <code>.class</code> 文件的字节流符合 JVM 规范，不会危害虚拟机自身安全。</li>
+<li><strong>准备 (Preparation)</strong>：为类变量（<code>static</code> 变量）分配内存并设置初始值（通常是零值）。</li>
+<li><strong>解析 (Resolution)</strong>：将常量池内的符号引用替换为直接引用。</li>
+</ul>
+</li>
+<li><strong>初始化 (Initialization)</strong>：执行类构造器 <code>&lt;clinit&gt;()</code> 方法，这是真正执行 Java 代码为类变量赋予程序指定初始值的阶段。</li>
+</ol>
+<p><strong>双亲委派模型 (Parent Delegation Model)<sup><a href="#user-content-fn-2" id="user-content-fnref-2" data-footnote-ref aria-describedby="footnote-label">4</a></sup></strong> 是类加载器的一个重要机制，它要求除了顶层的启动类加载器外，其余的类加载器都应当有自己的父类加载器。当一个类加载器收到类加载请求时，它不会立即自己去加载，而是先把请求委派给父类加载器去完成，只有当父类加载器无法完成加载时，子加载器才会尝试自己去加载。这保证了 Java 核心 API 的类型安全。</p>
+<h2 id="实践示例">实践示例</h2>
+<p>理解 JVM 原理的最终目的是进行性能调优和故障排查。</p>
+<h3 id="1-内存参数配置">1. 内存参数配置</h3>
+<p>在实际应用中，最常见的 JVM 实践是配置堆内存大小，以适应应用程序的负载。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left">参数</th>
+<th style="text-align: left">含义</th>
+<th style="text-align: left">建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left"><code>-Xms&lt;size&gt;</code></td>
+<td style="text-align: left">初始堆内存大小（Initial Heap Size）</td>
+<td style="text-align: left">建议与 <code>-Xmx</code> 设置相同，避免运行时频繁调整堆大小带来的性能损耗。</td>
+</tr>
+<tr>
+<td style="text-align: left"><code>-Xmx&lt;size&gt;</code></td>
+<td style="text-align: left">最大堆内存大小（Maximum Heap Size）</td>
+<td style="text-align: left">根据服务器物理内存和应用需求设置，通常不超过物理内存的 60% - 80%。</td>
+</tr>
+<tr>
+<td style="text-align: left"><code>-Xmn&lt;size&gt;</code></td>
+<td style="text-align: left">新生代大小（Young Generation Size）</td>
+<td style="text-align: left">影响 Minor GC 的频率和耗时。</td>
+</tr>
+<tr>
+<td style="text-align: left"><code>-XX:+UseG1GC</code></td>
+<td style="text-align: left">指定使用 G1 垃圾收集器</td>
+<td style="text-align: left">适用于大内存（6GB 以上）和多核处理器环境。</td>
+</tr>
+</tbody>
+</table>
+<p><strong>示例启动命令：</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">java</span><span style="color:#79B8FF"> -Xms4g</span><span style="color:#79B8FF"> -Xmx4g</span><span style="color:#79B8FF"> -XX:+UseG1GC</span><span style="color:#79B8FF"> -jar</span><span style="color:#9ECBFF"> your-application.jar</span></span></code></pre>
+<h3 id="2-故障排查与监控">2. 故障排查与监控</h3>
+<p>当应用程序出现性能瓶颈或内存溢出（OOM）时，需要借助 JVM 监控工具进行排查。</p>
+<ul>
+<li><strong>JConsole/VisualVM</strong>：图形化监控工具，可实时查看内存使用、线程状态、GC 活动等。</li>
+<li><strong>jstat</strong>：命令行工具，用于查看 JVM 统计信息，如类加载、内存、GC 等。</li>
+<li><strong>jmap</strong>：命令行工具，用于生成堆转储文件（Heap Dump），用于分析内存泄漏。</li>
+<li><strong>jstack</strong>：命令行工具，用于打印线程堆栈信息，用于分析死锁或线程阻塞。</li>
+</ul>
+<h2 id="总结">总结</h2>
+<p>JVM 是 Java 技术的基石，它通过将 Java 字节码与底层操作系统隔离，实现了 Java 强大的跨平台能力。掌握 JVM 的<strong>内存模型</strong>（堆、栈、方法区）、<strong>垃圾收集机制</strong>和<strong>类加载机制</strong>，是 Java 工程师从“能用”到“用好”的关键。通过合理的 JVM 参数配置和专业的监控工具，可以有效提升应用程序的性能和稳定性。</p>
+<hr>
+<section data-footnotes class="footnotes"><h2 class="sr-only" id="footnote-label">Footnotes</h2>
+<ol>
+<li id="user-content-fn-3">
+<p>是因为堆中的对象被引用着，无法被 GC 回收，导致堆内存耗尽。 <a href="#user-content-fnref-3" data-footnote-backref="" aria-label="Back to reference 1" class="data-footnote-backref">↩</a></p>
+</li>
+<li id="user-content-fn-4">
+<p>是因为每一个方法被分配的栈内存是固定的 在深层嵌套调用（如递归），外层方法始终等不到内层返回，导致栈空间耗尽。 <a href="#user-content-fnref-4" data-footnote-backref="" aria-label="Back to reference 2" class="data-footnote-backref">↩</a></p>
+</li>
+<li id="user-content-fn-1">
+<p>“野指针”（Dangling Pointer）是 C/C++ 编程中常见的内存安全问题之一，指的是指向已经释放（或无效）内存地址的指针。使用野指针可能导致程序崩溃、数据损坏，甚至安全漏洞。 <a href="#user-content-fnref-1" data-footnote-backref="" aria-label="Back to reference 3" class="data-footnote-backref">↩</a></p>
+</li>
+<li id="user-content-fn-2">
+<p>双亲委派是 JVM 为保证核心类安全（防止私有同名类替换）和类型系统一致（避免重复加载导致类型不兼容）而设计的默认加载策略。 <a href="#user-content-fnref-2" data-footnote-backref="" aria-label="Back to reference 4" class="data-footnote-backref">↩</a></p>
+</li>
+</ol>
+</section>
+</div></article></main><footer data-astro-cid-jo6i4kqk><div data-astro-cid-jo6i4kqk>Goppop 的博客</div><p data-astro-cid-jo6i4kqk>&copy; 2026 Goppop. 记录技术学习、系统设计和长期思考。</p></footer></body></html>

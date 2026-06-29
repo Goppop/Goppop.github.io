@@ -1,0 +1,162 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-tldeq5d5><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" href="/favicon.ico"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Goppop 的博客" href="https://goppop.github.io/rss.xml"><meta name="generator" content="Astro v7.0.3"><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/7443039bbc50ce9a.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/0edeceb0e4e5adfc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/7443039bbc50ce9a.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/0edeceb0e4e5adfc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/jvm-%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E8%AF%A6%E8%A7%A3/"><!-- Primary Meta Tags --><title>JVM-内存模型详解</title><meta name="description" content="JVM内存模型详解，深入理解堆、栈、方法区等内存区域"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/jvm-%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E8%AF%A6%E8%A7%A3/"><meta property="og:title" content="JVM-内存模型详解"><meta property="og:description" content="JVM内存模型详解，深入理解堆、栈、方法区等内存区域"><meta property="og:image" content="https://goppop.github.io/_astro/blog-placeholder-1.Bx0Zcyzv.jpg"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/jvm-%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E8%AF%A6%E8%A7%A3/"><meta property="twitter:title" content="JVM-内存模型详解"><meta property="twitter:description" content="JVM内存模型详解，深入理解堆、栈、方法区等内存区域"><meta property="twitter:image" content="https://goppop.github.io/_astro/blog-placeholder-1.Bx0Zcyzv.jpg"><link rel="stylesheet" href="/_astro/Header.DHc1oVwj.css"><style>main[data-astro-cid-tldeq5d5]{width:100%;max-width:none;margin:0;padding:0}.article-shell[data-astro-cid-tldeq5d5]{max-width:1120px;margin:0 auto;padding:3rem 1rem 1rem}.article-head[data-astro-cid-tldeq5d5]{border-bottom:1px solid #e1d2bbe6;grid-template-columns:minmax(0,1fr) 260px;align-items:end;gap:1.5rem;padding-bottom:1.4rem;display:grid}.title[data-astro-cid-tldeq5d5]{margin:0;line-height:1}.title[data-astro-cid-tldeq5d5] h1[data-astro-cid-tldeq5d5]{max-width:12em;color:var(--accent-dark);margin:0;font-size:3.6rem;line-height:1.08}.date-card[data-astro-cid-tldeq5d5]{color:var(--muted);background:#fff9eeb3;border-radius:8px;padding:1rem;font-size:.9rem;box-shadow:0 12px 28px #58422314}.date-card[data-astro-cid-tldeq5d5] strong[data-astro-cid-tldeq5d5]{color:var(--clay);letter-spacing:0;text-transform:uppercase;margin-bottom:.4rem;font-size:.82rem;display:block}.last-updated-on[data-astro-cid-tldeq5d5]{border-top:1px solid #e1d2bbc7;margin-top:.8rem;padding-top:.8rem}.meta-row[data-astro-cid-tldeq5d5]{flex-wrap:wrap;gap:.55rem;margin-top:1rem;display:flex}.hero-image[data-astro-cid-tldeq5d5]{width:100%;max-width:1120px;margin:2rem auto 0}.hero-image[data-astro-cid-tldeq5d5] img[data-astro-cid-tldeq5d5]{box-shadow:var(--box-shadow);border-radius:6px;margin:0 auto;display:block}.prose[data-astro-cid-tldeq5d5]{width:780px;max-width:100%;color:var(--ink);margin:2.2rem auto 0;padding:0 1rem}.prose[data-astro-cid-tldeq5d5] h2{border-top:1px solid var(--line);margin-top:3.4rem;padding-top:1rem}.prose[data-astro-cid-tldeq5d5] h2:first-child{border-top:0;margin-top:0;padding-top:0}.prose[data-astro-cid-tldeq5d5] h3{color:var(--accent-dark)}.prose[data-astro-cid-tldeq5d5] p,.prose[data-astro-cid-tldeq5d5] li{font-size:1.02rem}.prose[data-astro-cid-tldeq5d5] ul,.prose[data-astro-cid-tldeq5d5] ol{padding-left:1.4rem}.prose[data-astro-cid-tldeq5d5] table{display:block;overflow-x:auto}.prose[data-astro-cid-tldeq5d5] li+li{margin-top:.35rem}@media (width<=820px){.article-shell[data-astro-cid-tldeq5d5]{padding:2rem .75rem 1rem}.article-head[data-astro-cid-tldeq5d5]{grid-template-columns:1fr}.title[data-astro-cid-tldeq5d5] h1[data-astro-cid-tldeq5d5]{font-size:2.25rem}.prose[data-astro-cid-tldeq5d5]{margin-top:2rem;padding:0 .75rem}}
+</style></head><body data-astro-cid-tldeq5d5><header data-astro-cid-nen7h5rs><nav data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs>Goppop 的博客</a><div class="internal-links" data-astro-cid-nen7h5rs><a href="/" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>首页</a><a href="/blog" class="active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>文章</a><a href="/about" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>关于</a></div><div class="social-links" data-astro-cid-nen7h5rs><a href="https://github.com/Goppop" target="_blank" data-astro-cid-nen7h5rs><span class="sr-only" data-astro-cid-nen7h5rs>Goppop GitHub</span><svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" data-astro-cid-nen7h5rs><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" data-astro-cid-nen7h5rs></path></svg></a></div></nav></header><main data-astro-cid-tldeq5d5><article data-astro-cid-tldeq5d5><div class="article-shell" data-astro-cid-tldeq5d5><header class="article-head" data-astro-cid-tldeq5d5><div class="title" data-astro-cid-tldeq5d5><p class="eyebrow" data-astro-cid-tldeq5d5>Article</p><h1 data-astro-cid-tldeq5d5>JVM-内存模型详解</h1><div class="meta-row" data-astro-cid-tldeq5d5><span class="label" data-astro-cid-tldeq5d5>代码开发学习</span><span class="label" data-astro-cid-tldeq5d5>01-编程语言基础</span><span class="label" data-astro-cid-tldeq5d5>JVM</span><span class="label" data-astro-cid-tldeq5d5>JVM</span></div></div><aside class="date-card" aria-label="文章日期" data-astro-cid-tldeq5d5><strong data-astro-cid-tldeq5d5>Published</strong><time datetime="2025-12-12T00:00:00.000Z">Dec 12, 2025</time><div class="last-updated-on" data-astro-cid-tldeq5d5><strong data-astro-cid-tldeq5d5>Updated</strong><time datetime="2025-12-15T00:00:00.000Z">Dec 15, 2025</time></div></aside></header></div><div class="prose" data-astro-cid-tldeq5d5><h1 id="jvm-内存模型详解">JVM-内存模型详解</h1>
+<h2 id="概述">概述</h2>
+<p><strong>Java 虚拟机（JVM）内存模型</strong>，更准确地说是 <strong>JVM 运行时数据区（Runtime Data Areas）</strong>，是Java虚拟机在执行Java程序过程中，将其管理的内存划分为若干个不同的数据区域。理解这些区域对于深入掌握Java程序的运行机制、内存分配、垃圾回收以及进行性能调优和故障排查至关重要 。</p>
+<p>需要注意的是，<strong>JVM 运行时数据区</strong>（JVM Runtime Data Areas）与 <strong>Java 内存模型</strong>（Java Memory Model, JMM）是两个不同的概念。JVM 运行时数据区关注的是JVM如何划分和管理内存，而 JMM 则关注于在多线程环境下，变量在内存中的可见性、有序性和原子性等问题。本文档主要聚焦于前者，即 JVM 运行时数据区。</p>
+<p>JVM 运行时数据区主要包含以下五个部分，它们根据是否被线程共享可以分为两大类：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left">内存区域</th>
+<th style="text-align: left">线程共享性</th>
+<th style="text-align: left">作用</th>
+<th style="text-align: left">可能发生的异常</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left"><strong>程序计数器</strong> (Program Counter Register)</td>
+<td style="text-align: left">线程私有</td>
+<td style="text-align: left">存储当前线程执行的字节码指令地址</td>
+<td style="text-align: left">无 (唯一不会发生 OOM 的区域)</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>Java 虚拟机栈</strong> (Java Virtual Machine Stacks)</td>
+<td style="text-align: left">线程私有</td>
+<td style="text-align: left">存储栈帧，包含局部变量表、操作数栈、动态链接、方法返回地址</td>
+<td style="text-align: left"><code>StackOverflowError</code>、<code>OutOfMemoryError</code></td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>本地方法栈</strong> (Native Method Stacks)</td>
+<td style="text-align: left">线程私有</td>
+<td style="text-align: left">为 Native 方法服务</td>
+<td style="text-align: left"><code>StackOverflowError</code>、<code>OutOfMemoryError</code></td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>堆</strong> (Heap)</td>
+<td style="text-align: left">线程共享</td>
+<td style="text-align: left">存放对象实例和数组</td>
+<td style="text-align: left"><code>OutOfMemoryError</code></td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>方法区</strong> (Method Area)</td>
+<td style="text-align: left">线程共享</td>
+<td style="text-align: left">存储类信息、常量、静态变量、即时编译器编译后的代码等</td>
+<td style="text-align: left"><code>OutOfMemoryError</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="核心内容">核心内容</h2>
+<h3 id="1-程序计数器-program-counter-register">1. 程序计数器 (Program Counter Register)</h3>
+<p>程序计数器是一块较小的内存空间，可以看作是当前线程所执行的字节码的<strong>行号指示器</strong>。字节码解释器通过改变这个计数器的值来选取下一条需要执行的字节码指令 [1]。</p>
+<ul>
+<li><strong>线程私有</strong>：为了保证线程切换后能恢复到正确的执行位置，每条线程都有一个独立的程序计数器。</li>
+<li><strong>唯一性</strong>：它是 JVM 运行时数据区中<strong>唯一一个不会出现 <code>OutOfMemoryError</code></strong> 的区域 [1]。</li>
+</ul>
+<h3 id="2-java-虚拟机栈-java-virtual-machine-stacks">2. Java 虚拟机栈 (Java Virtual Machine Stacks)</h3>
+<p>Java 虚拟机栈也是<strong>线程私有</strong>的，它的生命周期与线程相同。它描述的是 <strong>Java 方法执行的内存模型</strong>。每次方法调用都会伴随着一个<strong>栈帧</strong>（Stack Frame）的入栈和出栈 [1]。</p>
+<p>每个栈帧包含以下核心组成部分：</p>
+<ul>
+<li><strong>局部变量表 (Local Variables Table)</strong>：存放方法参数和方法内部定义的局部变量，包括基本数据类型和对象引用（<code>reference</code> 类型）。</li>
+<li><strong>操作数栈 (Operand Stack)</strong>：作为方法执行过程中进行计算的中转站，用于存放方法执行过程中产生的中间计算结果。</li>
+<li><strong>动态链接 (Dynamic Linking)</strong>：将符号引用转换为直接引用的过程。对于虚方法，这个转换过程被推迟到程序运行期间，由动态链接完成，这是实现<strong>多态</strong>的基础。</li>
+<li><strong>方法返回地址 (Return Address)</strong>：存放方法正常退出或异常退出的返回地址。</li>
+</ul>
+<p><strong>异常情况</strong>：</p>
+<ul>
+<li><strong><code>StackOverflowError</code></strong>：当线程请求的栈深度超过虚拟机允许的最大深度时抛出。</li>
+<li><strong><code>OutOfMemoryError</code></strong>：如果虚拟机栈可以动态扩展，但在扩展时无法申请到足够的内存空间时抛出。</li>
+</ul>
+<h3 id="3-本地方法栈-native-method-stacks">3. 本地方法栈 (Native Method Stacks)</h3>
+<p>本地方法栈与虚拟机栈的作用相似，区别在于：<strong>虚拟机栈为执行 Java 方法服务，而本地方法栈则为执行 Native 方法服务</strong> [1]。在 HotSpot 虚拟机中，本地方法栈和 Java 虚拟机栈通常被合二为一。</p>
+<h3 id="4-堆-heap">4. 堆 (Heap)</h3>
+<p>Java 堆是 JVM 所管理的内存中<strong>最大的一块</strong>，也是所有线程<strong>共享</strong>的一块内存区域。</p>
+<ul>
+<li><strong>核心作用</strong>：存放<strong>对象实例</strong>和<strong>数组</strong>。几乎所有的对象实例都在这里分配内存 [1]。</li>
+<li><strong>垃圾回收</strong>：堆是垃圾收集器管理的主要区域，因此也被称为 <strong>GC 堆</strong>（Garbage Collected Heap）。</li>
+<li><strong>分代思想</strong>：现代 JVM 普遍采用分代垃圾回收机制，因此堆内存通常被划分为<strong>新生代</strong>（Young Generation）和<strong>老年代</strong>（Old Generation）。新生代又细分为 <strong>Eden 区</strong>、<strong>From Survivor 区</strong>和 <strong>To Survivor 区</strong>。</li>
+</ul>
+<h3 id="5-方法区-method-area">5. 方法区 (Method Area)</h3>
+<p>方法区是所有线程<strong>共享</strong>的内存区域，它用于存储已被虚拟机加载的<strong>类信息、常量、静态变量、即时编译器编译后的代码</strong>等数据 [1]。</p>
+<ul>
+<li><strong>演变</strong>：在 JDK 1.8 之前，HotSpot 虚拟机使用<strong>永久代</strong>（PermGen）来实现方法区。从 JDK 1.8 开始，永久代被彻底移除，取而代之的是<strong>元空间</strong>（Metaspace），元空间不再位于虚拟机内存中，而是使用<strong>本地内存</strong>（Native Memory） [1]。</li>
+<li><strong>运行时常量池</strong>：方法区的一部分，用于存放编译期生成的各种字面量和符号引用。</li>
+<li><strong>字符串常量池</strong>：在 JDK 1.7 之后，字符串常量池从方法区（永久代）被移到了<strong>堆</strong>中 [1]。</li>
+</ul>
+<h3 id="6-直接内存-direct-memory">6. 直接内存 (Direct Memory)</h3>
+<p>直接内存<strong>不是</strong>JVM 运行时数据区的一部分，但它在 Java NIO 中被广泛使用。它通过 JNI 的方式在<strong>本地内存</strong>（Native Memory）中分配，不受 Java 堆大小的限制，但会受到本机总内存的限制 [1]。使用直接内存可以减少一次数据拷贝，提高性能。</p>
+<h2 id="实践示例">实践示例</h2>
+<h3 id="java-对象的创建过程">Java 对象的创建过程</h3>
+<p>当一个 Java 对象（如 <code>new Object()</code>）被创建时，JVM 会经历以下五个核心步骤 [1]：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left">步骤</th>
+<th style="text-align: left">描述</th>
+<th style="text-align: left">发生区域</th>
+<th style="text-align: left">关键操作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left"><strong>Step 1: 类加载检查</strong></td>
+<td style="text-align: left">检查类是否已被加载、解析和初始化。如果未加载，则执行相应的类加载过程。</td>
+<td style="text-align: left">方法区</td>
+<td style="text-align: left">验证、准备、解析、初始化</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>Step 2: 分配内存</strong></td>
+<td style="text-align: left">在堆上为对象实例分配所需的内存空间。分配方式包括<strong>指针碰撞</strong>（适用于内存规整）和<strong>空闲列表</strong>（适用于内存不规整）。</td>
+<td style="text-align: left">堆</td>
+<td style="text-align: left">内存分配</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>Step 3: 初始化零值</strong></td>
+<td style="text-align: left">将分配到的内存空间（不包括对象头）都初始化为零值（如 <code>int</code> 为 0，<code>boolean</code> 为 <code>false</code>）。</td>
+<td style="text-align: left">堆</td>
+<td style="text-align: left">保证对象的字段在Java代码中可以不赋初始值就直接使用</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>Step 4: 设置对象头</strong></td>
+<td style="text-align: left">设置对象头（Object Header），包括对象的哈希码、GC 分代年龄、锁状态标志、偏向线程 ID 等信息。</td>
+<td style="text-align: left">堆</td>
+<td style="text-align: left">记录对象的元数据信息</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>Step 5: 执行 <code>&lt;init&gt;</code> 方法</strong></td>
+<td style="text-align: left">执行 Java 程序的 <code>&lt;init&gt;</code> 方法（即构造函数），按照程序员的意愿对对象进行初始化。</td>
+<td style="text-align: left">虚拟机栈</td>
+<td style="text-align: left">真正完成对象初始化</td>
+</tr>
+</tbody>
+</table>
+<h3 id="对象的访问定位">对象的访问定位</h3>
+<p>Java 程序通过栈上的 <strong>局部变量表</strong> 中的 <code>reference</code> 类型数据来操作堆上的具体对象。主流的访问方式有两种：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left">访问方式</th>
+<th style="text-align: left">描述</th>
+<th style="text-align: left">优点</th>
+<th style="text-align: left">缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left"><strong>句柄访问</strong></td>
+<td style="text-align: left">堆中会划分出一块内存作为<strong>句柄池</strong>。<code>reference</code> 存储的是对象的句柄地址，句柄中包含了对象实例数据和类型数据各自的地址。</td>
+<td style="text-align: left"><code>reference</code> 中存储的是稳定的句柄地址，对象被移动（如垃圾回收时）时只需改变句柄中的实例数据指针，<code>reference</code> 本身无需修改。</td>
+<td style="text-align: left">访问对象需要两次指针定位，效率略低。</td>
+</tr>
+<tr>
+<td style="text-align: left"><strong>直接指针访问</strong></td>
+<td style="text-align: left"><code>reference</code> 直接存储对象实例的地址。对象实例的内存中包含类型数据的指针。</td>
+<td style="text-align: left">访问对象只需一次指针定位，速度更快。</td>
+<td style="text-align: left">对象被移动时，<code>reference</code> 的值需要修改。</td>
+</tr>
+</tbody>
+</table>
+<p>HotSpot 虚拟机主要采用<strong>直接指针访问</strong>方式。</p>
+<h2 id="总结">总结</h2>
+<p>JVM 运行时数据区是 Java 内存管理的核心，它将内存划分为<strong>线程私有</strong>（程序计数器、虚拟机栈、本地方法栈）和<strong>线程共享</strong>（堆、方法区）两大区域。其中，<strong>堆</strong>是最大且最活跃的区域，用于存放对象实例，是垃圾回收的主要场所；<strong>虚拟机栈</strong>则管理着方法的执行，通过栈帧实现方法的调用和局部变量的存储。理解这些区域的划分、作用及其生命周期，是进行 Java 性能优化和问题排查的基础。</p>
+</div></article></main><footer data-astro-cid-jo6i4kqk><div data-astro-cid-jo6i4kqk>Goppop 的博客</div><p data-astro-cid-jo6i4kqk>&copy; 2026 Goppop. 记录技术学习、系统设计和长期思考。</p></footer></body></html>
