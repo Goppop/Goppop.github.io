@@ -1,0 +1,399 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-tldeq5d5><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" href="/favicon.ico"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Goppop 的博客" href="https://goppop.github.io/rss.xml"><meta name="generator" content="Astro v7.0.3"><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/7443039bbc50ce9a.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/0edeceb0e4e5adfc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/7443039bbc50ce9a.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/0edeceb0e4e5adfc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/spring-cloud-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E4%BD%93%E7%B3%BB%E4%BB%8E%E7%BB%84%E4%BB%B6%E5%88%B0%E7%94%9F%E4%BA%A7%E6%B2%BB%E7%90%86/"><!-- Primary Meta Tags --><title>Spring Cloud 微服务架构体系：从组件到生产治理</title><meta name="description" content="从架构边界、核心组件、服务协同、数据一致性到生产治理，系统梳理 Spring Cloud 微服务体系的设计取舍。"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/spring-cloud-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E4%BD%93%E7%B3%BB%E4%BB%8E%E7%BB%84%E4%BB%B6%E5%88%B0%E7%94%9F%E4%BA%A7%E6%B2%BB%E7%90%86/"><meta property="og:title" content="Spring Cloud 微服务架构体系：从组件到生产治理"><meta property="og:description" content="从架构边界、核心组件、服务协同、数据一致性到生产治理，系统梳理 Spring Cloud 微服务体系的设计取舍。"><meta property="og:image" content="https://goppop.github.io/_astro/blog-placeholder-1.Bx0Zcyzv.jpg"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/spring-cloud-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E4%BD%93%E7%B3%BB%E4%BB%8E%E7%BB%84%E4%BB%B6%E5%88%B0%E7%94%9F%E4%BA%A7%E6%B2%BB%E7%90%86/"><meta property="twitter:title" content="Spring Cloud 微服务架构体系：从组件到生产治理"><meta property="twitter:description" content="从架构边界、核心组件、服务协同、数据一致性到生产治理，系统梳理 Spring Cloud 微服务体系的设计取舍。"><meta property="twitter:image" content="https://goppop.github.io/_astro/blog-placeholder-1.Bx0Zcyzv.jpg"><link rel="stylesheet" href="/_astro/Header.DHc1oVwj.css"><style>main[data-astro-cid-tldeq5d5]{width:100%;max-width:none;margin:0;padding:0}.article-shell[data-astro-cid-tldeq5d5]{max-width:1120px;margin:0 auto;padding:3rem 1rem 1rem}.article-head[data-astro-cid-tldeq5d5]{border-bottom:1px solid #e1d2bbe6;grid-template-columns:minmax(0,1fr) 260px;align-items:end;gap:1.5rem;padding-bottom:1.4rem;display:grid}.title[data-astro-cid-tldeq5d5]{margin:0;line-height:1}.title[data-astro-cid-tldeq5d5] h1[data-astro-cid-tldeq5d5]{max-width:12em;color:var(--accent-dark);margin:0;font-size:3.6rem;line-height:1.08}.date-card[data-astro-cid-tldeq5d5]{color:var(--muted);background:#fff9eeb3;border-radius:8px;padding:1rem;font-size:.9rem;box-shadow:0 12px 28px #58422314}.date-card[data-astro-cid-tldeq5d5] strong[data-astro-cid-tldeq5d5]{color:var(--clay);letter-spacing:0;text-transform:uppercase;margin-bottom:.4rem;font-size:.82rem;display:block}.last-updated-on[data-astro-cid-tldeq5d5]{border-top:1px solid #e1d2bbc7;margin-top:.8rem;padding-top:.8rem}.meta-row[data-astro-cid-tldeq5d5]{flex-wrap:wrap;gap:.55rem;margin-top:1rem;display:flex}.hero-image[data-astro-cid-tldeq5d5]{width:100%;max-width:1120px;margin:2rem auto 0}.hero-image[data-astro-cid-tldeq5d5] img[data-astro-cid-tldeq5d5]{box-shadow:var(--box-shadow);border-radius:6px;margin:0 auto;display:block}.prose[data-astro-cid-tldeq5d5]{width:780px;max-width:100%;color:var(--ink);margin:2.2rem auto 0;padding:0 1rem}.prose[data-astro-cid-tldeq5d5] h2{border-top:1px solid var(--line);margin-top:3.4rem;padding-top:1rem}.prose[data-astro-cid-tldeq5d5] h2:first-child{border-top:0;margin-top:0;padding-top:0}.prose[data-astro-cid-tldeq5d5] h3{color:var(--accent-dark)}.prose[data-astro-cid-tldeq5d5] p,.prose[data-astro-cid-tldeq5d5] li{font-size:1.02rem}.prose[data-astro-cid-tldeq5d5] ul,.prose[data-astro-cid-tldeq5d5] ol{padding-left:1.4rem}.prose[data-astro-cid-tldeq5d5] table{display:block;overflow-x:auto}.prose[data-astro-cid-tldeq5d5] li+li{margin-top:.35rem}@media (width<=820px){.article-shell[data-astro-cid-tldeq5d5]{padding:2rem .75rem 1rem}.article-head[data-astro-cid-tldeq5d5]{grid-template-columns:1fr}.title[data-astro-cid-tldeq5d5] h1[data-astro-cid-tldeq5d5]{font-size:2.25rem}.prose[data-astro-cid-tldeq5d5]{margin-top:2rem;padding:0 .75rem}}
+</style></head><body data-astro-cid-tldeq5d5><header data-astro-cid-nen7h5rs><nav data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs>Goppop 的博客</a><div class="internal-links" data-astro-cid-nen7h5rs><a href="/" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>首页</a><a href="/blog" class="active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>文章</a><a href="/knowledge" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>知识库</a><a href="/about" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>关于</a></div><div class="social-links" data-astro-cid-nen7h5rs><a href="https://github.com/Goppop" target="_blank" data-astro-cid-nen7h5rs><span class="sr-only" data-astro-cid-nen7h5rs>Goppop GitHub</span><svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" data-astro-cid-nen7h5rs><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" data-astro-cid-nen7h5rs></path></svg></a></div></nav></header><main data-astro-cid-tldeq5d5><article data-astro-cid-tldeq5d5><div class="article-shell" data-astro-cid-tldeq5d5><header class="article-head" data-astro-cid-tldeq5d5><div class="title" data-astro-cid-tldeq5d5><p class="eyebrow" data-astro-cid-tldeq5d5>Article</p><h1 data-astro-cid-tldeq5d5>Spring Cloud 微服务架构体系：从组件到生产治理</h1><div class="meta-row" data-astro-cid-tldeq5d5><a class="label" href="/knowledge/backend/" data-astro-cid-tldeq5d5>后端工程</a><a class="label" href="/knowledge/backend/spring-cloud/" data-astro-cid-tldeq5d5>Spring Cloud</a><span class="label" data-astro-cid-tldeq5d5>代码开发学习</span><span class="label" data-astro-cid-tldeq5d5>Spring Cloud</span><span class="label" data-astro-cid-tldeq5d5>Spring Cloud Alibaba</span><span class="label" data-astro-cid-tldeq5d5>Nacos</span><span class="label" data-astro-cid-tldeq5d5>Gateway</span><span class="label" data-astro-cid-tldeq5d5>Sentinel</span></div></div><aside class="date-card" aria-label="文章日期" data-astro-cid-tldeq5d5><strong data-astro-cid-tldeq5d5>Published</strong><time datetime="2026-07-02T00:00:00.000Z">Jul 2, 2026</time><div class="last-updated-on" data-astro-cid-tldeq5d5><strong data-astro-cid-tldeq5d5>Updated</strong><time datetime="2026-07-02T00:00:00.000Z">Jul 2, 2026</time></div></aside></header></div><div class="prose" data-astro-cid-tldeq5d5><h1 id="spring-cloud-微服务架构体系从组件到生产治理">Spring Cloud 微服务架构体系：从组件到生产治理</h1>
+<p>Spring Cloud 不是一个单独的框架，而是一组围绕微服务架构展开的工程能力集合。它解决的问题不是“怎么把一个接口远程调用出去”，而是当系统拆成多个服务之后，如何完成服务发现、配置管理、流量入口、服务调用、容错治理、链路追踪、发布运维和数据一致性这些基础能力。</p>
+<p>如果只从组件名称入手，Spring Cloud 很容易被理解成“Gateway + Nacos + Feign + Sentinel + Seata”的组合。但在真实系统中，组件只是实现手段，真正重要的是每一层解决什么架构问题，以及组件之间如何协同。</p>
+<p>本文以 Spring Boot 3.x、Spring Cloud 2023.x/2025.x、Spring Cloud Alibaba 2023.x/2025.x 这一代技术栈为背景讨论。不同版本的细节会有差异，例如 Nacos 1.x 与 2.x 的通信机制、OpenFeign 默认 HTTP 客户端、Spring Cloud Netflix 组件的维护状态等，落地时应以项目实际版本文档为准。</p>
+<h2 id="1-微服务首先是架构边界问题">1. 微服务首先是架构边界问题</h2>
+<p>微服务架构的核心不是“技术更先进”，而是将系统按业务能力拆成可以独立交付、独立部署、独立演进的服务单元。它通常解决的是单体系统在团队规模、发布节奏、模块耦合和资源隔离上的瓶颈。</p>
+<p>一个比较稳妥的判断是：</p>
+<ul>
+<li>如果团队规模较小、领域边界还不清晰，模块化单体通常比微服务更合适。</li>
+<li>如果系统的大部分修改都需要全量回归、全量发布，服务边界可能已经成为工程效率问题。</li>
+<li>如果某些模块的流量、可靠性、数据一致性要求明显不同，独立拆分可以带来资源隔离和治理收益。</li>
+<li>如果拆分后一个简单业务动作需要跨多个服务同步调用，说明边界可能拆得过细。</li>
+</ul>
+<p>微服务不是为了追求“服务数量多”，而是为了让系统复杂度被合理分摊到清晰的边界内。服务拆分的基本原则是：能不拆就不拆；只有当独立演进、独立扩缩容、独立容错或组织协作真的需要时，再拆。</p>
+<h2 id="2-spring-cloud-微服务体系的分层">2. Spring Cloud 微服务体系的分层</h2>
+<p>一个生产级 Spring Cloud 系统可以分成六层：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>客户端 / 外部系统</span></span>
+<span class="line"><span>        ↓</span></span>
+<span class="line"><span>流量入口层：Gateway、鉴权、限流、灰度、协议适配</span></span>
+<span class="line"><span>        ↓</span></span>
+<span class="line"><span>服务治理层：服务发现、负载均衡、熔断、重试、降级</span></span>
+<span class="line"><span>        ↓</span></span>
+<span class="line"><span>业务服务层：按业务能力拆分的订单、用户、支付、库存等服务</span></span>
+<span class="line"><span>        ↓</span></span>
+<span class="line"><span>数据一致性层：本地事务、消息最终一致、TCC、Saga、AT</span></span>
+<span class="line"><span>        ↓</span></span>
+<span class="line"><span>生产治理层：日志、指标、链路追踪、发布、容量、故障处理</span></span></code></pre>
+<p>这几层不是孤立的。例如一次请求经过 Gateway 后，需要从注册中心发现服务，通过 LoadBalancer 选择实例，再由 OpenFeign 发起调用；调用失败时可能触发 Sentinel 或 CircuitBreaker；整个过程要带上 TraceId，便于日志、指标和链路追踪关联；如果请求涉及跨服务写操作，还需要选择合适的一致性方案。</p>
+<p>理解 Spring Cloud 的关键，就是理解这些能力在请求链路中的位置。</p>
+<h2 id="3-流量入口spring-cloud-gateway">3. 流量入口：Spring Cloud Gateway</h2>
+<p>Spring Cloud Gateway 是微服务系统的统一入口。它通常负责路由转发、统一鉴权、限流、灰度发布、请求改写、响应处理和链路追踪上下文注入。</p>
+<p>Gateway 基于 WebFlux 和 Reactor Netty 构建，适合处理大量并发连接。它的优势来自事件驱动和非阻塞 I/O，但前提是处理链路中不能混入阻塞操作。如果在自定义 Filter 里做同步数据库查询、阻塞 HTTP 调用或长时间计算，就会占用 Netty EventLoop 线程，导致整个网关吞吐下降。</p>
+<h3 id="31-routepredicate-与-filter">3.1 Route、Predicate 与 Filter</h3>
+<p>Gateway 的核心模型由三部分组成：</p>
+<ul>
+<li><code>Route</code>：一条路由规则，描述请求转发到哪里。</li>
+<li><code>Predicate</code>：路由匹配条件，例如 Path、Method、Header、Host。</li>
+<li><code>Filter</code>：请求进入下游前和响应返回客户端前的处理逻辑。</li>
+</ul>
+<p>一个典型配置如下：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#85E89D">spring</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">  cloud</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">    gateway</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">      routes</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#E1E4E8">        - </span><span style="color:#85E89D">id</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">order-service</span></span>
+<span class="line"><span style="color:#85E89D">          uri</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">lb://order-center</span></span>
+<span class="line"><span style="color:#85E89D">          predicates</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#E1E4E8">            - </span><span style="color:#9ECBFF">Path=/api/order/**</span></span>
+<span class="line"><span style="color:#E1E4E8">            - </span><span style="color:#9ECBFF">Method=GET,POST</span></span>
+<span class="line"><span style="color:#85E89D">          filters</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#E1E4E8">            - </span><span style="color:#9ECBFF">StripPrefix=1</span></span>
+<span class="line"><span style="color:#E1E4E8">            - </span><span style="color:#85E89D">name</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">RequestRateLimiter</span></span>
+<span class="line"><span style="color:#85E89D">              args</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">                redis-rate-limiter.replenishRate</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">100</span></span>
+<span class="line"><span style="color:#85E89D">                redis-rate-limiter.burstCapacity</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">200</span></span></code></pre>
+<p><code>lb://order-center</code> 表示目标服务不是一个固定地址，而是交给 Spring Cloud LoadBalancer 从服务注册中心中选择实例。</p>
+<h3 id="32-网关层适合做什么">3.2 网关层适合做什么</h3>
+<p>网关适合承载与业务服务无关、但与流量入口强相关的能力：</p>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>统一鉴权</td>
+<td>校验 Token，向下游注入用户上下文</td>
+</tr>
+<tr>
+<td>限流</td>
+<td>按 IP、用户、接口、租户等维度保护系统</td>
+</tr>
+<tr>
+<td>灰度</td>
+<td>根据 Header、用户标签或权重将流量导向不同版本</td>
+</tr>
+<tr>
+<td>协议适配</td>
+<td>对外 REST，对内服务发现和负载均衡</td>
+</tr>
+<tr>
+<td>观测注入</td>
+<td>生成或透传 TraceId、租户 ID、请求 ID</td>
+</tr>
+</tbody>
+</table>
+<p>网关不适合承载复杂业务逻辑。业务规则越多，网关越容易从“流量入口”变成“隐藏的业务服务”，后续维护和排障都会变困难。</p>
+<h3 id="33-超时与连接池">3.3 超时与连接池</h3>
+<p>网关到下游服务的调用也需要明确的超时与连接池策略。下游慢不是一个局部问题，它会占用连接、堆积请求、放大排队延迟，最终影响网关整体稳定性。</p>
+<p>示例配置：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#85E89D">spring</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">  cloud</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">    gateway</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">      httpclient</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">        connect-timeout</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">3000</span></span>
+<span class="line"><span style="color:#85E89D">        response-timeout</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">5s</span></span>
+<span class="line"><span style="color:#85E89D">        pool</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">          max-connections</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">500</span></span>
+<span class="line"><span style="color:#85E89D">          acquire-timeout</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">3000</span></span>
+<span class="line"><span style="color:#85E89D">          max-idle-time</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">60s</span></span></code></pre>
+<p>这些值不应该照抄。合理配置取决于下游服务延迟、网关实例数、峰值 QPS、连接复用情况和业务可接受的失败时间。重要的是不要让请求无限等待。</p>
+<h2 id="4-注册与配置nacos-的双重角色">4. 注册与配置：Nacos 的双重角色</h2>
+<p>在 Spring Cloud Alibaba 体系中，Nacos 常同时承担服务注册中心和配置中心两个角色。</p>
+<p>作为注册中心，它解决“服务在哪里”的问题。服务启动后向 Nacos 注册实例，调用方通过服务名获取实例列表，再由负载均衡组件选择目标实例。</p>
+<p>作为配置中心，它解决“配置如何集中管理和动态变更”的问题。配置变更后，客户端能够感知变更并刷新本地配置。</p>
+<h3 id="41-临时实例与持久实例">4.1 临时实例与持久实例</h3>
+<p>Nacos 的服务实例一般可以分为临时实例和持久实例：</p>
+<ul>
+<li>临时实例适合普通应用服务，由客户端维持心跳。心跳异常后，实例会被标记为不健康或被摘除。</li>
+<li>持久实例适合需要由服务端主动探测的场景，实例信息不会因为客户端心跳消失而立即删除。</li>
+</ul>
+<p>从一致性取舍看，临时实例更偏向可用性和最终一致，持久数据和配置数据更强调一致性。但不要把所有组件都简单套进 CAP 标签。工程上更重要的问题是：短暂不一致会造成什么业务后果，以及系统如何兜底。</p>
+<h3 id="42-nacos-1x-与-2x-的通信差异">4.2 Nacos 1.x 与 2.x 的通信差异</h3>
+<p>讨论 Nacos 机制时要注意版本差异。Nacos 1.x 中，服务发现变更通知常被描述为 UDP 推送加定时拉取兜底；配置中心常被描述为 HTTP 长轮询。Nacos 2.x 引入了 gRPC 长连接能力，客户端与服务端的通信模型发生了变化。</p>
+<p>因此更稳妥的说法是：</p>
+<blockquote>
+<p>Nacos 的配置和服务发现机制与版本有关。1.x 时代常见描述是 HTTP 长轮询、UDP 推送和定时拉取；2.x 起引入 gRPC 长连接，实际通信方式应以客户端和服务端版本为准。</p>
+</blockquote>
+<h3 id="43-配置动态刷新要谨慎">4.3 配置动态刷新要谨慎</h3>
+<p>Spring Cloud 体系中常用 <code>@RefreshScope</code> 支持配置刷新。它的基本思路是：配置变化后发布刷新事件，相关 Bean 的缓存被清理，下一次访问时重新创建并注入新配置。</p>
+<p>它适合开关、阈值、轻量级策略参数，不适合无脑套在所有配置上。数据库连接池、线程池、MQ 客户端这类有状态资源，刷新过程涉及连接重建、任务迁移和并发窗口，通常应该通过更明确的生命周期控制来处理。</p>
+<h2 id="5-服务调用openfeign-与-loadbalancer">5. 服务调用：OpenFeign 与 LoadBalancer</h2>
+<p>OpenFeign 让服务间 HTTP 调用以接口方式声明：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">FeignClient</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">name</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> "order-center"</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">fallbackFactory</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> OrderClientFallbackFactory.class)</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> interface</span><span style="color:#B392F0"> OrderClient</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">GetMapping</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"/api/orders/{orderId}"</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    Result&#x3C;</span><span style="color:#F97583">OrderDTO</span><span style="color:#E1E4E8">> </span><span style="color:#B392F0">getOrder</span><span style="color:#E1E4E8">(@</span><span style="color:#F97583">PathVariable</span><span style="color:#E1E4E8"> Long </span><span style="color:#FFAB70">orderId</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>调用这个接口时，底层会完成方法元数据解析、请求模板构建、拦截器处理、服务实例选择、HTTP 请求发送、响应解码和异常处理。</p>
+<p>完整链路可以简化为：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>业务代码调用 Feign 接口</span></span>
+<span class="line"><span>        ↓</span></span>
+<span class="line"><span>Feign 动态代理生成 HTTP 请求</span></span>
+<span class="line"><span>        ↓</span></span>
+<span class="line"><span>RequestInterceptor 注入 Token、TraceId、TenantId</span></span>
+<span class="line"><span>        ↓</span></span>
+<span class="line"><span>Spring Cloud LoadBalancer 选择服务实例</span></span>
+<span class="line"><span>        ↓</span></span>
+<span class="line"><span>底层 HTTP Client 发起请求</span></span>
+<span class="line"><span>        ↓</span></span>
+<span class="line"><span>Decoder 解码响应或进入 fallback</span></span></code></pre>
+<h3 id="51-上下文传递">5.1 上下文传递</h3>
+<p>微服务调用中，用户身份、租户标识、TraceId 等上下文需要跨服务传递。Feign 的 <code>RequestInterceptor</code> 是常见实现方式：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Component</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> FeignContextInterceptor</span><span style="color:#F97583"> implements</span><span style="color:#B392F0"> RequestInterceptor</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> apply</span><span style="color:#E1E4E8">(RequestTemplate </span><span style="color:#FFAB70">template</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        ServletRequestAttributes attrs </span><span style="color:#F97583">=</span></span>
+<span class="line"><span style="color:#E1E4E8">            (ServletRequestAttributes) RequestContextHolder.</span><span style="color:#B392F0">getRequestAttributes</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (attrs </span><span style="color:#F97583">==</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">            return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">        HttpServletRequest request </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> attrs.</span><span style="color:#B392F0">getRequest</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#B392F0">        copyHeader</span><span style="color:#E1E4E8">(request, template, </span><span style="color:#9ECBFF">"Authorization"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#B392F0">        copyHeader</span><span style="color:#E1E4E8">(request, template, </span><span style="color:#9ECBFF">"X-Trace-Id"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#B392F0">        copyHeader</span><span style="color:#E1E4E8">(request, template, </span><span style="color:#9ECBFF">"X-Tenant-Id"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> copyHeader</span><span style="color:#E1E4E8">(HttpServletRequest </span><span style="color:#FFAB70">request</span><span style="color:#E1E4E8">, RequestTemplate </span><span style="color:#FFAB70">template</span><span style="color:#E1E4E8">, String </span><span style="color:#FFAB70">name</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        String value </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> request.</span><span style="color:#B392F0">getHeader</span><span style="color:#E1E4E8">(name);</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (value </span><span style="color:#F97583">!=</span><span style="color:#79B8FF"> null</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#F97583"> !</span><span style="color:#E1E4E8">value.</span><span style="color:#B392F0">isBlank</span><span style="color:#E1E4E8">()) {</span></span>
+<span class="line"><span style="color:#E1E4E8">            template.</span><span style="color:#B392F0">header</span><span style="color:#E1E4E8">(name, value);</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>这个方案依赖 <code>RequestContextHolder</code> 中的 <code>ThreadLocal</code>。如果 Feign 调用发生在 <code>@Async</code>、线程池任务或消息消费线程中，原始 Web 请求上下文通常不存在，需要显式传递上下文，而不能假设 ThreadLocal 自动跨线程传播。</p>
+<h3 id="52-超时重试与幂等">5.2 超时、重试与幂等</h3>
+<p>服务间调用必须设置连接超时和读取超时：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#85E89D">spring</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">  cloud</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">    openfeign</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">      client</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">        config</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">          default</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">            connectTimeout</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">3000</span></span>
+<span class="line"><span style="color:#85E89D">            readTimeout</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">5000</span></span>
+<span class="line"><span style="color:#85E89D">          order-center</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">            connectTimeout</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">3000</span></span>
+<span class="line"><span style="color:#85E89D">            readTimeout</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">10000</span></span></code></pre>
+<p>重试要比超时更谨慎。读接口通常更容易重试，写接口只有在具备幂等能力时才适合自动重试。对于创建订单、扣费、发券这类操作，重试策略必须和幂等键、业务状态机、去重表一起设计。</p>
+<p>OpenFeign 的底层 HTTP 客户端也与版本和依赖有关。现代 Spring Cloud OpenFeign 中常见选择是 OkHttp 或 Apache HttpClient 5。不要沿用过时的 HttpClient 4 配置。</p>
+<h2 id="6-流量治理限流熔断降级">6. 流量治理：限流、熔断、降级</h2>
+<p>微服务系统的故障往往不是单点故障，而是级联故障。一个下游服务变慢，如果上游没有超时、限流和熔断，很快会造成线程池耗尽、连接池耗尽、请求排队和整体延迟上升。</p>
+<p>流量治理通常包含三类能力：</p>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>解决的问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>限流</td>
+<td>请求过多时保护当前服务</td>
+</tr>
+<tr>
+<td>熔断</td>
+<td>下游持续失败时快速失败，避免拖垮调用方</td>
+</tr>
+<tr>
+<td>降级</td>
+<td>非核心能力失败时返回兜底结果</td>
+</tr>
+</tbody>
+</table>
+<p>在 Spring Cloud Alibaba 中，Sentinel 是常见选择。它以资源为核心，通过规则控制访问：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>请求进入资源</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>统计当前 QPS、并发、响应时间、异常比例</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>判断是否触发限流、熔断或系统保护规则</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>通过：执行业务逻辑</span></span>
+<span class="line"><span>拒绝：进入 BlockException 或 fallback</span></span></code></pre>
+<p>Feign 与 Sentinel 集成时，常见配置是：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#85E89D">feign</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">  sentinel</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">    enabled</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">true</span></span></code></pre>
+<p>如果不是 Spring Cloud Alibaba 体系，也可以使用 Spring Cloud CircuitBreaker 与 Resilience4j 来实现熔断、限流和舱壁隔离。</p>
+<h2 id="7-数据一致性不要默认上分布式事务">7. 数据一致性：不要默认上分布式事务</h2>
+<p>微服务拆分后，原来一个数据库事务能解决的问题，可能变成跨服务一致性问题。这里最重要的不是记住某个框架，而是根据业务选择一致性策略。</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>推荐策略</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>单服务单库写入</td>
+<td>本地事务</td>
+<td>最简单，也最可靠</td>
+</tr>
+<tr>
+<td>跨服务通知</td>
+<td>MQ 最终一致</td>
+<td>适合短信、积分、资源创建通知</td>
+</tr>
+<tr>
+<td>跨服务读模型</td>
+<td>CQRS / 数据冗余</td>
+<td>适合报表、列表页、聚合查询</td>
+</tr>
+<tr>
+<td>短链路强一致</td>
+<td>TCC</td>
+<td>适合资金、库存预留等核心链路</td>
+</tr>
+<tr>
+<td>长流程编排</td>
+<td>Saga</td>
+<td>适合多步骤、耗时长、可补偿的流程</td>
+</tr>
+<tr>
+<td>普通跨库事务</td>
+<td>Seata AT</td>
+<td>适合改造成本可接受、热点冲突不高的场景</td>
+</tr>
+</tbody>
+</table>
+<p>AT、TCC、Saga 没有绝对优劣，只有适用边界。</p>
+<p>TCC 的本质是资源预留：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>Try：检查并预留资源</span></span>
+<span class="line"><span>Confirm：确认使用预留资源</span></span>
+<span class="line"><span>Cancel：释放预留资源</span></span></code></pre>
+<p>它需要处理幂等、空回滚和悬挂问题，开发成本高，但在资金类链路中可控性更强。</p>
+<p>Saga 的本质是正向执行和反向补偿：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>创建订单 → 扣余额 → 创建资源 → 绑定资源</span></span>
+<span class="line"><span>                         ↓ 失败</span></span>
+<span class="line"><span>释放资源 ← 退余额 ← 取消订单</span></span></code></pre>
+<p>它适合长流程，但补偿并不等于回到“从未发生过”的状态，因此业务上必须允许补偿语义。</p>
+<p>对于大量普通业务，最常用的仍然是本地消息表、事务消息、Outbox Pattern、幂等消费和补偿任务组合出来的最终一致方案。</p>
+<h2 id="8-可观测性日志指标链路追踪">8. 可观测性：日志、指标、链路追踪</h2>
+<p>微服务系统一旦拆分，排障难度会明显上升。生产系统必须具备三类观测能力。</p>
+<h3 id="81-日志">8.1 日志</h3>
+<p>日志要能回答“这次请求发生了什么”。关键是统一 TraceId，并在 Gateway、业务服务、Feign 调用、MQ 消息中持续传递。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>[gateway] traceId=abc123 path=/api/orders status=200</span></span>
+<span class="line"><span>[order]   traceId=abc123 create order success orderId=1001</span></span>
+<span class="line"><span>[pay]     traceId=abc123 freeze balance success userId=8</span></span></code></pre>
+<h3 id="82-指标">8.2 指标</h3>
+<p>指标要能回答“系统现在是否健康”。常见分层如下：</p>
+<ul>
+<li>业务指标：订单成功率、支付转化率、注册量。</li>
+<li>应用指标：QPS、错误率、P95/P99 延迟、线程池、连接池、JVM。</li>
+<li>基础设施指标：CPU、内存、磁盘、网络、Pod 重启、Redis/MySQL 状态。</li>
+</ul>
+<p>服务监控常用 RED 方法：Rate、Errors、Duration。基础设施监控常用 USE 方法：Utilization、Saturation、Errors。</p>
+<h3 id="83-链路追踪">8.3 链路追踪</h3>
+<p>链路追踪要能回答“一次请求在多个服务之间怎么走，慢在哪里”。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>Trace abc123</span></span>
+<span class="line"><span>├── Gateway 5ms</span></span>
+<span class="line"><span>├── OrderService.createOrder 120ms</span></span>
+<span class="line"><span>│   ├── AccountService.freeze 35ms</span></span>
+<span class="line"><span>│   ├── InventoryService.reserve 28ms</span></span>
+<span class="line"><span>│   └── MySQL insert 15ms</span></span>
+<span class="line"><span>└── MQ publish 8ms</span></span></code></pre>
+<p>在 Spring Boot 3.x 之后，Micrometer Observation、Micrometer Tracing 和 OpenTelemetry 逐渐成为更通用的观测基础。Zipkin、Jaeger、Tempo、SkyWalking 等可以作为链路数据的后端或展示平台。SkyWalking 常见做法是 Java Agent 自动增强；Zipkin 更常作为追踪数据收集和展示后端。</p>
+<h2 id="9-发布治理让变更可控">9. 发布治理：让变更可控</h2>
+<p>微服务的发布频率通常高于单体系统，因此发布治理必须前置设计。</p>
+<h3 id="91-滚动更新">9.1 滚动更新</h3>
+<p>Kubernetes 中常见滚动更新配置：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#85E89D">spec</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">  strategy</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">    type</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">RollingUpdate</span></span>
+<span class="line"><span style="color:#85E89D">    rollingUpdate</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">      maxSurge</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">1</span></span>
+<span class="line"><span style="color:#85E89D">      maxUnavailable</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">0</span></span></code></pre>
+<p>滚动更新必须配合：</p>
+<ul>
+<li><code>readinessProbe</code>：新实例就绪后再接流量。</li>
+<li><code>livenessProbe</code>：实例异常时自动恢复。</li>
+<li><code>preStop</code>：终止前留出下线和请求处理时间。</li>
+<li>优雅停机：让应用停止接收新请求，并等待存量请求完成。</li>
+</ul>
+<p>示例：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#85E89D">lifecycle</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">  preStop</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">    exec</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">      command</span><span style="color:#E1E4E8">: [</span><span style="color:#9ECBFF">"sh"</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"-c"</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"sleep 15"</span><span style="color:#E1E4E8">]</span></span></code></pre>
+<p><code>sleep 15</code> 只是最简化做法。更完整的方案应该包括应用优雅停机、注册中心摘除、负载均衡缓存刷新和最大终止时间控制。</p>
+<h3 id="92-灰度发布">9.2 灰度发布</h3>
+<p>灰度发布可以按权重、用户标签、租户、Header 或地域逐步放量：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>方案一：Gateway 权重路由</span></span>
+<span class="line"><span>90% 流量 → v1</span></span>
+<span class="line"><span>10% 流量 → v2</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>方案二：Header 精准灰度</span></span>
+<span class="line"><span>X-Gray-Tag=internal → v2</span></span>
+<span class="line"><span>其他请求 → v1</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>方案三：全链路灰度</span></span>
+<span class="line"><span>Gateway 识别灰度标记</span></span>
+<span class="line"><span>        ↓</span></span>
+<span class="line"><span>Feign / LoadBalancer 继续传递并选择对应版本实例</span></span>
+<span class="line"><span>        ↓</span></span>
+<span class="line"><span>整条调用链保持版本一致</span></span></code></pre>
+<p>全链路灰度的难点不在 Gateway，而在服务间调用也要识别灰度上下文，否则入口进入了 v2，内部调用又回到 v1，容易出现版本混用。</p>
+<h2 id="10-容量规划与故障处理">10. 容量规划与故障处理</h2>
+<p>容量规划不能只看平均 QPS。更可靠的方式是通过压测确定单实例能力，再预留余量：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>单 Pod 压测能力：500 QPS，P99 &#x3C; 200ms</span></span>
+<span class="line"><span>预留 30% 余量：有效能力 = 500 × 0.7 = 350 QPS</span></span>
+<span class="line"><span>业务峰值：2000 QPS</span></span>
+<span class="line"><span>所需 Pod：ceil(2000 / 350) = 6</span></span>
+<span class="line"><span>再加冗余：7 个 Pod</span></span></code></pre>
+<p>连接池、线程池、队列长度也应该随着容量一起评估。很多线上故障不是 CPU 不够，而是数据库连接池、HTTP 连接池、Redis 连接池、线程池队列先被打满。</p>
+<p>故障处理的优先级是先止血，再定位：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>1. 止血：限流、降级、扩容、重启、回滚、摘除异常实例</span></span>
+<span class="line"><span>2. 评估：影响范围、错误率、数据一致性、资金风险</span></span>
+<span class="line"><span>3. 定位：时间线、监控、日志、链路追踪、代码变更</span></span>
+<span class="line"><span>4. 复盘：根因、为什么没提前发现、如何防止复发</span></span></code></pre>
+<p>故障期间不应把时间耗在证明根因上。先恢复服务，再基于证据链做根因分析。</p>
+<h2 id="11-常见误区">11. 常见误区</h2>
+<h3 id="111-把微服务当成默认架构">11.1 把微服务当成默认架构</h3>
+<p>微服务会引入网络调用、服务治理、分布式事务、观测、发布和运维复杂度。如果这些复杂度超过了拆分收益，模块化单体是更好的选择。</p>
+<h3 id="112-只拆服务不拆数据边界">11.2 只拆服务，不拆数据边界</h3>
+<p>两个服务如果仍然共享数据库表，本质上没有形成真正的服务边界。更合理的方式是各服务拥有自己的数据，通过 API、事件或查询模型协作。</p>
+<h3 id="113-无限制同步调用">11.3 无限制同步调用</h3>
+<p>同步调用链越长，整体可用性越低。一个入口请求如果依赖五六个下游同步成功，任何一个节点变慢都会拖慢整个链路。对非核心动作，应优先考虑异步化。</p>
+<h3 id="114-网关承载业务逻辑">11.4 网关承载业务逻辑</h3>
+<p>网关应该做入口治理，不应该成为复杂业务规则中心。否则业务变更会频繁影响网关，入口层故障影响面也会被放大。</p>
+<h3 id="115-只有日志没有指标和链路">11.5 只有日志，没有指标和链路</h3>
+<p>日志适合解释细节，指标适合发现异常，链路追踪适合定位跨服务耗时。只靠日志排查微服务故障，效率会很低。</p>
+<h2 id="12-生产落地检查清单">12. 生产落地检查清单</h2>
+<p>一套 Spring Cloud 微服务体系至少应检查以下问题：</p>
+<ul>
+<li>服务边界是否按业务能力拆分，而不是按 Controller、Service、DAO 技术层拆分。</li>
+<li>Gateway 是否只承担入口治理，是否避免阻塞操作。</li>
+<li>所有服务间调用是否设置连接超时、读取超时和合理的重试策略。</li>
+<li>写接口是否具备幂等能力，是否有幂等键或状态机保护。</li>
+<li>是否有统一 TraceId，并贯穿 HTTP、Feign、MQ、日志。</li>
+<li>是否接入 QPS、错误率、延迟、JVM、线程池、连接池等指标。</li>
+<li>是否有熔断、限流、降级策略，且规则经过压测验证。</li>
+<li>配置动态刷新是否避开连接池、线程池等有状态资源的简单热替换。</li>
+<li>发布是否具备 readinessProbe、preStop、优雅停机和回滚能力。</li>
+<li>跨服务一致性是否明确选择了本地事务、最终一致、TCC、Saga 或 AT，而不是默认使用分布式事务。</li>
+</ul>
+<h2 id="总结">总结</h2>
+<p>Spring Cloud 微服务架构的重点不在于记住每个组件怎么配置，而在于理解拆分之后系统会新增哪些工程问题：服务如何发现，流量如何进入，调用如何治理，失败如何隔离，数据如何一致，变更如何发布，故障如何定位。</p>
+<p>组件选型会随着版本演进而变化，但架构问题长期存在。把 Spring Cloud 看作一套“分布式系统工程能力”，比把它看作一组组件清单更接近真实生产环境。</p>
+<h2 id="参考资料">参考资料</h2>
+<ul>
+<li><a href="https://docs.spring.io/spring-cloud-gateway/reference/">Spring Cloud Gateway Reference</a></li>
+<li><a href="https://docs.spring.io/spring-cloud-openfeign/reference/">Spring Cloud OpenFeign Reference</a></li>
+<li><a href="https://docs.spring.io/spring-cloud-commons/reference/spring-cloud-commons/loadbalancer.html">Spring Cloud Commons LoadBalancer</a></li>
+<li><a href="https://sca.aliyun.com/en/docs/2025.x/overview/what-is-sca/">Spring Cloud Alibaba</a></li>
+<li><a href="https://nacos.io/docs/latest/what-is-nacos/">Nacos Documentation</a></li>
+<li><a href="https://sentinelguard.io/en-us/docs/introduction.html">Sentinel Documentation</a></li>
+<li><a href="https://seata.apache.org/docs/overview/what-is-seata/">Seata Documentation</a></li>
+<li><a href="https://docs.spring.io/spring-boot/reference/actuator/observability.html">Spring Boot Observability</a></li>
+</ul>
+</div></article></main><footer data-astro-cid-jo6i4kqk><div data-astro-cid-jo6i4kqk>Goppop 的博客</div><p data-astro-cid-jo6i4kqk>&copy; 2026 Goppop. 记录技术学习、系统设计和长期思考。</p></footer></body></html>

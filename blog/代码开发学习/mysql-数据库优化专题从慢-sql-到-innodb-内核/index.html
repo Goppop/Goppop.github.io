@@ -1,0 +1,663 @@
+<!DOCTYPE html><html lang="zh-CN" data-astro-cid-tldeq5d5><head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" href="/favicon.ico"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Goppop 的博客" href="https://goppop.github.io/rss.xml"><meta name="generator" content="Astro v7.0.3"><style>@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/7443039bbc50ce9a.woff") format("woff");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Atkinson-c7f4c4e8b285552f;src:url("/_astro/fonts/0edeceb0e4e5adfc.woff") format("woff");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.3717%;ascent-override:80.1033%;descent-override:25.2587%;line-gap-override:0%;}@font-face{font-family:"Atkinson-c7f4c4e8b285552f fallback: Arial Bold";src:local("Arial Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:92.2954%;ascent-override:86.2448%;descent-override:27.1953%;line-gap-override:0%;}:root{--font-atkinson:Atkinson-c7f4c4e8b285552f,"Atkinson-c7f4c4e8b285552f fallback: Arial","Atkinson-c7f4c4e8b285552f fallback: Arial Bold",sans-serif;}</style><link rel="preload" href="/_astro/fonts/7443039bbc50ce9a.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/_astro/fonts/0edeceb0e4e5adfc.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/mysql-%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BC%98%E5%8C%96%E4%B8%93%E9%A2%98%E4%BB%8E%E6%85%A2-sql-%E5%88%B0-innodb-%E5%86%85%E6%A0%B8/"><!-- Primary Meta Tags --><title>MySQL 数据库优化专题：从慢 SQL 到 InnoDB 内核</title><meta name="description" content="从阿里云慢 SQL 监控出发，系统梳理 MySQL 优化闭环、索引设计、执行计划、事务锁和 InnoDB 内核机制。"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/mysql-%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BC%98%E5%8C%96%E4%B8%93%E9%A2%98%E4%BB%8E%E6%85%A2-sql-%E5%88%B0-innodb-%E5%86%85%E6%A0%B8/"><meta property="og:title" content="MySQL 数据库优化专题：从慢 SQL 到 InnoDB 内核"><meta property="og:description" content="从阿里云慢 SQL 监控出发，系统梳理 MySQL 优化闭环、索引设计、执行计划、事务锁和 InnoDB 内核机制。"><meta property="og:image" content="https://goppop.github.io/_astro/blog-placeholder-1.Bx0Zcyzv.jpg"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://goppop.github.io/blog/%E4%BB%A3%E7%A0%81%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0/mysql-%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BC%98%E5%8C%96%E4%B8%93%E9%A2%98%E4%BB%8E%E6%85%A2-sql-%E5%88%B0-innodb-%E5%86%85%E6%A0%B8/"><meta property="twitter:title" content="MySQL 数据库优化专题：从慢 SQL 到 InnoDB 内核"><meta property="twitter:description" content="从阿里云慢 SQL 监控出发，系统梳理 MySQL 优化闭环、索引设计、执行计划、事务锁和 InnoDB 内核机制。"><meta property="twitter:image" content="https://goppop.github.io/_astro/blog-placeholder-1.Bx0Zcyzv.jpg"><link rel="stylesheet" href="/_astro/Header.DHc1oVwj.css"><style>main[data-astro-cid-tldeq5d5]{width:100%;max-width:none;margin:0;padding:0}.article-shell[data-astro-cid-tldeq5d5]{max-width:1120px;margin:0 auto;padding:3rem 1rem 1rem}.article-head[data-astro-cid-tldeq5d5]{border-bottom:1px solid #e1d2bbe6;grid-template-columns:minmax(0,1fr) 260px;align-items:end;gap:1.5rem;padding-bottom:1.4rem;display:grid}.title[data-astro-cid-tldeq5d5]{margin:0;line-height:1}.title[data-astro-cid-tldeq5d5] h1[data-astro-cid-tldeq5d5]{max-width:12em;color:var(--accent-dark);margin:0;font-size:3.6rem;line-height:1.08}.date-card[data-astro-cid-tldeq5d5]{color:var(--muted);background:#fff9eeb3;border-radius:8px;padding:1rem;font-size:.9rem;box-shadow:0 12px 28px #58422314}.date-card[data-astro-cid-tldeq5d5] strong[data-astro-cid-tldeq5d5]{color:var(--clay);letter-spacing:0;text-transform:uppercase;margin-bottom:.4rem;font-size:.82rem;display:block}.last-updated-on[data-astro-cid-tldeq5d5]{border-top:1px solid #e1d2bbc7;margin-top:.8rem;padding-top:.8rem}.meta-row[data-astro-cid-tldeq5d5]{flex-wrap:wrap;gap:.55rem;margin-top:1rem;display:flex}.hero-image[data-astro-cid-tldeq5d5]{width:100%;max-width:1120px;margin:2rem auto 0}.hero-image[data-astro-cid-tldeq5d5] img[data-astro-cid-tldeq5d5]{box-shadow:var(--box-shadow);border-radius:6px;margin:0 auto;display:block}.prose[data-astro-cid-tldeq5d5]{width:780px;max-width:100%;color:var(--ink);margin:2.2rem auto 0;padding:0 1rem}.prose[data-astro-cid-tldeq5d5] h2{border-top:1px solid var(--line);margin-top:3.4rem;padding-top:1rem}.prose[data-astro-cid-tldeq5d5] h2:first-child{border-top:0;margin-top:0;padding-top:0}.prose[data-astro-cid-tldeq5d5] h3{color:var(--accent-dark)}.prose[data-astro-cid-tldeq5d5] p,.prose[data-astro-cid-tldeq5d5] li{font-size:1.02rem}.prose[data-astro-cid-tldeq5d5] ul,.prose[data-astro-cid-tldeq5d5] ol{padding-left:1.4rem}.prose[data-astro-cid-tldeq5d5] table{display:block;overflow-x:auto}.prose[data-astro-cid-tldeq5d5] li+li{margin-top:.35rem}@media (width<=820px){.article-shell[data-astro-cid-tldeq5d5]{padding:2rem .75rem 1rem}.article-head[data-astro-cid-tldeq5d5]{grid-template-columns:1fr}.title[data-astro-cid-tldeq5d5] h1[data-astro-cid-tldeq5d5]{font-size:2.25rem}.prose[data-astro-cid-tldeq5d5]{margin-top:2rem;padding:0 .75rem}}
+</style></head><body data-astro-cid-tldeq5d5><header data-astro-cid-nen7h5rs><nav data-astro-cid-nen7h5rs><a class="brand" href="/" data-astro-cid-nen7h5rs>Goppop 的博客</a><div class="internal-links" data-astro-cid-nen7h5rs><a href="/" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>首页</a><a href="/blog" class="active" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>文章</a><a href="/knowledge" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>知识库</a><a href="/about" data-astro-cid-nen7h5rs="true" data-astro-cid-evkijfd6>关于</a></div><div class="social-links" data-astro-cid-nen7h5rs><a href="https://github.com/Goppop" target="_blank" data-astro-cid-nen7h5rs><span class="sr-only" data-astro-cid-nen7h5rs>Goppop GitHub</span><svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" data-astro-cid-nen7h5rs><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" data-astro-cid-nen7h5rs></path></svg></a></div></nav></header><main data-astro-cid-tldeq5d5><article data-astro-cid-tldeq5d5><div class="article-shell" data-astro-cid-tldeq5d5><header class="article-head" data-astro-cid-tldeq5d5><div class="title" data-astro-cid-tldeq5d5><p class="eyebrow" data-astro-cid-tldeq5d5>Article</p><h1 data-astro-cid-tldeq5d5>MySQL 数据库优化专题：从慢 SQL 到 InnoDB 内核</h1><div class="meta-row" data-astro-cid-tldeq5d5><a class="label" href="/knowledge/database/" data-astro-cid-tldeq5d5>数据库</a><a class="label" href="/knowledge/database/mysql-optimization/" data-astro-cid-tldeq5d5>MySQL 优化</a><span class="label" data-astro-cid-tldeq5d5>代码开发学习</span><span class="label" data-astro-cid-tldeq5d5>MySQL</span><span class="label" data-astro-cid-tldeq5d5>SQL 优化</span><span class="label" data-astro-cid-tldeq5d5>数据库</span><span class="label" data-astro-cid-tldeq5d5>InnoDB</span></div></div><aside class="date-card" aria-label="文章日期" data-astro-cid-tldeq5d5><strong data-astro-cid-tldeq5d5>Published</strong><time datetime="2026-07-02T00:00:00.000Z">Jul 2, 2026</time><div class="last-updated-on" data-astro-cid-tldeq5d5><strong data-astro-cid-tldeq5d5>Updated</strong><time datetime="2026-07-02T00:00:00.000Z">Jul 2, 2026</time></div></aside></header></div><div class="prose" data-astro-cid-tldeq5d5><h1 id="mysql-数据库优化专题从慢-sql-到-innodb-内核">MySQL 数据库优化专题：从慢 SQL 到 InnoDB 内核</h1>
+<h2 id="摘要">摘要</h2>
+<p>数据库优化并非单一参数调节或索引补充问题，而是一个由负载观测、执行计划解释、存储引擎机制、事务并发控制和架构治理共同构成的系统性工程问题。对于应用系统而言，最直接的优化入口通常来自线上慢 SQL：阿里云 RDS / PolarDB 的 SQL 洞察、慢 SQL 统计和性能趋势图能够提供执行次数、平均耗时、最大耗时、扫描行数、返回行数、锁等待、CPU 与 IO 趋势等基础证据。</p>
+<p>然而，监控系统只能指出“哪些 SQL 出现异常”，并不能直接回答“异常为何产生”以及“何种修改具有最小风险和最大收益”。因此，数据库优化必须建立从现象采集到机制解释、从局部改写到系统验证的分析链条。</p>
+<p>本文以 MySQL 8.0+ 与 InnoDB 存储引擎为主要对象，围绕慢 SQL 识别、执行计划分析、索引设计、Buffer Pool、Redo / Undo Log、MVCC、锁机制、大表治理和在线 DDL 等主题展开论述。文章的目的不是罗列优化技巧，而是建立一套可复用的数据库性能分析框架。</p>
+<h2 id="引言研究对象与分析路径">引言：研究对象与分析路径</h2>
+<p>本文讨论的核心问题可以表述为：</p>
+<blockquote>
+<p>当业务系统通过阿里云 SQL 监控发现慢 SQL 后，如何基于执行计划和 InnoDB 内部机制判断瓶颈来源，并选择可验证、可回滚、可持续治理的优化方案？</p>
+</blockquote>
+<p>为回答该问题，全文按以下路径展开：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>慢 SQL 监控</span></span>
+<span class="line"><span>  → 执行计划分析</span></span>
+<span class="line"><span>  → 索引与 SQL 改写</span></span>
+<span class="line"><span>  → InnoDB 存储与日志机制</span></span>
+<span class="line"><span>  → 事务隔离与锁等待</span></span>
+<span class="line"><span>  → 大表治理与架构演进</span></span>
+<span class="line"><span>  → 诊断 SQL 与决策树</span></span></code></pre>
+<p>需要说明的是，不同 MySQL 版本、云数据库产品形态、参数配置和业务负载会影响具体结论。本文给出的是分析框架和工程推理路径，而不是可无条件套用的配置模板。</p>
+<h2 id="1-从阿里云慢-sql-监控开始">1. 从阿里云慢 SQL 监控开始</h2>
+<p>在真实生产环境中，数据库性能问题通常首先表现为接口响应时间上升、慢查询告警增加、CPU 利用率异常、连接池耗尽或锁等待堆积。阿里云 SQL 监控的价值在于将这些现象具象化为可分析的 SQL 样本和实例级指标。</p>
+<p>基于慢 SQL 样本的优化流程可以抽象为：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>SQL 监控发现慢 SQL</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>确认影响：执行次数、平均耗时、最大耗时、扫描行数、返回行数</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>拿到 SQL、表结构、索引、数据量、查询参数分布</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>EXPLAIN / EXPLAIN ANALYZE 分析执行计划</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>判断瓶颈：索引、排序、临时表、锁等待、IO、返回数据量</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>修改 SQL / 索引 / 表结构 / 访问模式</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>测试环境验证执行计划和耗时</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>灰度上线，继续观察慢 SQL、CPU、IO、锁等待、Buffer Pool</span></span></code></pre>
+<p>这一流程强调两个原则。第一，优化动作必须由证据驱动，而不是由经验规则直接驱动。第二，任何修改都必须经过执行计划、耗时和资源指标的复核。相同的慢 SQL 现象可能由不同原因触发：缺失索引、联合索引顺序不合理、数据量超过热数据边界、锁等待、统计信息失真、Buffer Pool 被大范围扫描污染，或者应用侧调用频率过高。</p>
+<h2 id="2-sql-延迟的构成">2. SQL 延迟的构成</h2>
+<p>SQL 延迟不是单点因素，而是多个阶段成本的叠加。一个查询请求从应用发出到结果返回，通常包含以下组成部分：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>SQL 总耗时 =</span></span>
+<span class="line"><span>  网络传输</span></span>
+<span class="line"><span>+ 连接排队</span></span>
+<span class="line"><span>+ 解析与优化</span></span>
+<span class="line"><span>+ 锁等待</span></span>
+<span class="line"><span>+ 数据读取</span></span>
+<span class="line"><span>+ 过滤与计算</span></span>
+<span class="line"><span>+ 排序 / 分组 / 临时表</span></span>
+<span class="line"><span>+ 结果返回</span></span></code></pre>
+<p>不同成本项对应的优化策略并不相同：</p>
+<table>
+<thead>
+<tr>
+<th>慢的原因</th>
+<th>常见表现</th>
+<th>优先处理方向</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>扫描行太多</td>
+<td><code>rows</code> 很大，返回行很少</td>
+<td>建索引、改写条件、减少扫描范围</td>
+</tr>
+<tr>
+<td>没走合适索引</td>
+<td><code>type=ALL</code> 或 <code>index</code></td>
+<td>调整索引顺序、避免索引失效</td>
+</tr>
+<tr>
+<td>排序成本高</td>
+<td><code>Using filesort</code></td>
+<td>让索引同时服务过滤和排序</td>
+</tr>
+<tr>
+<td>临时表成本高</td>
+<td><code>Using temporary</code></td>
+<td>减少分组数据量，优化 GROUP BY</td>
+</tr>
+<tr>
+<td>锁等待</td>
+<td>SQL 本身不复杂但耗时长</td>
+<td>查事务、锁等待、死锁、长事务</td>
+</tr>
+<tr>
+<td>返回数据过多</td>
+<td>扫描和返回都很大</td>
+<td>分页、字段裁剪、冷热拆分</td>
+</tr>
+<tr>
+<td>IO 压力大</td>
+<td>磁盘读写高，Buffer Pool 命中率低</td>
+<td>扩内存、减少扫描、归档冷数据</td>
+</tr>
+</tbody>
+</table>
+<p>因此，慢 SQL 分析的第一步不是添加索引，而是判定主要瓶颈类型。索引只能解决访问路径问题，不能直接解决锁等待、连接池堆积、返回数据过大或实例级 IO 饱和等问题。</p>
+<h2 id="3-慢-sql-分析闭环">3. 慢 SQL 分析闭环</h2>
+<h3 id="31-采集">3.1 采集</h3>
+<p>慢 SQL 的证据来源通常包括三类：</p>
+<ul>
+<li>慢查询日志：适合离线分析 Top SQL。</li>
+<li><code>performance_schema</code> / <code>sys</code>：适合看当前实例运行状态。</li>
+<li>APM / 业务埋点：适合把 SQL 耗时和接口耗时关联起来。</li>
+</ul>
+<p>慢查询日志或云监控仅提供问题样本；根因判断还依赖表结构、索引定义、数据分布、执行计划、运行时锁状态以及实例资源指标。孤立地观察 SQL 文本，通常无法得到可靠结论。</p>
+<h3 id="32-分析">3.2 分析</h3>
+<p>对单条 SQL，最常用的是：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#E1E4E8">EXPLAIN </span><span style="color:#F97583">SELECT</span><span style="color:#E1E4E8"> ...</span></span></code></pre>
+<p>MySQL 8.0 以后还可以使用：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#E1E4E8">EXPLAIN ANALYZE </span><span style="color:#F97583">SELECT</span><span style="color:#E1E4E8"> ...</span></span></code></pre>
+<p><code>EXPLAIN ANALYZE</code> 会实际执行 SQL，并输出执行过程中每个节点的实际耗时和行数。它更接近真实情况，但因为会执行 SQL，生产环境要谨慎使用，尤其是写语句或大查询。</p>
+<h3 id="33-判断">3.3 判断</h3>
+<p>阅读执行计划的重点不在于机械记忆字段含义，而在于回答以下问题：</p>
+<ul>
+<li>驱动表选得对不对？</li>
+<li>访问类型是全表扫描、索引扫描，还是范围扫描？</li>
+<li>预估扫描行数和实际返回行数差距大不大？</li>
+<li>是否出现临时表或文件排序？</li>
+<li>联合索引是否同时服务了过滤、排序和分组？</li>
+<li>是否有隐式类型转换、函数计算、前导模糊匹配导致索引失效？</li>
+</ul>
+<h3 id="34-修改">3.4 修改</h3>
+<p>优化动作可以按照工程成本和风险从低到高排列：</p>
+<ol>
+<li>改 SQL 写法：减少 <code>SELECT *</code>、避免函数包裹索引列、拆分复杂查询。</li>
+<li>加或调整索引：联合索引顺序、覆盖索引、删除冗余索引。</li>
+<li>改访问模式：游标分页、缓存、异步化、预聚合。</li>
+<li>改表结构：字段拆分、冷热分离、分区、归档。</li>
+<li>改架构：读写分离、分库分表、搜索引擎、OLAP 系统。</li>
+</ol>
+<p>越靠后的方案，对系统结构的影响越大，也越需要灰度、回滚和监控验证。对于线上数据库而言，“可恢复性”与“可验证性”应当与性能收益同等重要。</p>
+<h2 id="4-索引设计的基本原则">4. 索引设计的基本原则</h2>
+<p>索引是数据库以空间成本和写入维护成本换取读取效率的结构化冗余。索引并非越多越好。过量索引会增加写入、更新和删除成本，占用 Buffer Pool，并可能使优化器选择空间变得更复杂。</p>
+<h3 id="41-btree-为什么适合-mysql">4.1 B+Tree 为什么适合 MySQL</h3>
+<p>InnoDB 的主流索引结构是 B+Tree。其适用性来自磁盘数据库的基本约束：随机 IO 成本远高于内存访问成本，而 B+Tree 通过多路平衡结构显著降低树高，从而减少访问路径上的页读取次数。</p>
+<p>在默认 16KB 页大小下，一个非叶子页可以容纳大量索引项。实际查询过程中，根节点和中间层索引页通常具有较高缓存命中率，磁盘访问压力主要集中在叶子页和回表读取上。</p>
+<p>B+Tree 的结构特征直接决定了多项索引设计规则：</p>
+<ul>
+<li>非叶子节点只存 key 和指针，树高低。</li>
+<li>叶子节点按 key 有序，适合范围查询。</li>
+<li>叶子节点之间有链表，适合顺序扫描。</li>
+<li>索引列顺序决定了能否利用最左前缀。</li>
+</ul>
+<h3 id="42-联合索引的设计原则">4.2 联合索引的设计原则</h3>
+<p>联合索引设计时，可以按这个顺序思考：</p>
+<ol>
+<li>等值条件优先放前面。</li>
+<li>区分度高的列通常更适合靠前，但不是绝对。</li>
+<li>范围条件之后的列，通常不能继续用于索引过滤。</li>
+<li>如果查询需要排序，尽量让索引顺序同时满足 <code>ORDER BY</code>。</li>
+<li>高频查询可以考虑覆盖索引，减少回表。</li>
+</ol>
+<p>例如：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#F97583">SELECT</span><span style="color:#E1E4E8"> id, order_no, amount</span></span>
+<span class="line"><span style="color:#F97583">FROM</span><span style="color:#E1E4E8"> orders</span></span>
+<span class="line"><span style="color:#F97583">WHERE</span><span style="color:#E1E4E8"> user_id </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> ?</span></span>
+<span class="line"><span style="color:#F97583">  AND</span><span style="color:#F97583"> status</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> ?</span></span>
+<span class="line"><span style="color:#F97583">  AND</span><span style="color:#E1E4E8"> create_time </span><span style="color:#F97583">>=</span><span style="color:#E1E4E8"> ?</span></span>
+<span class="line"><span style="color:#F97583">ORDER BY</span><span style="color:#E1E4E8"> create_time </span><span style="color:#F97583">DESC</span></span>
+<span class="line"><span style="color:#F97583">LIMIT</span><span style="color:#79B8FF"> 20</span><span style="color:#E1E4E8">;</span></span></code></pre>
+<p>可能适合的索引是：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#F97583">CREATE</span><span style="color:#F97583"> INDEX</span><span style="color:#B392F0"> idx_user_status_time</span></span>
+<span class="line"><span style="color:#F97583">ON</span><span style="color:#E1E4E8"> orders (user_id, </span><span style="color:#F97583">status</span><span style="color:#E1E4E8">, create_time);</span></span></code></pre>
+<p>如果查询只需要 <code>id、order_no、amount</code>，还可以评估是否值得扩展成覆盖索引：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#F97583">CREATE</span><span style="color:#F97583"> INDEX</span><span style="color:#B392F0"> idx_user_status_time_cover</span></span>
+<span class="line"><span style="color:#F97583">ON</span><span style="color:#E1E4E8"> orders (user_id, </span><span style="color:#F97583">status</span><span style="color:#E1E4E8">, create_time, order_no, amount);</span></span></code></pre>
+<p>覆盖索引能减少回表，但会让索引更大，写入更慢。是否值得，需要看查询频率和写入压力。</p>
+<h3 id="43-常见索引失效场景">4.3 常见索引失效场景</h3>
+<p>常见问题包括：</p>
+<ul>
+<li>对索引列使用函数：<code>DATE(create_time) = '2026-07-02'</code></li>
+<li>隐式类型转换：字符串列用数字条件查询。</li>
+<li>前导模糊匹配：<code>LIKE '%abc'</code></li>
+<li>范围条件之后继续期待后续列生效。</li>
+<li><code>OR</code> 条件两侧索引设计不一致。</li>
+<li>统计信息不准导致优化器选错索引。</li>
+</ul>
+<p>很多“索引失效”不是 MySQL 不使用索引，而是索引用得不充分。分析时要看扫描行数，而不是只看 <code>key</code> 字段有没有值。</p>
+<h2 id="5-innodb-存储与内存结构">5. InnoDB 存储与内存结构</h2>
+<p>SQL 优化之所以不能停留在语法层面，是因为执行成本最终会落到页读取、缓存命中、索引维护和磁盘刷写等存储引擎行为上。InnoDB 的若干核心结构决定了许多优化结论的边界。</p>
+<h3 id="51-页与行记录">5.1 页与行记录</h3>
+<p>InnoDB 以页为基本管理单位，默认页大小为 16KB。数据页中包含页头、用户记录、空闲空间、页目录以及校验信息。用户记录按主键顺序组织，页目录用于支持页内查找，叶子页之间通过指针形成有序链表。</p>
+<p>这一结构意味着：查询并不是逐行从磁盘读取，而是以页为单位读取。若查询条件无法有效缩小范围，即使最终只返回少量记录，也可能读取大量无关页。</p>
+<h3 id="52-buffer-pool">5.2 Buffer Pool</h3>
+<p>Buffer Pool 是 InnoDB 最核心的内存结构。数据页和索引页在访问时会先进入 Buffer Pool；命中时直接从内存返回，未命中时才访问磁盘。</p>
+<p>相关指标如下：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#E1E4E8">SHOW </span><span style="color:#F97583">GLOBAL</span><span style="color:#F97583"> STATUS</span><span style="color:#F97583"> LIKE</span><span style="color:#9ECBFF"> 'Innodb_buffer_pool_read_requests'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">SHOW </span><span style="color:#F97583">GLOBAL</span><span style="color:#F97583"> STATUS</span><span style="color:#F97583"> LIKE</span><span style="color:#9ECBFF"> 'Innodb_buffer_pool_reads'</span><span style="color:#E1E4E8">;</span></span></code></pre>
+<p>粗略命中率可以表示为：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>命中率 = 1 - Innodb_buffer_pool_reads / Innodb_buffer_pool_read_requests</span></span></code></pre>
+<p>Buffer Pool 命中率下降并不必然意味着只能扩容内存。低效索引、全表扫描、深分页、大量冷数据混在主表中，都会降低缓存的有效性。因此，缓存治理与 SQL 改写、索引设计、冷热分离之间存在直接关联。</p>
+<h3 id="53-change-buffer">5.3 Change Buffer</h3>
+<p>对于非唯一二级索引的写入，如果目标索引页不在 Buffer Pool 中，InnoDB 可以先将变更记录到 Change Buffer，待后续读取该页或后台合并时再写入真实索引页。</p>
+<p>该机制通过延迟合并减少随机读，但只适用于非唯一二级索引。唯一索引必须立即判断唯一性，因此无法以相同方式推迟校验。</p>
+<p>由此可得出一个工程推论：索引不仅影响查询，也影响写入路径。写多读少的表若存在大量二级索引或唯一索引，写入成本会显著上升。</p>
+<h3 id="54-自适应哈希索引">5.4 自适应哈希索引</h3>
+<p>Adaptive Hash Index 是 InnoDB 针对部分高频等值访问自动建立的内存哈希结构。它可以在特定访问模式下减少 B+Tree 查找成本，但也会占用内存并引入并发维护开销。</p>
+<p>因此，自适应哈希索引不是必然收益项。是否开启应依据实际负载、等待事件和性能指标判断，而不应作为固定调优动作。</p>
+<h2 id="6-大表治理与架构级优化">6. 大表治理与架构级优化</h2>
+<p>当单表规模持续增长时，分库分表并不应作为首选方案。其原因在于，分库分表会引入路由规则、分布式事务、跨分片查询、全局唯一 ID、扩容迁移和数据倾斜等额外复杂度。若 SQL、索引、冷热数据和访问模式仍存在明显优化空间，过早分片反而会放大系统复杂度。</p>
+<p>较为稳妥的治理顺序如下：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>SQL 和索引优化</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>字段裁剪和垂直拆分</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>冷热数据归档</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>分区表或历史表</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>读写分离</span></span>
+<span class="line"><span>    ↓</span></span>
+<span class="line"><span>分库分表</span></span></code></pre>
+<h3 id="61-冷热分离">6.1 冷热分离</h3>
+<p>大量业务表的数据访问具有明显时间局部性。例如订单表的大部分在线查询可能集中于最近数月。若主表长期承载多年历史数据，索引体积、缓存污染和归档成本都会持续增加。</p>
+<p>一种可行的数据生命周期分层方式如下：</p>
+<ul>
+<li>主表保留热数据。</li>
+<li>历史表或归档库存放温数据。</li>
+<li>离线系统或对象存储保存冷数据。</li>
+<li>查询入口根据时间范围路由到不同数据源。</li>
+</ul>
+<p>归档任务应具备分批、限速、可暂停和可校验能力，并持续监控主从延迟、实例负载和业务错误率。</p>
+<h3 id="62-深分页">6.2 深分页</h3>
+<p>深分页是慢 SQL 的高发来源：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#F97583">SELECT</span><span style="color:#F97583"> *</span></span>
+<span class="line"><span style="color:#F97583">FROM</span><span style="color:#E1E4E8"> orders</span></span>
+<span class="line"><span style="color:#F97583">ORDER BY</span><span style="color:#E1E4E8"> id</span></span>
+<span class="line"><span style="color:#F97583">LIMIT</span><span style="color:#79B8FF"> 1000000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">20</span><span style="color:#E1E4E8">;</span></span></code></pre>
+<p>数据库需要扫描并跳过前 1000000 行，再返回 20 行。更合理的方式是基于游标或业务有序键进行翻页：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#F97583">SELECT</span><span style="color:#F97583"> *</span></span>
+<span class="line"><span style="color:#F97583">FROM</span><span style="color:#E1E4E8"> orders</span></span>
+<span class="line"><span style="color:#F97583">WHERE</span><span style="color:#E1E4E8"> id </span><span style="color:#F97583">></span><span style="color:#E1E4E8"> ?</span></span>
+<span class="line"><span style="color:#F97583">ORDER BY</span><span style="color:#E1E4E8"> id</span></span>
+<span class="line"><span style="color:#F97583">LIMIT</span><span style="color:#79B8FF"> 20</span><span style="color:#E1E4E8">;</span></span></code></pre>
+<p>若业务必须支持任意跳页，应评估搜索引擎、页码边界缓存或交互方式调整，而不宜将全部成本转嫁给在线 MySQL 实例。</p>
+<h3 id="63-在线-ddl">6.3 在线 DDL</h3>
+<p>大表加索引、改字段、改表结构都有风险。即使 MySQL 支持 Online DDL，也可能因为 MDL 锁等待、IO 压力、主从延迟而影响业务。</p>
+<p>生产环境中常用 gh-ost 或 pt-online-schema-change 降低大表 DDL 风险。此类工具通过影子表、增量同步和最终切换减少锁表时间，但仍需满足以下约束：</p>
+<ul>
+<li>低峰执行。</li>
+<li>限制批次大小。</li>
+<li>监控主从延迟。</li>
+<li>准备回滚方案。</li>
+<li>先在预发或影子环境验证。</li>
+</ul>
+<h2 id="7-walredo-log-与-undo-log">7. WAL、Redo Log 与 Undo Log</h2>
+<p>写入性能与事务持久性之间的平衡，主要由 InnoDB 日志系统承担。InnoDB 能够在保证事务持久性的同时维持较高写入吞吐，核心原因在于 WAL 机制。</p>
+<h3 id="71-wal先写日志再写数据">7.1 WAL：先写日志，再写数据</h3>
+<p>WAL 即 Write-Ahead Logging，含义是“先写日志，再写数据”。事务提交时，InnoDB 不需要立即将数据页随机写回磁盘，而是先将物理修改写入 redo log：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>事务写入流程</span></span>
+<span class="line"><span>1. 修改 Buffer Pool 中的数据页，数据页变成脏页</span></span>
+<span class="line"><span>2. 将物理修改写入 Redo Log Buffer</span></span>
+<span class="line"><span>3. 事务提交时，将 Redo Log 按策略刷到磁盘</span></span>
+<span class="line"><span>4. 返回客户端提交成功</span></span>
+<span class="line"><span>5. 后台线程异步把脏页刷回数据文件</span></span></code></pre>
+<p>该设计将大量随机写转化为顺序写。只要 redo log 已经持久化，即使脏页尚未刷回数据文件，MySQL 崩溃后也可以通过 redo log 重放完成恢复。</p>
+<h3 id="72-redo-log-环形空间">7.2 Redo Log 环形空间</h3>
+<p>Redo Log 可以抽象为循环使用的日志空间：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>checkpoint ---------------- write pos</span></span>
+<span class="line"><span>     ↑                         ↑</span></span>
+<span class="line"><span>已刷回数据文件的位置        当前写入位置</span></span></code></pre>
+<ul>
+<li><code>write pos</code>：当前写入位置。</li>
+<li><code>checkpoint</code>：已经刷回数据文件的位置。</li>
+</ul>
+<p>当写入速度持续高于脏页刷新速度时，<code>write pos</code> 会逐渐逼近 <code>checkpoint</code>。一旦 redo log 可用空间不足，前台写入会等待刷脏页推进 checkpoint。因此，线上写入抖动不应仅观察 SQL 本身，还应同时检查 redo log 空间、脏页比例和磁盘刷写能力。</p>
+<h3 id="73-innodb_flush_log_at_trx_commit">7.3 <code>innodb_flush_log_at_trx_commit</code></h3>
+<p>这个参数影响事务提交时 redo log 的刷盘策略：</p>
+<table>
+<thead>
+<tr>
+<th>值</th>
+<th>行为</th>
+<th>性能</th>
+<th>数据安全</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>1</code></td>
+<td>每次事务提交都尽量 fsync redo log</td>
+<td>最低</td>
+<td>最安全</td>
+</tr>
+<tr>
+<td><code>2</code></td>
+<td>每次提交写入 OS 缓存，每秒 fsync</td>
+<td>较高</td>
+<td>OS 崩溃可能丢约 1 秒</td>
+</tr>
+<tr>
+<td><code>0</code></td>
+<td>每秒写入并 fsync，提交时不主动写</td>
+<td>最高</td>
+<td>MySQL 崩溃也可能丢约 1 秒</td>
+</tr>
+</tbody>
+</table>
+<p>核心交易链路通常应保持 <code>1</code>。日志、统计或可重建数据是否允许放宽，应由业务可接受的数据丢失窗口决定。</p>
+<h3 id="74-undo-log-与版本链">7.4 Undo Log 与版本链</h3>
+<p>Undo Log 记录数据修改前的旧版本，主要有两个作用：</p>
+<ul>
+<li>事务回滚时恢复旧值。</li>
+<li>MVCC 快照读时读取历史版本。</li>
+</ul>
+<p>一行数据被多次修改后，会形成版本链：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>当前行: trx_id=300, roll_pointer</span></span>
+<span class="line"><span>   ↓</span></span>
+<span class="line"><span>Undo V2: trx_id=200</span></span>
+<span class="line"><span>   ↓</span></span>
+<span class="line"><span>Undo V1: trx_id=100</span></span></code></pre>
+<p>当某个事务读取当前版本不可见时，InnoDB 会沿 undo 版本链向前查找，直到定位到对该事务可见的历史版本。</p>
+<p>长事务会阻止旧版本清理，导致 undo 表空间膨胀、版本链延长，并进一步增加快照读成本。因此，慢 SQL 排查除执行计划外，还应检查是否存在长期未提交事务。</p>
+<h2 id="8-事务隔离mvcc-与锁">8. 事务隔离、MVCC 与锁</h2>
+<p>数据库系统必须在并发读写条件下同时满足正确性与吞吐量要求。事务隔离、MVCC 与锁机制正是围绕这一矛盾建立的并发控制体系。</p>
+<h3 id="81-隔离级别">8.1 隔离级别</h3>
+<table>
+<thead>
+<tr>
+<th>隔离级别</th>
+<th>脏读</th>
+<th>不可重复读</th>
+<th>幻读</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Read Uncommitted</td>
+<td>可能</td>
+<td>可能</td>
+<td>可能</td>
+<td>很少用于业务系统</td>
+</tr>
+<tr>
+<td>Read Committed</td>
+<td>不会</td>
+<td>可能</td>
+<td>可能</td>
+<td>并发度较好</td>
+</tr>
+<tr>
+<td>Repeatable Read</td>
+<td>不会</td>
+<td>通常不会</td>
+<td>InnoDB 通过 MVCC + 锁机制处理</td>
+<td>MySQL 常见默认值</td>
+</tr>
+<tr>
+<td>Serializable</td>
+<td>不会</td>
+<td>不会</td>
+<td>不会</td>
+<td>并发度最低</td>
+</tr>
+</tbody>
+</table>
+<p>Repeatable Read 提供更稳定的事务快照，但在范围更新场景下可能引入更大的锁范围。Read Committed 的并发度通常更高，但需要应用层通过唯一约束、乐观锁、状态机和幂等机制补足业务一致性。</p>
+<h3 id="82-readview">8.2 ReadView</h3>
+<p>MVCC 的核心结构是 ReadView。执行快照读时，InnoDB 会生成读视图，其中包含当前活跃事务列表等信息，并据此判断记录版本的可见性。</p>
+<p>简化可见性判断：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>如果版本事务 ID 是当前事务自己：可见</span></span>
+<span class="line"><span>如果版本事务 ID 小于最小活跃事务 ID：可见</span></span>
+<span class="line"><span>如果版本事务 ID 大于等于下一个待分配事务 ID：不可见</span></span>
+<span class="line"><span>如果版本事务 ID 仍在活跃事务列表中：不可见</span></span>
+<span class="line"><span>否则：可见</span></span></code></pre>
+<p>RC 和 RR 的核心差异在 ReadView 生成时机：</p>
+<table>
+<thead>
+<tr>
+<th>隔离级别</th>
+<th>ReadView 生成时机</th>
+<th>效果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RC</td>
+<td>每次 SELECT 都生成新的 ReadView</td>
+<td>每次读都能看到最新已提交数据</td>
+</tr>
+<tr>
+<td>RR</td>
+<td>第一次快照读生成，事务内复用</td>
+<td>同一事务内快照稳定</td>
+</tr>
+</tbody>
+</table>
+<h3 id="83-快照读与当前读">8.3 快照读与当前读</h3>
+<p>普通 <code>SELECT</code> 是快照读，不读取最新版本，而是根据 ReadView 读取可见版本。</p>
+<p>以下操作属于当前读：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#F97583">SELECT</span><span style="color:#E1E4E8"> ... </span><span style="color:#F97583">FOR</span><span style="color:#F97583"> UPDATE</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">SELECT</span><span style="color:#E1E4E8"> ... LOCK </span><span style="color:#F97583">IN</span><span style="color:#E1E4E8"> SHARE MODE;</span></span>
+<span class="line"><span style="color:#F97583">UPDATE</span><span style="color:#E1E4E8"> ...;</span></span>
+<span class="line"><span style="color:#F97583">DELETE</span><span style="color:#E1E4E8"> ...;</span></span>
+<span class="line"><span style="color:#F97583">INSERT</span><span style="color:#E1E4E8"> ...;</span></span></code></pre>
+<p>当前读读取最新版本，并可能加锁。很多锁等待问题都发生在当前读上，尤其是范围更新、缺少索引的更新和删除。</p>
+<h3 id="84-行锁间隙锁与-next-key-lock">8.4 行锁、间隙锁与 Next-Key Lock</h3>
+<p>InnoDB 的锁加在索引上。常见锁包括：</p>
+<ul>
+<li>Record Lock：锁住索引记录。</li>
+<li>Gap Lock：锁住索引记录之间的间隙。</li>
+<li>Next-Key Lock：Record Lock + Gap Lock。</li>
+</ul>
+<p>由此可以得到以下结论：</p>
+<ul>
+<li>没有合适索引时，更新可能扫描大量记录，锁范围被放大。</li>
+<li>范围条件在 RR 下可能产生间隙锁。</li>
+<li>唯一索引等值命中时，锁范围通常更小。</li>
+</ul>
+<p>排查锁等待可以看：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#F97583">SELECT</span><span style="color:#F97583"> *</span></span>
+<span class="line"><span style="color:#F97583">FROM</span><span style="color:#79B8FF"> sys</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">innodb_lock_waits</span><span style="color:#E1E4E8">\G</span></span></code></pre>
+<h2 id="9-查询执行引擎与执行计划">9. 查询执行引擎与执行计划</h2>
+<p>执行计划是连接 SQL 文本与存储引擎执行行为之间的关键证据。它并不等同于最终运行结果，但能够揭示优化器选择的访问路径、连接顺序、扫描规模和额外操作。</p>
+<h3 id="91-sql-执行流程">9.1 SQL 执行流程</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>客户端发送 SQL</span></span>
+<span class="line"><span>  ↓</span></span>
+<span class="line"><span>连接器处理连接和权限</span></span>
+<span class="line"><span>  ↓</span></span>
+<span class="line"><span>解析器做词法、语法分析</span></span>
+<span class="line"><span>  ↓</span></span>
+<span class="line"><span>预处理器检查表、字段、权限</span></span>
+<span class="line"><span>  ↓</span></span>
+<span class="line"><span>优化器选择执行计划</span></span>
+<span class="line"><span>  ↓</span></span>
+<span class="line"><span>执行器调用 InnoDB 接口</span></span>
+<span class="line"><span>  ↓</span></span>
+<span class="line"><span>InnoDB 读取索引页和数据页</span></span>
+<span class="line"><span>  ↓</span></span>
+<span class="line"><span>返回结果</span></span></code></pre>
+<p>优化器依赖统计信息估算成本。统计信息不准、字段分布倾斜、参数差异大时，优化器可能选错索引。此时可以考虑 <code>ANALYZE TABLE</code> 更新统计信息，但生产上要评估影响。</p>
+<h3 id="92-explain-重点字段">9.2 EXPLAIN 重点字段</h3>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>关注点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>type</code></td>
+<td>访问类型，判断是全表扫描、范围扫描还是等值索引</td>
+</tr>
+<tr>
+<td><code>key</code></td>
+<td>实际使用的索引</td>
+</tr>
+<tr>
+<td><code>rows</code></td>
+<td>预估扫描行数</td>
+</tr>
+<tr>
+<td><code>filtered</code></td>
+<td>过滤后剩余比例</td>
+</tr>
+<tr>
+<td><code>Extra</code></td>
+<td>是否排序、临时表、覆盖索引、索引条件下推</td>
+</tr>
+</tbody>
+</table>
+<p>常见访问类型：</p>
+<table>
+<thead>
+<tr>
+<th>type</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ALL</code></td>
+<td>全表扫描</td>
+</tr>
+<tr>
+<td><code>index</code></td>
+<td>全索引扫描</td>
+</tr>
+<tr>
+<td><code>range</code></td>
+<td>范围扫描</td>
+</tr>
+<tr>
+<td><code>ref</code></td>
+<td>非唯一索引等值查询</td>
+</tr>
+<tr>
+<td><code>eq_ref</code></td>
+<td>JOIN 中通过唯一索引匹配一行</td>
+</tr>
+<tr>
+<td><code>const</code></td>
+<td>主键或唯一索引常量查询</td>
+</tr>
+</tbody>
+</table>
+<p>常见 <code>Extra</code>：</p>
+<table>
+<thead>
+<tr>
+<th>Extra</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Using index</code></td>
+<td>覆盖索引，不需要回表</td>
+</tr>
+<tr>
+<td><code>Using where</code></td>
+<td>存储引擎返回后仍需过滤</td>
+</tr>
+<tr>
+<td><code>Using index condition</code></td>
+<td>索引条件下推</td>
+</tr>
+<tr>
+<td><code>Using filesort</code></td>
+<td>需要额外排序</td>
+</tr>
+<tr>
+<td><code>Using temporary</code></td>
+<td>使用临时表</td>
+</tr>
+</tbody>
+</table>
+<h3 id="93-explain-analyze">9.3 EXPLAIN ANALYZE</h3>
+<p>MySQL 8.0 支持：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#E1E4E8">EXPLAIN ANALYZE </span><span style="color:#F97583">SELECT</span><span style="color:#E1E4E8"> ...</span></span></code></pre>
+<p>它会实际执行 SQL，并输出每个执行节点的真实耗时和行数。它比普通 <code>EXPLAIN</code> 更接近真实情况，但也因为会执行 SQL，生产环境要谨慎使用。</p>
+<h2 id="10-sql-优化实战">10. SQL 优化实战</h2>
+<h3 id="101-避免-select-">10.1 避免 <code>SELECT *</code></h3>
+<p><code>SELECT *</code> 的问题：</p>
+<ul>
+<li>读取不必要字段，增加 IO 和网络传输。</li>
+<li>大字段可能触发额外页读取。</li>
+<li>无法使用覆盖索引。</li>
+<li>表结构变化可能影响应用。</li>
+</ul>
+<p>列表页、接口响应、导出任务都应该明确字段。</p>
+<h3 id="102-深分页">10.2 深分页</h3>
+<p>典型慢查询：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#F97583">SELECT</span><span style="color:#F97583"> *</span></span>
+<span class="line"><span style="color:#F97583">FROM</span><span style="color:#E1E4E8"> orders</span></span>
+<span class="line"><span style="color:#F97583">ORDER BY</span><span style="color:#E1E4E8"> id</span></span>
+<span class="line"><span style="color:#F97583">LIMIT</span><span style="color:#79B8FF"> 1000000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">20</span><span style="color:#E1E4E8">;</span></span></code></pre>
+<p>数据库需要跳过前 1000000 行，再返回 20 行。更好的方式是游标分页：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#F97583">SELECT</span><span style="color:#F97583"> *</span></span>
+<span class="line"><span style="color:#F97583">FROM</span><span style="color:#E1E4E8"> orders</span></span>
+<span class="line"><span style="color:#F97583">WHERE</span><span style="color:#E1E4E8"> id </span><span style="color:#F97583">></span><span style="color:#E1E4E8"> ?</span></span>
+<span class="line"><span style="color:#F97583">ORDER BY</span><span style="color:#E1E4E8"> id</span></span>
+<span class="line"><span style="color:#F97583">LIMIT</span><span style="color:#79B8FF"> 20</span><span style="color:#E1E4E8">;</span></span></code></pre>
+<p>如果业务必须支持跳页，可以考虑缓存页码边界、搜索引擎或调整交互方式。</p>
+<h3 id="103-join-优化">10.3 JOIN 优化</h3>
+<p>JOIN 优化重点：</p>
+<ul>
+<li>小结果集驱动大表。</li>
+<li>被驱动表的 JOIN 字段要有索引。</li>
+<li>尽量先过滤再 JOIN。</li>
+<li>控制返回字段，避免宽行 JOIN。</li>
+</ul>
+<p>示例：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#F97583">SELECT</span><span style="color:#79B8FF"> o</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">id</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">o</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">amount</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">u</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">name</span></span>
+<span class="line"><span style="color:#F97583">FROM</span><span style="color:#E1E4E8"> orders o</span></span>
+<span class="line"><span style="color:#F97583">JOIN</span><span style="color:#E1E4E8"> users u </span><span style="color:#F97583">ON</span><span style="color:#79B8FF"> u</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">id</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> o</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">user_id</span></span>
+<span class="line"><span style="color:#F97583">WHERE</span><span style="color:#79B8FF"> o</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">status</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> ?</span></span>
+<span class="line"><span style="color:#F97583">  AND</span><span style="color:#79B8FF"> o</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">create_time</span><span style="color:#F97583"> >=</span><span style="color:#E1E4E8"> ?;</span></span></code></pre>
+<p>这里 <code>orders</code> 应该能通过合适索引先缩小范围，<code>users.id</code> 是主键，JOIN 成本才可控。</p>
+<h3 id="104-排序与分组">10.4 排序与分组</h3>
+<p><code>ORDER BY</code> 和 <code>GROUP BY</code> 如果不能利用索引，可能产生 filesort 或临时表。</p>
+<p>优化方向：</p>
+<ul>
+<li>让索引顺序匹配过滤条件和排序字段。</li>
+<li>先过滤再排序。</li>
+<li>高频统计用汇总表或离线预聚合。</li>
+<li>大报表不要直接扫在线业务明细表。</li>
+</ul>
+<h2 id="11-线上排查路径">11. 线上排查路径</h2>
+<h3 id="111-个别-sql-慢">11.1 个别 SQL 慢</h3>
+<p>排查顺序：</p>
+<ol>
+<li>从阿里云慢 SQL 监控拿 SQL、耗时、扫描行数、执行次数。</li>
+<li>查表结构、索引、数据量。</li>
+<li>使用 <code>EXPLAIN</code> 分析执行计划。</li>
+<li>判断是否全表扫描、排序、临时表、索引选择错误。</li>
+<li>检查是否有锁等待。</li>
+<li>改 SQL 或索引。</li>
+<li>验证执行计划和耗时。</li>
+</ol>
+<h3 id="112-所有-sql-都慢">11.2 所有 SQL 都慢</h3>
+<p>如果所有 SQL 都变慢，往往不是单条 SQL 的问题：</p>
+<ul>
+<li>CPU 是否被打满。</li>
+<li>磁盘 IO 是否打满。</li>
+<li>Buffer Pool 命中率是否下降。</li>
+<li>连接数是否打满。</li>
+<li>是否有长事务。</li>
+<li>是否有 DDL 等待 MDL 锁。</li>
+<li>主从延迟是否异常。</li>
+</ul>
+<p>一种典型传导链路是：新上线 SQL 触发全表扫描，磁盘 IO 被快速耗尽，Buffer Pool 热数据被污染，随后正常 SQL 的响应时间也被整体拉高。</p>
+<h3 id="113-cpu-飙高">11.3 CPU 飙高</h3>
+<p>先看当前活跃 SQL：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#F97583">SELECT</span><span style="color:#F97583"> *</span></span>
+<span class="line"><span style="color:#F97583">FROM</span><span style="color:#79B8FF"> information_schema</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">PROCESSLIST</span></span>
+<span class="line"><span style="color:#F97583">WHERE</span><span style="color:#E1E4E8"> COMMAND </span><span style="color:#F97583">!=</span><span style="color:#9ECBFF"> 'Sleep'</span></span>
+<span class="line"><span style="color:#F97583">ORDER BY</span><span style="color:#F97583"> TIME</span><span style="color:#F97583"> DESC</span></span>
+<span class="line"><span style="color:#F97583">LIMIT</span><span style="color:#79B8FF"> 20</span><span style="color:#E1E4E8">;</span></span></code></pre>
+<p>如果某类 SQL 大量堆积且确认有问题，可以先在业务层限流、回滚发布或临时 kill 相关线程。根因通常包括缺索引、复杂排序、复杂 JOIN、函数计算、锁竞争。</p>
+<h2 id="12-专题后续展开方向">12. 专题后续展开方向</h2>
+<p>本文作为数据库专题的总论，后续可以沿以下方向展开为独立文章：</p>
+<ol>
+<li><strong>慢 SQL 分析实战</strong>：慢查询日志、<code>EXPLAIN</code>、<code>EXPLAIN ANALYZE</code>、<code>performance_schema</code>。</li>
+<li><strong>索引设计方法论</strong>：联合索引、覆盖索引、索引下推、最左前缀、冗余索引。</li>
+<li><strong>执行计划详解</strong>：系统解释 <code>type</code>、<code>key</code>、<code>rows</code>、<code>filtered</code>、<code>Extra</code> 等字段的工程含义。</li>
+<li><strong>事务与锁</strong>：MVCC、ReadView、Next-Key Lock、死锁、长事务。</li>
+<li><strong>InnoDB 存储机制</strong>：页、行格式、Buffer Pool、Change Buffer、AHI。</li>
+<li><strong>日志系统</strong>：Redo Log、Undo Log、Binlog、两阶段提交、崩溃恢复。</li>
+<li><strong>大表治理</strong>：冷热分离、归档、分区表、在线 DDL。</li>
+<li><strong>数据库架构演进</strong>：读写分离、分库分表、TiDB、ES、OLAP。</li>
+</ol>
+<p>这样组织后，数据库专题会从“零散知识点”变成一条清晰路线：先能分析慢 SQL，再理解索引和执行计划，最后补上 InnoDB 内核和架构治理。</p>
+<h2 id="13-常用诊断-sql">13. 常用诊断 SQL</h2>
+<p>用于观察当前正在执行的 SQL：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#F97583">SELECT</span><span style="color:#F97583"> *</span></span>
+<span class="line"><span style="color:#F97583">FROM</span><span style="color:#79B8FF"> information_schema</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">PROCESSLIST</span></span>
+<span class="line"><span style="color:#F97583">WHERE</span><span style="color:#E1E4E8"> COMMAND </span><span style="color:#F97583">!=</span><span style="color:#9ECBFF"> 'Sleep'</span></span>
+<span class="line"><span style="color:#F97583">ORDER BY</span><span style="color:#F97583"> TIME</span><span style="color:#F97583"> DESC</span></span>
+<span class="line"><span style="color:#F97583">LIMIT</span><span style="color:#79B8FF"> 20</span><span style="color:#E1E4E8">;</span></span></code></pre>
+<p>用于分析锁等待关系：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#F97583">SELECT</span><span style="color:#F97583"> *</span></span>
+<span class="line"><span style="color:#F97583">FROM</span><span style="color:#79B8FF"> sys</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">innodb_lock_waits</span><span style="color:#E1E4E8">\G</span></span></code></pre>
+<p>用于识别长事务：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#F97583">SELECT</span><span style="color:#E1E4E8"> trx_id,</span></span>
+<span class="line"><span style="color:#E1E4E8">       trx_state,</span></span>
+<span class="line"><span style="color:#E1E4E8">       trx_started,</span></span>
+<span class="line"><span style="color:#E1E4E8">       TIMESTAMPDIFF(</span><span style="color:#F97583">SECOND</span><span style="color:#E1E4E8">, trx_started, </span><span style="color:#F97583">NOW</span><span style="color:#E1E4E8">()) </span><span style="color:#F97583">AS</span><span style="color:#E1E4E8"> duration_sec,</span></span>
+<span class="line"><span style="color:#E1E4E8">       trx_query</span></span>
+<span class="line"><span style="color:#F97583">FROM</span><span style="color:#79B8FF"> information_schema</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">INNODB_TRX</span></span>
+<span class="line"><span style="color:#F97583">ORDER BY</span><span style="color:#E1E4E8"> trx_started </span><span style="color:#F97583">ASC</span><span style="color:#E1E4E8">;</span></span></code></pre>
+<p>用于检查冗余索引：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#F97583">SELECT</span><span style="color:#F97583"> *</span></span>
+<span class="line"><span style="color:#F97583">FROM</span><span style="color:#79B8FF"> sys</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">schema_redundant_indexes</span><span style="color:#E1E4E8">;</span></span></code></pre>
+<p>用于检查未使用索引：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#F97583">SELECT</span><span style="color:#F97583"> *</span></span>
+<span class="line"><span style="color:#F97583">FROM</span><span style="color:#79B8FF"> sys</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">schema_unused_indexes</span><span style="color:#E1E4E8">;</span></span></code></pre>
+<p>用于评估表与索引空间占用：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#F97583">SELECT</span><span style="color:#E1E4E8"> table_name,</span></span>
+<span class="line"><span style="color:#79B8FF">       ROUND</span><span style="color:#E1E4E8">(data_length </span><span style="color:#F97583">/</span><span style="color:#79B8FF"> 1024</span><span style="color:#F97583"> /</span><span style="color:#79B8FF"> 1024</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">AS</span><span style="color:#E1E4E8"> data_mb,</span></span>
+<span class="line"><span style="color:#79B8FF">       ROUND</span><span style="color:#E1E4E8">(index_length </span><span style="color:#F97583">/</span><span style="color:#79B8FF"> 1024</span><span style="color:#F97583"> /</span><span style="color:#79B8FF"> 1024</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">AS</span><span style="color:#E1E4E8"> index_mb,</span></span>
+<span class="line"><span style="color:#E1E4E8">       table_rows</span></span>
+<span class="line"><span style="color:#F97583">FROM</span><span style="color:#79B8FF"> information_schema</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">TABLES</span></span>
+<span class="line"><span style="color:#F97583">WHERE</span><span style="color:#E1E4E8"> table_schema </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> 'your_db'</span></span>
+<span class="line"><span style="color:#F97583">ORDER BY</span><span style="color:#E1E4E8"> data_length </span><span style="color:#F97583">DESC</span><span style="color:#E1E4E8">;</span></span></code></pre>
+<h2 id="14-结论">14. 结论</h2>
+<p>数据库优化并非若干孤立技巧的简单集合，而是一套证据驱动的闭环能力：通过监控发现问题，通过执行计划定位瓶颈，通过存储引擎机制解释成本，通过可控变更验证效果，并通过持续治理降低问题复发概率。</p>
+<p>对于应用开发者而言，慢 SQL 分析、执行计划阅读和索引设计应当构成数据库能力的第一层基础。在此基础上继续深入 Buffer Pool、Redo / Undo Log、MVCC、锁机制、大表治理和数据库架构演进，才能形成相对完整的 MySQL 性能优化体系。</p>
+</div></article></main><footer data-astro-cid-jo6i4kqk><div data-astro-cid-jo6i4kqk>Goppop 的博客</div><p data-astro-cid-jo6i4kqk>&copy; 2026 Goppop. 记录技术学习、系统设计和长期思考。</p></footer></body></html>
